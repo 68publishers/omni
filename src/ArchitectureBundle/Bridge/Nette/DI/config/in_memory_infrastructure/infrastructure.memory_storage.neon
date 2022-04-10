@@ -1,0 +1,9 @@
+services:
+	infrastructure.memory_storage:
+		autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemoryStorageInterface
+		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemoryStorageInterface
+		factory: @extension.infrastructure.memory_storage.default
+
+	infrastructure.memory_storage.default:
+		autowired: no
+		factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemoryStorage

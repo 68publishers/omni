@@ -1,0 +1,4 @@
+services:
+	event_bus:
+		type: SixtyEightPublishers\ArchitectureBundle\Bus\EventBusInterface
+		factory: SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Bus\EventBus(@%68publishers.architecture_bundle.extension_name%.messenger.event_bus.bus)

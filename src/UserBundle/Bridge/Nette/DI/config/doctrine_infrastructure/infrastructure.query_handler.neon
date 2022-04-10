@@ -1,0 +1,20 @@
+services:
+	infrastructure.query_handler.get_credentials:
+		autowired: no
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetCredentialsQueryHandler
+
+	infrastructure.query_handler.get_identity:
+		autowired: no
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetIdentityQueryHandler
+
+	infrastructure.query_handler.get_user_by_email_address:
+		autowired: no
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetUserByEmailAddressQueryHandler
+
+	infrastructure.query_handler.get_user_by_id:
+		autowired: no
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetUserByIdQueryHandler
+
+	infrastructure.query_handler.get_user_by_username:
+		autowired: no
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetUserByUsernameQueryHandler

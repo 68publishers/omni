@@ -1,0 +1,6 @@
+services:
+	sendersLocator:
+		autowired: no
+
+	stamp_based_senders_locator:
+		factory: SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Transport\StampBasedSendersLocator(@extension.sendersLocator)

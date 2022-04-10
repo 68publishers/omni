@@ -1,0 +1,9 @@
+services:
+	infrastructure.repository:
+		autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface
+		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface
+		factory: @extension.infrastructure.repository.in_memory
+
+	infrastructure.repository.in_memory:
+		autowired: no
+		factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\Repository\InMemoryAggregateRootRepository

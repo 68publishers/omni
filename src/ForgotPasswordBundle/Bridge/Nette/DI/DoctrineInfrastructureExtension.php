@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace SixtyEightPublishers\ForgotPasswordBundle\Bridge\Nette\DI;
+
+use Nette\DI\CompilerExtension;
+use SixtyEightPublishers\DoctrineBridge\DI\TargetEntity;
+use SixtyEightPublishers\DoctrineBridge\DI\DatabaseTypeProviderInterface;
+use SixtyEightPublishers\DoctrineBridge\DI\TargetEntityProviderInterface;
+use SixtyEightPublishers\DoctrineBridge\DI\EntityMappingProviderInterface;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\AutoRegisterDoctrineTypesTrait;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\AutoRegisterDoctrineXmlMappingTrait;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\DoctrineInfrastructureExtension as MainDoctrineInfrastructureExtension;
+
+final class DoctrineInfrastructureExtension extends CompilerExtension implements InfrastructureExtensionInterface, DatabaseTypeProviderInterface, TargetEntityProviderInterface, EntityMappingProviderInterface
+{
+	use CompilerExtensionUtilsTrait;
+	use AutoRegisterDoctrineTypesTrait;
+	use AutoRegisterDoctrineXmlMappingTrait;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function loadConfiguration(): void
+	{
+		$this->requireCompilerExtension(MainDoctrineInfrastructureExtension::class);
+		$this->requireCompilerExtension(ForgotPasswordBundleExtension::class);
+		$this->checkCompilerExtensionConcurrency(InfrastructureExtensionInterface::class);
+		$this->loadConfigurationDir(__DIR__ . '/config/doctrine_infrastructure');
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getTargetEntities(): array
+	{
+		$userBundleExtension = $this->requireCompilerExtension(ForgotPasswordBundleExtension::class);
+		assert($userBundleExtension instanceof ForgotPasswordBundleExtension);
+
+		$classname = $userBundleExtension->getConfig()->entity_classname->password_request;
+
+		if (PasswordRequest::class === $classname) {
+			return [];
+		}
+
+		return [
+			new TargetEntity(PasswordRequest::class, $classname),
+		];
+	}
+}

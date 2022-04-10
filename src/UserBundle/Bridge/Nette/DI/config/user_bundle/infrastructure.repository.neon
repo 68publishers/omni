@@ -1,0 +1,11 @@
+services:
+	infrastructure.repository.user:
+		autowired: SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface
+		type: SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface
+		factory: @extension.infrastructure.repository.user.default
+
+	infrastructure.repository.user.default:
+		autowired: no
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Repository\UserRepository
+		arguments:
+			classname: %68publishers.user_bundle.entity_classname.user%

@@ -1,0 +1,9 @@
+services:
+	infrastructure.store_adapter:
+		autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface
+		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface
+		factory: @extension.infrastructure.store_adapter.doctrine
+
+	infrastructure.store_adapter.doctrine:
+		autowired: no
+		factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\StoreAdapter\DoctrineStoreAdapter

@@ -1,0 +1,11 @@
+services:
+	infrastructure.repository.password_request:
+		autowired: SixtyEightPublishers\ForgotPasswordBundle\Domain\Repository\PasswordRequestRepositoryInterface
+		type: SixtyEightPublishers\ForgotPasswordBundle\Domain\Repository\PasswordRequestRepositoryInterface
+		factory: @extension.infrastructure.repository.password_request.default
+
+	infrastructure.repository.password_request.default:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Repository\PasswordRequestRepository
+		arguments:
+			classname: %68publishers.forgot_password_bundle.entity_classname.password_request%

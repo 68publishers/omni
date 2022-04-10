@@ -1,0 +1,4 @@
+services:
+	infrastructure.query_handler.find_requested_password_changes:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\QueryHandler\FindRequestedPasswordChangesQueryHandler

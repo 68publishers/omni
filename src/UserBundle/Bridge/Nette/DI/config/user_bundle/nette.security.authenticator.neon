@@ -1,0 +1,11 @@
+services:
+	nette.security.authenticator:
+		autowired:
+			- Nette\Security\Authenticator
+			- Nette\Security\IAuthenticator
+		type: Nette\Security\Authenticator
+		factory: @extension.nette.security.authenticator.default
+
+	nette.security.authenticator.default:
+		autowired: no
+		factory: SixtyEightPublishers\UserBundle\Bridge\Nette\Security\Authenticator

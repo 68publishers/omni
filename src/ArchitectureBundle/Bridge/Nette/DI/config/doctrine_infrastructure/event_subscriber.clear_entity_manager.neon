@@ -1,0 +1,3 @@
+services:
+	event_subscriber.clear_entity_manager_worker:
+		type: SixtyEightPublishers\ArchitectureBundle\Bridge\Doctrine\EventSubscriber\ClearEntityManagerWorkerSubscriber

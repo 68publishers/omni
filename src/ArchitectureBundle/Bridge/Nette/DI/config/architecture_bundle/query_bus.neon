@@ -1,0 +1,4 @@
+services:
+	query_bus:
+		type: SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface
+		factory: SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Bus\QueryBus(@%68publishers.architecture_bundle.extension_name%.messenger.query_bus.bus)

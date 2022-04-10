@@ -1,0 +1,4 @@
+services:
+	application.event_handler.cancel_previous_password_requests:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Application\EventHandler\CancelPreviousPasswordRequestsEventHandler

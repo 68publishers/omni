@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate;
+
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+
+interface AggregateRootInterface
+{
+	/**
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId
+	 */
+	public function aggregateId(): AggregateId;
+
+	/**
+	 * @return int
+	 */
+	public function version(): int;
+
+	/**
+	 * @internal
+	 *
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent[]
+	 */
+	public function popRecordedEvents(): array;
+}

@@ -1,0 +1,37 @@
+{
+	"name": "68publishers/omni",
+	"description": "Awesome bundles for Nette framework based on DDD, CQRS and ES.",
+	"keywords": ["68publishers", "omni", "nette"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Tomáš Glawaty",
+			"email": "tomasglawaty@icloud.com"
+		}
+	],
+	"require": {
+		"php": "^7.4",
+		"ext-json": "*",
+		"fmasa/messenger": "^2.0",
+		"nette/di": "^3.0.3",
+		"nette/security": "^3.1",
+		"ramsey/uuid": "^4.1"
+	},
+	"require-dev": {
+		"68publishers/doctrine-bridge": "^0.2.1",
+		"doctrine/migrations": "^3.5",
+		"doctrine/orm": "^2.12",
+		"friendsofphp/php-cs-fixer": "^2.19",
+		"roave/security-advisories": "dev-latest"
+	},
+	"config": {
+		"sort-packages": true
+	},
+	"autoload": {
+		"psr-4": {
+			"SixtyEightPublishers\\ArchitectureBundle\\": "src/ArchitectureBundle/",
+			"SixtyEightPublishers\\UserBundle\\": "src/UserBundle/",
+			"SixtyEightPublishers\\ForgotPasswordBundle\\": "src/ForgotPasswordBundle/"
+		}
+	}
+}
