@@ -1,0 +1,9 @@
+services:
+	infrastructure.collection.flash_message:
+		autowired: SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessageCollectionInterface
+		type: SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessageCollectionInterface
+		factory: @extension.infrastructure.collection.flash_message.nette_session
+
+	infrastructure.collection.flash_message.nette_session:
+		autowired: no
+		factory: SixtyEightPublishers\FlashMessageBundle\Infrastructure\NetteSession\NetteSessionFlashMessageCollection

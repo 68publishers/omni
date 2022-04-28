@@ -8,6 +8,8 @@ use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\DI\CompilerExtension;
 use Nette\InvalidArgumentException;
+use Nette\Bridges\HttpDI\HttpExtension;
+use Nette\Bridges\SecurityDI\SecurityExtension;
 use SixtyEightPublishers\UserBundle\Domain\Aggregate\User;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\ArchitectureBundleExtension;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
@@ -45,6 +47,8 @@ final class UserBundleExtension extends CompilerExtension
 	{
 		$this->requireCompilerExtension(ArchitectureBundleExtension::class);
 		$this->requireCompilerExtension(InfrastructureExtensionInterface::class);
+		$this->requireCompilerExtension(SecurityExtension::class);
+		$this->requireCompilerExtension(HttpExtension::class);
 
 		$this->setBundleParameter('entity_classname', [
 			'user' => $this->config->entity_classname->user,

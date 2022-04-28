@@ -1,0 +1,40 @@
+{templateType SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageTemplate}
+
+{snippet messages}
+    <script n:nonce type="text/javascript">
+        {foreach $messages as $message}
+            {var $type = $message->type()}
+            {var $messagePhrase = $message->message()}
+            {var $titlePhrase = $message->title()}
+
+            {capture $messageText}
+                {if empty($messagePhrase->args())}
+                    {_$messagePhrase->text()}
+                {else}
+                    {_$messagePhrase->text(), ...$messagePhrase->args()}
+                {/if}
+            {/capture}
+
+            {capture $messageTitle}
+                {if NULL !== $titlePhrase && empty($titlePhrase->args())}
+                    {_$titlePhrase->text()}
+                {elseif NULL !== $titlePhrase}
+                    {_$titlePhrase->text(), ...$titlePhrase->args()}
+                {/if}
+            {/capture}
+
+            {switch TRUE}
+                {case $type->is($type::INFO)}
+                    toastr.info({$messageText}, {$messageTitle});
+                {case $type->is($type::WARNING)}
+                    toastr.warning({$messageText}, {$messageTitle});
+                {case $type->is($type::SUCCESS)}
+                    toastr.success({$messageText}, {$messageTitle});
+                {case $type->is($type::ERROR)}
+                    toastr.error({$messageText}, {$messageTitle});
+            {/switch}
+
+            {do $expireFlashMessage($message)}
+        {/foreach}
+    </script>
+{/snippet}
