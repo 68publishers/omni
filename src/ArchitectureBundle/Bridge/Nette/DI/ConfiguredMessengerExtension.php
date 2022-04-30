@@ -14,9 +14,13 @@ use Nette\DI\Definitions\Statement;
 use Fmasa\Messenger\DI\TransportConfig;
 use Fmasa\Messenger\DI\SerializerConfig;
 use Fmasa\Messenger\DI\MessengerExtension;
+use Nette\DI\Extensions\DecoratorExtension;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use SixtyEightPublishers\ArchitectureBundle\Event\EventHandlerInterface;
+use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
+use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterface;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\StoreTransactionMiddleware;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\OriginalExceptionMiddleware;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\StorePingConnectionMiddleware;
@@ -110,6 +114,28 @@ final class ConfiguredMessengerExtension extends CompilerExtension
 	 */
 	public function beforeCompile(): void
 	{
+		$decoratorExtension = $this->requireCompilerExtension(DecoratorExtension::class);
+
+		assert($decoratorExtension instanceof DecoratorExtension);
+
+		$decoratorExtension->addTags(CommandHandlerInterface::class, [
+			'messenger.messageHandler' => [
+				'bus' => self::COMMAND_BUS_NAME,
+			],
+		]);
+
+		$decoratorExtension->addTags(QueryHandlerInterface::class, [
+			'messenger.messageHandler' => [
+				'bus' => self::QUERY_BUS_NAME,
+			],
+		]);
+
+		$decoratorExtension->addTags(EventHandlerInterface::class, [
+			'messenger.messageHandler' => [
+				'bus' => self::EVENT_BUS_NAME,
+			],
+		]);
+
 		$this->extension->beforeCompile();
 	}
 

@@ -6,10 +6,6 @@ namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI;
 
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
-use Nette\DI\Extensions\DecoratorExtension;
-use SixtyEightPublishers\ArchitectureBundle\Event\EventHandlerInterface;
-use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
-use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterface;
 
 final class ArchitectureBundleExtension extends CompilerExtension
 {
@@ -37,33 +33,5 @@ final class ArchitectureBundleExtension extends CompilerExtension
 		$this->requireCompilerExtension(InfrastructureExtensionInterface::class);
 		$this->setBundleParameter('extension_name', $this->name);
 		$this->loadConfigurationDir(__DIR__ . '/config/architecture_bundle');
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function beforeCompile(): void
-	{
-		$decoratorExtension = $this->requireCompilerExtension(DecoratorExtension::class);
-
-		assert($decoratorExtension instanceof DecoratorExtension);
-
-		$decoratorExtension->addTags(CommandHandlerInterface::class, [
-			'messenger.messageHandler' => [
-				'bus' => ConfiguredMessengerExtension::COMMAND_BUS_NAME,
-			],
-		]);
-
-		$decoratorExtension->addTags(QueryHandlerInterface::class, [
-			'messenger.messageHandler' => [
-				'bus' => ConfiguredMessengerExtension::QUERY_BUS_NAME,
-			],
-		]);
-
-		$decoratorExtension->addTags(EventHandlerInterface::class, [
-			'messenger.messageHandler' => [
-				'bus' => ConfiguredMessengerExtension::EVENT_BUS_NAME,
-			],
-		]);
 	}
 }
