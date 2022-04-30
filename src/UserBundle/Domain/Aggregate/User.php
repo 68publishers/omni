@@ -11,20 +11,20 @@ use SixtyEightPublishers\UserBundle\Domain\Dto\Roles;
 use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use SixtyEightPublishers\UserBundle\Domain\Dto\Password;
 use SixtyEightPublishers\UserBundle\Domain\Dto\Username;
-use SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddress;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserCreated;
 use SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword;
-use SixtyEightPublishers\UserBundle\Domain\Dto\ValidEmailAddress;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserNameChanged;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserRolesChanged;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress;
 use SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand;
 use SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand;
-use SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserPasswordChanged;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserUsernameChanged;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\ValidEmailAddress;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserEmailAddressChanged;
 use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\DeletableAggregateRootTrait;
 
@@ -129,7 +129,7 @@ class User implements AggregateRootInterface
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface $emailAddress
 	 *
 	 * @return void
 	 */

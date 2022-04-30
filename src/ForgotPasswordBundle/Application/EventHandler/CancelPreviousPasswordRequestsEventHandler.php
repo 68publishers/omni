@@ -36,7 +36,7 @@ final class CancelPreviousPasswordRequestsEventHandler implements EventHandlerIn
 	 */
 	public function __invoke(PasswordChangeRequested $event): void
 	{
-		foreach ($this->queryBus->dispatch(FindRequestedPasswordChangesQuery::create($event->userId()->toString())) as $batch) {
+		foreach ($this->queryBus->dispatch(FindRequestedPasswordChangesQuery::create($event->emailAddress()->value())) as $batch) {
 			assert($batch instanceof Batch);
 
 			foreach ($batch as $item) {

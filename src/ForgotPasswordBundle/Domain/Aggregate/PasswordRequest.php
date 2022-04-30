@@ -7,19 +7,21 @@ namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate;
 use Exception;
 use DateTimeZone;
 use DateTimeImmutable;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\Status;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\IpAddress;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\UserAgent;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\ValidIpAddress;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\ValidEmailAddress;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootTrait;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeCanceled;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeCompleted;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeRequested;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootInterface;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\CheckEmailAddressExistsInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\CancelPasswordRequestCommand;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\RequestPasswordChangeCommand;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\CompletePasswordRequestCommand;
@@ -33,7 +35,7 @@ class PasswordRequest implements AggregateRootInterface
 
 	protected PasswordRequestId $id;
 	
-	protected UserId $userId;
+	protected EmailAddressInterface $emailAddress;
 
 	protected Status $status;
 
@@ -50,24 +52,27 @@ class PasswordRequest implements AggregateRootInterface
 	/**
 	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\RequestPasswordChangeCommand       $command
 	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\PasswordRequestExpirationProviderInterface $expirationProvider
+	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\CheckEmailAddressExistsInterface           $checkEmailAddressExists
 	 *
 	 * @return static
 	 * @throws \Exception
 	 */
-	public static function requestPasswordChange(RequestPasswordChangeCommand $command, PasswordRequestExpirationProviderInterface $expirationProvider): self
+	public static function requestPasswordChange(RequestPasswordChangeCommand $command, PasswordRequestExpirationProviderInterface $expirationProvider, CheckEmailAddressExistsInterface $checkEmailAddressExists): self
 	{
 		$passwordRequest = new self();
 
 		$passwordRequestId = NULL !== $command->passwordRequestId() ? PasswordRequestId::fromString($command->passwordRequestId()) : PasswordRequestId::new();
-		$userId = UserId::fromString($command->userId());
+		$emailAddress = ValidEmailAddress::fromValue($command->emailAddress());
 		$deviceInfo = DeviceInfo::create(
 			ValidIpAddress::fromValue($command->ipAddress(), TRUE),
 			UserAgent::fromValue($command->userAgent())
 		);
 
+		$checkEmailAddressExists($emailAddress);
+
 		$passwordRequest->recordThat(PasswordChangeRequested::create(
 			$passwordRequestId,
-			$userId,
+			$emailAddress,
 			$deviceInfo,
 			$expirationProvider->provideExpiration(new DateTimeImmutable('now', new DateTimeZone('UTC')))
 		));
@@ -108,7 +113,7 @@ class PasswordRequest implements AggregateRootInterface
 			UserAgent::fromValue($command->userAgent())
 		);
 
-		$this->recordThat(PasswordChangeCompleted::create($this->id, $deviceInfo));
+		$this->recordThat(PasswordChangeCompleted::create($this->id, $deviceInfo, $this->emailAddress, $command->password()));
 	}
 
 	/**
@@ -127,7 +132,7 @@ class PasswordRequest implements AggregateRootInterface
 			UserAgent::fromValue($command->userAgent())
 		);
 
-		$this->recordThat(PasswordChangeCanceled::create($this->id, $deviceInfo));
+		$this->recordThat(PasswordChangeCanceled::create($this->id, $deviceInfo, $this->emailAddress));
 	}
 
 	/**
@@ -146,7 +151,7 @@ class PasswordRequest implements AggregateRootInterface
 	protected function whenPasswordChangeRequested(PasswordChangeRequested $event): void
 	{
 		$this->id = $event->passwordRequestId();
-		$this->userId = $event->userId();
+		$this->emailAddress = $event->emailAddress();
 		$this->status = Status::REQUESTED();
 		$this->requestedAt = $event->createdAt();
 		$this->expiredAt = $event->expiredAt();

@@ -2,17 +2,11 @@ services:
 	application.command_handler.cancel_password_request:
 		autowired: no
 		factory: SixtyEightPublishers\ForgotPasswordBundle\Application\CommandHandler\CancelPasswordRequestCommandHandler
-		arguments:
-			commandConsistencyGuard: @extension.infrastructure.command_consistency_guard.password_request
 
 	application.command_handler.complete_password_request:
 		autowired: no
 		factory: SixtyEightPublishers\ForgotPasswordBundle\Application\CommandHandler\CompletePasswordRequestCommandHandler
-		arguments:
-			commandConsistencyGuard: @extension.infrastructure.command_consistency_guard.password_request
 
 	application.command_handler.request_password_change:
 		autowired: no
 		factory: SixtyEightPublishers\ForgotPasswordBundle\Application\CommandHandler\RequestPasswordChangeCommandHandler
-		arguments:
-			commandConsistencyGuard: @extension.infrastructure.command_consistency_guard.password_request

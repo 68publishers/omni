@@ -6,42 +6,43 @@ namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\Event;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\IpAddress;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\UserAgent;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 final class PasswordChangeRequested extends AbstractDomainEvent
 {
 	private PasswordRequestId $passwordRequestId;
 
-	private UserId $userId;
+	private EmailAddressInterface $emailAddress;
 
 	private DeviceInfo $requestDeviceInfo;
 
 	private DateTimeImmutable $expiredAt;
 
 	/**
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId $passwordRequestId
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId                      $userId
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo        $requestDeviceInfo
-	 * @param \DateTimeImmutable                                                      $expiredAt
+	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId   $passwordRequestId
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo          $requestDeviceInfo
+	 * @param \DateTimeImmutable                                                        $expiredAt
 	 *
 	 * @return static
 	 */
-	public static function create(PasswordRequestId $passwordRequestId, UserId $userId, DeviceInfo $requestDeviceInfo, DateTimeImmutable $expiredAt): self
+	public static function create(PasswordRequestId $passwordRequestId, EmailAddressInterface $emailAddress, DeviceInfo $requestDeviceInfo, DateTimeImmutable $expiredAt): self
 	{
 		$event = self::occur($passwordRequestId->toString(), [
-			'user_id' => $userId->toString(),
+			'email_address' => $emailAddress->value(),
 			'request_ip_address' => $requestDeviceInfo->ipAddress()->value(),
 			'request_user_agent' => $requestDeviceInfo->userAgent()->value(),
 			'expired_at' => $expiredAt->format(DateTimeInterface::ATOM),
 		]);
 
 		$event->passwordRequestId = $passwordRequestId;
-		$event->userId = $userId;
+		$event->emailAddress = $emailAddress;
 		$event->requestDeviceInfo = $requestDeviceInfo;
 		$event->expiredAt = $expiredAt;
 
@@ -57,11 +58,11 @@ final class PasswordChangeRequested extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\UserId
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface
 	 */
-	public function userId(): UserId
+	public function emailAddress(): EmailAddressInterface
 	{
-		return $this->userId;
+		return $this->emailAddress;
 	}
 
 	/**
@@ -88,7 +89,7 @@ final class PasswordChangeRequested extends AbstractDomainEvent
 	protected function reconstituteState(array $parameters): void
 	{
 		$this->passwordRequestId = PasswordRequestId::fromUuid($this->aggregateId()->id());
-		$this->userId = UserId::fromString($parameters['user_id']);
+		$this->emailAddress = EmailAddress::fromValue($parameters['email_address']);
 		$this->requestDeviceInfo = DeviceInfo::create(
 			IpAddress::fromValue($parameters['request_ip_address']),
 			UserAgent::fromValue($parameters['request_user_agent'])

@@ -8,9 +8,9 @@ use SixtyEightPublishers\UserBundle\Domain\Dto\Name;
 use SixtyEightPublishers\UserBundle\Domain\Dto\Roles;
 use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use SixtyEightPublishers\UserBundle\Domain\Dto\Username;
-use SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddress;
 use SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword;
-use SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 final class UserCreated extends AbstractDomainEvent
@@ -28,12 +28,12 @@ final class UserCreated extends AbstractDomainEvent
 	private Roles $roles;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId                $userId
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Username              $username
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword|NULL   $password
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface $emailAddress
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Name                  $name
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Roles                 $roles
+	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId                        $userId
+	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Username                      $username
+	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword|NULL           $password
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Name                          $name
+	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Roles                         $roles
 	 *
 	 * @return static
 	 */
@@ -83,7 +83,7 @@ final class UserCreated extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface
 	 */
 	public function emailAddress(): EmailAddressInterface
 	{

@@ -10,15 +10,17 @@ final class CompletePasswordRequestCommand extends AbstractCommand
 {
 	/**
 	 * @param string $passwordRequestId
+	 * @param string $password
 	 * @param string $ipAddress
 	 * @param string $userAgent
 	 *
 	 * @return static
 	 */
-	public static function create(string $passwordRequestId, string $ipAddress, string $userAgent): self
+	public static function create(string $passwordRequestId, string $password, string $ipAddress, string $userAgent): self
 	{
 		return self::fromParameters([
 			'password_request_id' => $passwordRequestId,
+			'password' => $password,
 			'ip_address' => $ipAddress,
 			'user_agent' => $userAgent,
 		]);
@@ -30,6 +32,14 @@ final class CompletePasswordRequestCommand extends AbstractCommand
 	public function passwordRequestId(): string
 	{
 		return $this->getParam('password_request_id');
+	}
+
+	/**
+	 * @return string
+	 */
+	public function password(): string
+	{
+		return $this->getParam('password');
 	}
 
 	/**

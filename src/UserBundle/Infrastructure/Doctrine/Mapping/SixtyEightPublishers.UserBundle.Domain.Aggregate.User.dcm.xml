@@ -17,7 +17,7 @@
 
         <field name="password" column="password" type="SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword" nullable="true" />
 
-        <field name="emailAddress" column="email_address" type="SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddress" unique="true" />
+        <field name="emailAddress" column="email_address" type="SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress" unique="true" />
 
         <embedded name="name" class="SixtyEightPublishers\UserBundle\Domain\Dto\Name" use-column-prefix="false" />
 

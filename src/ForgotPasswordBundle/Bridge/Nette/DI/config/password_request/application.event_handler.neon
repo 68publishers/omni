@@ -2,3 +2,7 @@ services:
 	application.event_handler.cancel_previous_password_requests:
 		autowired: no
 		factory: SixtyEightPublishers\ForgotPasswordBundle\Application\EventHandler\CancelPreviousPasswordRequestsEventHandler
+
+	application.event_handler.change_password_on_password_request_completed:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Application\EventHandler\ChangePasswordOnPasswordRequestCompletedEventHandler

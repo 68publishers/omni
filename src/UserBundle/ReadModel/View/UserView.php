@@ -10,8 +10,8 @@ use SixtyEightPublishers\UserBundle\Domain\Dto\Roles;
 use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use SixtyEightPublishers\UserBundle\Domain\Dto\Username;
 use SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword;
-use SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\AbstractView;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
 
 /**
  * @property-read UserId $id

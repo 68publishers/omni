@@ -12,22 +12,22 @@ use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\AbstractBatchedQuery
 final class FindRequestedPasswordChangesQuery extends AbstractBatchedQuery
 {
 	/**
-	 * @param string $userId
+	 * @param string $emailAddress
 	 *
 	 * @return static
 	 */
-	public static function create(string $userId): self
+	public static function create(string $emailAddress): self
 	{
 		return self::fromParameters([
-			'user_id' => $userId,
+			'email_address' => $emailAddress,
 		]);
 	}
 
 	/**
 	 * @return string
 	 */
-	public function userId(): string
+	public function emailAddress(): string
 	{
-		return $this->getParam('user_id');
+		return $this->getParam('email_address');
 	}
 }

@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View;
 
 use DateTimeImmutable;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\Status;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\AbstractView;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
 
 /**
  * @property-read PasswordRequestId $id
- * @property-read UserId $userId
+ * @property-read EmailAddressInterface $emailAddress
  * @property-read Status $status
  * @property-read DateTimeImmutable $requestedAt
  * @property-read DateTimeImmutable $expiredAt

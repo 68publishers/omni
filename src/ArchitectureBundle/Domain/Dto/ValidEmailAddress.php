@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\UserBundle\Domain\Dto;
+namespace SixtyEightPublishers\ArchitectureBundle\Domain\Dto;
 
 use Nette\Utils\Validators;
 use SixtyEightPublishers\UserBundle\Domain\Exception\EmailAddressException;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AbstractStringValueObject;
 
 final class ValidEmailAddress extends AbstractStringValueObject implements EmailAddressInterface
 {
@@ -23,7 +22,7 @@ final class ValidEmailAddress extends AbstractStringValueObject implements Email
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface $emailAddress
 	 *
 	 * @return static
 	 */

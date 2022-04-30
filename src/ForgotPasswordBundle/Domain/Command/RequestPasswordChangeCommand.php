@@ -9,17 +9,17 @@ use SixtyEightPublishers\ArchitectureBundle\Command\AbstractCommand;
 final class RequestPasswordChangeCommand extends AbstractCommand
 {
 	/**
-	 * @param string      $userId
+	 * @param string      $emailAddress
 	 * @param string      $ipAddress
 	 * @param string      $userAgent
 	 * @param string|NULL $passwordRequestId
 	 *
 	 * @return static
 	 */
-	public static function create(string $userId, string $ipAddress, string $userAgent, ?string $passwordRequestId = NULL): self
+	public static function create(string $emailAddress, string $ipAddress, string $userAgent, ?string $passwordRequestId = NULL): self
 	{
 		return self::fromParameters([
-			'user_id' => $userId,
+			'email_address' => $emailAddress,
 			'ip_address' => $ipAddress,
 			'user_agent' => $userAgent,
 			'password_request_id' => $passwordRequestId,
@@ -29,9 +29,9 @@ final class RequestPasswordChangeCommand extends AbstractCommand
 	/**
 	 * @return string
 	 */
-	public function userId(): string
+	public function emailAddress(): string
 	{
-		return $this->getParam('user_id');
+		return $this->getParam('email_address');
 	}
 
 	/**

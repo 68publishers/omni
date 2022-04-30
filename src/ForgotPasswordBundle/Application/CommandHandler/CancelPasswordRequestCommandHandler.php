@@ -6,7 +6,6 @@ namespace SixtyEightPublishers\ForgotPasswordBundle\Application\CommandHandler;
 
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
 use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Guard\CommandConsistencyGuardInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\CancelPasswordRequestCommand;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Repository\PasswordRequestRepositoryInterface;
 
@@ -14,16 +13,12 @@ final class CancelPasswordRequestCommandHandler implements CommandHandlerInterfa
 {
 	private PasswordRequestRepositoryInterface $passwordRequestRepository;
 
-	private CommandConsistencyGuardInterface $commandConsistencyGuard;
-
 	/**
 	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Repository\PasswordRequestRepositoryInterface $passwordRequestRepository
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Guard\CommandConsistencyGuardInterface          $commandConsistencyGuard
 	 */
-	public function __construct(PasswordRequestRepositoryInterface $passwordRequestRepository, CommandConsistencyGuardInterface $commandConsistencyGuard)
+	public function __construct(PasswordRequestRepositoryInterface $passwordRequestRepository)
 	{
 		$this->passwordRequestRepository = $passwordRequestRepository;
-		$this->commandConsistencyGuard = $commandConsistencyGuard;
 	}
 
 	/**
@@ -33,8 +28,6 @@ final class CancelPasswordRequestCommandHandler implements CommandHandlerInterfa
 	 */
 	public function __invoke(CancelPasswordRequestCommand $command): void
 	{
-		($this->commandConsistencyGuard)($command);
-
 		$passwordRequest = $this->passwordRequestRepository->get(PasswordRequestId::fromString($command->passwordRequestId()));
 
 		$passwordRequest->cancel($command);

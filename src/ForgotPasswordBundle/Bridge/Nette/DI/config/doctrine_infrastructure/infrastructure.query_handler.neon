@@ -2,3 +2,7 @@ services:
 	infrastructure.query_handler.find_requested_password_changes:
 		autowired: no
 		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\QueryHandler\FindRequestedPasswordChangesQueryHandler
+
+	infrastructure.query_handler.get_password_request_by_id:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\QueryHandler\GetPasswordRequestByIdQueryHandler

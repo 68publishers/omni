@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Domain\Event;
 
 use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
-use SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddress;
-use SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 final class UserEmailAddressChanged extends AbstractDomainEvent
@@ -16,8 +16,8 @@ final class UserEmailAddressChanged extends AbstractDomainEvent
 	private EmailAddressInterface $emailAddress;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId                $userId
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId                        $userId
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface $emailAddress
 	 *
 	 * @return static
 	 */
@@ -42,7 +42,7 @@ final class UserEmailAddressChanged extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\EmailAddress
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress
 	 */
 	public function emailAddress(): EmailAddressInterface
 	{
