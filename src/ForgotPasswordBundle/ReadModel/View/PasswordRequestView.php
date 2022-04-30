@@ -10,6 +10,8 @@ use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\AbstractView;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
+use DateTimeZone;
+use Exception;
 
 /**
  * @property-read PasswordRequestId $id
@@ -23,4 +25,15 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
  */
 class PasswordRequestView extends AbstractView
 {
+	/**
+	 * @return bool
+	 */
+	public function expired(): bool
+	{
+		try {
+			return new DateTimeImmutable('now', new DateTimeZone('UTC')) > $this->expiredAt;
+		} catch (Exception $e) {
+			return TRUE;
+		}
+	}
 }
