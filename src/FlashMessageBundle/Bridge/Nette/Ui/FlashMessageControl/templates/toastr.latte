@@ -6,22 +6,20 @@
             {var $type = $message->type()}
             {var $messagePhrase = $message->message()}
             {var $titlePhrase = $message->title()}
+            {var $messageText = ''}
+            {var $messageTitle = ''}
 
-            {capture $messageText}
-                {if empty($messagePhrase->args())}
-                    {_$messagePhrase->text()}
-                {else}
-                    {_$messagePhrase->text(), ...$messagePhrase->args()}
-                {/if}
-            {/capture}
+            {if empty($messagePhrase->args())}
+                {do $messageText = ($messagePhrase->text()|translate)}
+            {else}
+                {do $messageText = ($messagePhrase->text(), ...$messagePhrase->args()|translate)}
+            {/if}
 
-            {capture $messageTitle}
-                {if NULL !== $titlePhrase && empty($titlePhrase->args())}
-                    {_$titlePhrase->text()}
-                {elseif NULL !== $titlePhrase}
-                    {_$titlePhrase->text(), ...$titlePhrase->args()}
-                {/if}
-            {/capture}
+            {if NULL !== $titlePhrase && empty($titlePhrase->args())}
+                {do $messageTitle = ($titlePhrase->text()|translate)}
+            {elseif NULL !== $titlePhrase}
+                {do $messageTitle = ($titlePhrase->text(), ...$titlePhrase->args()|translate)}
+            {/if}
 
             {switch TRUE}
                 {case $type->is($type::INFO)}
