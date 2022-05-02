@@ -4,27 +4,34 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View;
 
+use Exception;
+use DateTimeZone;
 use DateTimeImmutable;
+use DateTimeInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\Status;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\AbstractView;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
-use DateTimeZone;
-use Exception;
 
-/**
- * @property-read PasswordRequestId $id
- * @property-read EmailAddressInterface $emailAddress
- * @property-read Status $status
- * @property-read DateTimeImmutable $requestedAt
- * @property-read DateTimeImmutable $expiredAt
- * @property-read DateTimeImmutable|NULL $finishedAt
- * @property-read DeviceInfo $requestDeviceInfo
- * @property-read DeviceInfo $finishedDeviceInfo
- */
 class PasswordRequestView extends AbstractView
 {
+	public PasswordRequestId $id;
+
+	public EmailAddressInterface $emailAddress;
+
+	public Status $status;
+
+	public DateTimeImmutable $requestedAt;
+
+	public DateTimeImmutable $expiredAt;
+
+	public ?DateTimeImmutable $finishedAt;
+
+	public DeviceInfo $requestDeviceInfo;
+
+	public DeviceInfo $finishedDeviceInfo;
+
 	/**
 	 * @return bool
 	 */
@@ -35,5 +42,29 @@ class PasswordRequestView extends AbstractView
 		} catch (Exception $e) {
 			return TRUE;
 		}
+	}
+
+	/**
+	 * @return array
+	 */
+	public function jsonSerialize(): array
+	{
+		return [
+			'id' => $this->id->toString(),
+			'emailAddress' => $this->emailAddress->value(),
+			'status' => $this->status->value(),
+			'requestedAt' => $this->requestedAt->format(DateTimeInterface::ATOM),
+			'expiredAt' => $this->expiredAt->format(DateTimeInterface::ATOM),
+			'finishedAt' => $this->finishedAt->format(DateTimeInterface::ATOM),
+			'expired' => $this->expired(),
+			'requestDeviceInfo' => [
+				'userAgent' => $this->requestDeviceInfo->userAgent(),
+				'ipAddress' => $this->requestDeviceInfo->ipAddress(),
+			],
+			'finishedDeviceInfo' => [
+				'userAgent' => $this->finishedDeviceInfo->userAgent(),
+				'ipAddress' => $this->finishedDeviceInfo->ipAddress(),
+			],
+		];
 	}
 }

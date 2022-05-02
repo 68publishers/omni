@@ -9,13 +9,14 @@ use SixtyEightPublishers\UserBundle\Domain\Dto\Username;
 use SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\AbstractView;
 
-/**
- * @property-read UserId $id
- * @property-read Username $username
- * @property-read HashedPassword $password
- */
 class CredentialsView extends AbstractView
 {
+	public UserId $id;
+
+	public Username $username;
+
+	public HashedPassword $password;
+
 	/**
 	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId         $id
 	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Username       $username
@@ -30,5 +31,17 @@ class CredentialsView extends AbstractView
 			'username' => $username,
 			'password' => $password,
 		]);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function jsonSerialize(): array
+	{
+		return [
+			'id' => $this->id->toString(),
+			'username' => $this->username->value(),
+			'password' => $this->password->value(),
+		];
 	}
 }
