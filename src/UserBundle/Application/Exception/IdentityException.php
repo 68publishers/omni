@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Application\Exception;
 
 use Exception;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 
 final class IdentityException extends Exception
 {
@@ -26,7 +26,7 @@ final class IdentityException extends Exception
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId $userId
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId $userId
 	 *
 	 * @return static
 	 */

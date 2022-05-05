@@ -8,11 +8,11 @@ use Exception;
 use DateTimeZone;
 use DateTimeImmutable;
 use DateTimeInterface;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\Status;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\AbstractView;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\Status;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface;
 
 class PasswordRequestView extends AbstractView
 {

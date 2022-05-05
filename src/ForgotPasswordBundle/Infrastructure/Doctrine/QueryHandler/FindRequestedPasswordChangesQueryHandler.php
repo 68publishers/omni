@@ -7,7 +7,7 @@ namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\Quer
 use Generator;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\Status;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\Status;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View\PasswordRequestView;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterface;

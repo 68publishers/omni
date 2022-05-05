@@ -1,0 +1,10 @@
+services:
+	infrastructure.check.email_address_uniqueness:
+		autowired: SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface
+		type: SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\CheckEmailAddressUniqueness
+
+	infrastructure.check.username_uniqueness:
+		autowired: SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface
+		type: SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\CheckUsernameUniqueness

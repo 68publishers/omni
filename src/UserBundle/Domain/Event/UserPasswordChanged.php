@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\Event;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
-use SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 final class UserPasswordChanged extends AbstractDomainEvent
@@ -15,8 +15,8 @@ final class UserPasswordChanged extends AbstractDomainEvent
 	private HashedPassword $password;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId         $userId
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword $password
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId         $userId
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword $password
 	 *
 	 * @return static
 	 */
@@ -33,7 +33,7 @@ final class UserPasswordChanged extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\UserId
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
 	 */
 	public function userId(): UserId
 	{
@@ -41,7 +41,7 @@ final class UserPasswordChanged extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword
 	 */
 	public function password(): HashedPassword
 	{

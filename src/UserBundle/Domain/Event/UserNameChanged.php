@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\Event;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\Name;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 final class UserNameChanged extends AbstractDomainEvent
@@ -15,8 +15,8 @@ final class UserNameChanged extends AbstractDomainEvent
 	private Name $name;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId $userId
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Name   $name
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId $userId
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Name   $name
 	 *
 	 * @return static
 	 */
@@ -34,7 +34,7 @@ final class UserNameChanged extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\UserId
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
 	 */
 	public function userId(): UserId
 	{
@@ -42,7 +42,7 @@ final class UserNameChanged extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\Name
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Name
 	 */
 	public function name(): Name
 	{

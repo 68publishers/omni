@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 interface AggregateRootInterface
 {
 	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId
 	 */
 	public function aggregateId(): AggregateId;
 

@@ -10,34 +10,34 @@ final class InvalidIdentityValueException extends DomainException
 {
 	private string $identifier;
 
-	private string $identityDtoClassname;
+	private string $identityValueObjectClassname;
 
 	/**
 	 * @param string $message
 	 * @param string $identifier
-	 * @param string $identityDtoClassname
+	 * @param string $identityValueObjectClassname
 	 */
-	private function __construct(string $message, string $identifier, string $identityDtoClassname)
+	private function __construct(string $message, string $identifier, string $identityValueObjectClassname)
 	{
 		parent::__construct($message);
 
 		$this->identifier = $identifier;
-		$this->identityDtoClassname = $identityDtoClassname;
+		$this->identityValueObjectClassname = $identityValueObjectClassname;
 	}
 
 	/**
 	 * @param string $identifier
-	 * @param string $identityDtoClassname
+	 * @param string $identityValueObjectClassname
 	 *
 	 * @return static
 	 */
-	public static function create(string $identifier, string $identityDtoClassname): self
+	public static function create(string $identifier, string $identityValueObjectClassname): self
 	{
 		return new self(sprintf(
 			'Invalid identifier value %s for identity of type %s.',
 			$identifier,
-			$identityDtoClassname
-		), $identifier, $identityDtoClassname);
+			$identityValueObjectClassname
+		), $identifier, $identityValueObjectClassname);
 	}
 
 
@@ -52,8 +52,8 @@ final class InvalidIdentityValueException extends DomainException
 	/**
 	 * @return string
 	 */
-	public function identityDtoClassname(): string
+	public function identityValueObjectClassname(): string
 	{
-		return $this->identityDtoClassname;
+		return $this->identityValueObjectClassname;
 	}
 }

@@ -7,18 +7,18 @@ namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalTy
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\StringValueObjectInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\StringValueObjectInterface;
 
 abstract class AbstractTextValueObjectType extends TextType
 {
-	protected string $dtoClassname;
+	protected string $valueObjectClassname;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getName(): string
 	{
-		return $this->dtoClassname;
+		return $this->valueObjectClassname;
 	}
 
 	/**
@@ -28,7 +28,7 @@ abstract class AbstractTextValueObjectType extends TextType
 	{
 		$value = parent::convertToPHPValue($value, $platform);
 
-		return NULL !== $value ? call_user_func([$this->dtoClassname, 'fromValue'], $value) : NULL;
+		return NULL !== $value ? call_user_func([$this->valueObjectClassname, 'fromValue'], $value) : NULL;
 	}
 
 	/**
@@ -37,7 +37,7 @@ abstract class AbstractTextValueObjectType extends TextType
 	public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
 	{
 		if (!is_string($value) && !$value instanceof StringValueObjectInterface) {
-			throw ConversionException::conversionFailed($value, $this->dtoClassname);
+			throw ConversionException::conversionFailed($value, $this->valueObjectClassname);
 		}
 
 		if ($value instanceof StringValueObjectInterface) {

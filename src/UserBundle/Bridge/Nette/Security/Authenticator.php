@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\Security;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use Nette\Security\IIdentity as NetteIdentityInterface;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use Nette\Security\Authenticator as NetteAuthenticatorInterface;
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use Nette\Security\IdentityHandler as NetteIdentityHandlerInterface;

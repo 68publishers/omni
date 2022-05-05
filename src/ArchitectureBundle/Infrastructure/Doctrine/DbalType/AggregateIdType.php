@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 final class AggregateIdType extends AbstractUuidIdentityType
 {
-	protected string $dtoClassname = AggregateId::class;
+	protected string $valueObjectClassname = AggregateId::class;
 }

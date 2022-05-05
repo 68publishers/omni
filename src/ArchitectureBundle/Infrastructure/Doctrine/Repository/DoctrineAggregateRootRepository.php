@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AggregateDeleted;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface;

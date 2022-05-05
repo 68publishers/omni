@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\Security;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use Nette\Security\IIdentity as NetteIdentityInterface;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Role as RoleDto;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Role as RoleValueObject;
 use SixtyEightPublishers\UserBundle\Application\Authentication\Identity as AuthIdentity;
 
 final class Identity extends AuthIdentity implements NetteIdentityInterface
@@ -28,7 +28,7 @@ final class Identity extends AuthIdentity implements NetteIdentityInterface
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\UserId
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
 	 */
 	public function getId(): UserId
 	{
@@ -46,6 +46,6 @@ final class Identity extends AuthIdentity implements NetteIdentityInterface
 			return [];
 		}
 
-		return array_map(static fn (RoleDto $role): Role => Role::fromDto($role), $this->data()->roles->all());
+		return array_map(static fn (RoleValueObject $role): Role => Role::fromValueObject($role), $this->data()->roles->all());
 	}
 }

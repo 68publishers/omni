@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher;
 
 use SixtyEightPublishers\ArchitectureBundle\Bus\EventBusInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 final class EventBusPublisher implements EventPublisherInterface
 {

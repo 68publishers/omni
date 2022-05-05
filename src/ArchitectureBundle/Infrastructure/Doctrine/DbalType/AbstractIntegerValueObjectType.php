@@ -7,18 +7,18 @@ namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalTy
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\IntegerValueObjectInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\IntegerValueObjectInterface;
 
 abstract class AbstractIntegerValueObjectType extends IntegerType
 {
-	protected string $dtoClassname;
+	protected string $valueObjectClassname;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getName(): string
 	{
-		return $this->dtoClassname;
+		return $this->valueObjectClassname;
 	}
 
 	/**
@@ -28,7 +28,7 @@ abstract class AbstractIntegerValueObjectType extends IntegerType
 	{
 		$value = parent::convertToPHPValue($value, $platform);
 
-		return NULL !== $value ? call_user_func([$this->dtoClassname, 'fromValue'], $value) : NULL;
+		return NULL !== $value ? call_user_func([$this->valueObjectClassname, 'fromValue'], $value) : NULL;
 	}
 
 	/**
@@ -37,7 +37,7 @@ abstract class AbstractIntegerValueObjectType extends IntegerType
 	public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
 	{
 		if (!is_int($value) && !$value instanceof IntegerValueObjectInterface) {
-			throw ConversionException::conversionFailed($value, $this->dtoClassname);
+			throw ConversionException::conversionFailed($value, $this->valueObjectClassname);
 		}
 
 		if ($value instanceof IntegerValueObjectInterface) {

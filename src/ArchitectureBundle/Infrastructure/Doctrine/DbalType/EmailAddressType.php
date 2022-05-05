@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddress;
 
 final class EmailAddressType extends AbstractStringValueObjectType
 {
-	protected string $dtoClassname = EmailAddress::class;
+	protected string $valueObjectClassname = EmailAddress::class;
 }

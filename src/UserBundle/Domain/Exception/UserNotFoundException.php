@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Domain\Exception;
 
 use DomainException;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 
 final class UserNotFoundException extends DomainException
 {
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId $id
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId $id
 	 *
 	 * @return static
 	 */

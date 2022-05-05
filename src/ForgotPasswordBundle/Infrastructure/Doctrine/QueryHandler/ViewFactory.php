@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\QueryHandler;
 
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View\PasswordRequestView;
 
 final class ViewFactory

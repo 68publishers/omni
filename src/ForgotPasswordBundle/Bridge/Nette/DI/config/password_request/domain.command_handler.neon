@@ -1,0 +1,12 @@
+services:
+	domain.command_handler.cancel_password_request:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Domain\CommandHandler\CancelPasswordRequestCommandHandler
+
+	domain.command_handler.complete_password_request:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Domain\CommandHandler\CompletePasswordRequestCommandHandler
+
+	domain.command_handler.request_password_change:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Domain\CommandHandler\RequestPasswordChangeCommandHandler

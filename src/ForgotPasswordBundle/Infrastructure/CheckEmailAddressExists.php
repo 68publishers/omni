@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure;
 
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
 use SixtyEightPublishers\UserBundle\ReadModel\Query\GetUserByEmailAddressQuery;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\CheckEmailAddressExistsInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception\EmailAddressNotFoundException;
 

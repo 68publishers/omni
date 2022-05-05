@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Exception;
 
 use DomainException;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 final class UnableToRecordEventOnDeletedAggregateException extends DomainException
 {
@@ -14,9 +14,9 @@ final class UnableToRecordEventOnDeletedAggregateException extends DomainExcepti
 	private AggregateId $aggregateId;
 
 	/**
-	 * @param string                                                          $message
-	 * @param string                                                          $aggregateClassname
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId $aggregateId
+	 * @param string                                                                  $message
+	 * @param string                                                                  $aggregateClassname
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId $aggregateId
 	 */
 	private function __construct(string $message, string $aggregateClassname, AggregateId $aggregateId)
 	{
@@ -27,8 +27,8 @@ final class UnableToRecordEventOnDeletedAggregateException extends DomainExcepti
 	}
 
 	/**
-	 * @param string                                                          $aggregateClassname
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId $aggregateId
+	 * @param string                                                                  $aggregateClassname
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId $aggregateId
 	 *
 	 * @return $this
 	 */
@@ -50,7 +50,7 @@ final class UnableToRecordEventOnDeletedAggregateException extends DomainExcepti
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId
 	 */
 	public function getAggregateId(): AggregateId
 	{

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception;
 
 use DomainException;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId;
 
 final class PasswordRequestNotFoundException extends DomainException
 {
 	/**
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId $id
+	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId $id
 	 *
 	 * @return static
 	 */

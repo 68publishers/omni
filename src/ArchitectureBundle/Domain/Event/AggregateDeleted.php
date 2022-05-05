@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Event;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 final class AggregateDeleted extends AbstractDomainEvent
 {
 	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId $aggregateId
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId $aggregateId
 	 *
 	 * @return static
 	 */

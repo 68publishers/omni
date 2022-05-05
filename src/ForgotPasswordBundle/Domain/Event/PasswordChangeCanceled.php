@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\Event;
 
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\IpAddress;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\UserAgent;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\IpAddress;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\UserAgent;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddress;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface;
 
 final class PasswordChangeCanceled extends AbstractDomainEvent
 {
@@ -21,9 +21,9 @@ final class PasswordChangeCanceled extends AbstractDomainEvent
 	private EmailAddressInterface $emailAddress;
 
 	/**
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId   $passwordRequestId
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo          $finishedDeviceInfo
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId   $passwordRequestId
+	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo          $finishedDeviceInfo
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface $emailAddress
 	 *
 	 * @return static
 	 */
@@ -43,7 +43,7 @@ final class PasswordChangeCanceled extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId
+	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId
 	 */
 	public function passwordRequestId(): PasswordRequestId
 	{
@@ -51,7 +51,7 @@ final class PasswordChangeCanceled extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\DeviceInfo
+	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo
 	 */
 	public function finishedDeviceInfo(): DeviceInfo
 	{
@@ -59,7 +59,7 @@ final class PasswordChangeCanceled extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface
 	 */
 	public function emailAddress(): EmailAddressInterface
 	{

@@ -6,13 +6,13 @@ namespace SixtyEightPublishers\UserBundle\ReadModel\View;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Name;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Roles;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Username;
-use SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Username;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\AbstractView;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface;
 
 class UserView extends AbstractView
 {
@@ -22,7 +22,7 @@ class UserView extends AbstractView
 
 	public Username $username;
 
-	public HashedPassword $password;
+	public ?HashedPassword $password = NULL;
 
 	public EmailAddressInterface $emailAddress;
 

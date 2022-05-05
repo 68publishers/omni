@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\Repository;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use SixtyEightPublishers\UserBundle\Domain\Aggregate\User;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 
 interface UserRepositoryInterface
 {
@@ -22,7 +22,7 @@ interface UserRepositoryInterface
 	public function save(User $user): void;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId $id
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId $id
 	 *
 	 * @return \SixtyEightPublishers\UserBundle\Domain\Aggregate\User
 	 * @throws \SixtyEightPublishers\UserBundle\Domain\Exception\UserNotFoundException

@@ -5,27 +5,29 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Domain\Aggregate;
 
 use DateTimeImmutable;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Name;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Role;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Roles;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Password;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Username;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Role;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserCreated;
-use SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Password;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Username;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserNameChanged;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserRolesChanged;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress;
 use SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand;
 use SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserPasswordChanged;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserUsernameChanged;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\ValidEmailAddress;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserEmailAddressChanged;
 use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddress;
+use SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface;
+use SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValidEmailAddress;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\DeletableAggregateRootTrait;
 
 class User implements AggregateRootInterface
@@ -47,13 +49,14 @@ class User implements AggregateRootInterface
 	protected Roles $roles;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand      $command
-	 * @param \SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface $algorithm
+	 * @param \SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand            $command
+	 * @param \SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface       $algorithm
+	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness
+	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface     $checkUsernameUniqueness
 	 *
 	 * @return static
-	 * @throws \Exception
 	 */
-	public static function create(CreateUserCommand $command, PasswordHashAlgorithmInterface $algorithm): self
+	public static function create(CreateUserCommand $command, PasswordHashAlgorithmInterface $algorithm, CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness, CheckUsernameUniquenessInterface $checkUsernameUniqueness): self
 	{
 		$user = new self();
 
@@ -64,25 +67,30 @@ class User implements AggregateRootInterface
 		$name = Name::fromValues($command->firstname(), $command->surname());
 		$roles = Roles::reconstitute($command->roles());
 
+		$checkEmailAddressUniqueness($userId, $emailAddress);
+		$checkUsernameUniqueness($userId, $username);
+
 		$user->recordThat(UserCreated::create($userId, $username, $password, $emailAddress, $name, $roles));
 
 		return $user;
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand      $command
-	 * @param \SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface $algorithm
+	 * @param \SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand            $command
+	 * @param \SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface       $algorithm
+	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness
+	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface     $checkUsernameUniqueness
 	 *
 	 * @return void
 	 */
-	public function update(UpdateUserCommand $command, PasswordHashAlgorithmInterface $algorithm): void
+	public function update(UpdateUserCommand $command, PasswordHashAlgorithmInterface $algorithm, CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness, CheckUsernameUniquenessInterface $checkUsernameUniqueness): void
 	{
 		if (NULL !== $command->emailAddress()) {
-			$this->changeEmailAddress(EmailAddress::fromValue($command->emailAddress()));
+			$this->changeEmailAddress(EmailAddress::fromValue($command->emailAddress()), $checkEmailAddressUniqueness);
 		}
 
 		if (NULL !== $command->username()) {
-			$this->changeUsername(Username::fromValue($command->username()));
+			$this->changeUsername(Username::fromValue($command->username()), $checkUsernameUniqueness);
 		}
 
 		if (NULL !== $command->password()) {
@@ -99,7 +107,7 @@ class User implements AggregateRootInterface
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId
 	 */
 	public function aggregateId(): AggregateId
 	{
@@ -107,19 +115,21 @@ class User implements AggregateRootInterface
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Username $username
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Username             $username
+	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface $checkUsernameUniqueness
 	 *
 	 * @return void
 	 */
-	public function changeUsername(Username $username): void
+	public function changeUsername(Username $username, CheckUsernameUniquenessInterface $checkUsernameUniqueness): void
 	{
 		if (!$this->username->equals($username)) {
+			$checkUsernameUniqueness($this->id, $username);
 			$this->recordThat(UserUsernameChanged::create($this->id, $username));
 		}
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword $password
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword $password
 	 *
 	 * @return void
 	 */
@@ -129,19 +139,21 @@ class User implements AggregateRootInterface
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface      $checkEmailAddressUniqueness
 	 *
 	 * @return void
 	 */
-	public function changeEmailAddress(EmailAddressInterface $emailAddress): void
+	public function changeEmailAddress(EmailAddressInterface $emailAddress, CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness): void
 	{
 		if (!$this->emailAddress->equals($emailAddress)) {
+			$checkEmailAddressUniqueness($this->id, $emailAddress);
 			$this->recordThat(UserEmailAddressChanged::create($this->id, ValidEmailAddress::fromInstance($emailAddress)));
 		}
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Name $name
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Name $name
 	 *
 	 * @return void
 	 */
@@ -153,7 +165,7 @@ class User implements AggregateRootInterface
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Role $role
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Role $role
 	 *
 	 * @return void
 	 */
@@ -165,7 +177,7 @@ class User implements AggregateRootInterface
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Role $role
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Role $role
 	 *
 	 * @return void
 	 */
@@ -177,7 +189,7 @@ class User implements AggregateRootInterface
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Roles $roles
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles $roles
 	 *
 	 * @return void
 	 */

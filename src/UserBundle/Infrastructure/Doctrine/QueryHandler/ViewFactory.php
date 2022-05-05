@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\Name;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
 use SixtyEightPublishers\UserBundle\ReadModel\View\UserView;
 use SixtyEightPublishers\UserBundle\ReadModel\View\IdentityView;
 

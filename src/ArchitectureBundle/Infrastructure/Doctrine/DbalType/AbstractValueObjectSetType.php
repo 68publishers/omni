@@ -7,18 +7,18 @@ namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalTy
 use Doctrine\DBAL\Types\JsonType;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\ValueObjectSetInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectSetInterface;
 
 abstract class AbstractValueObjectSetType extends JsonType
 {
-	protected string $dtoClassname;
+	protected string $valueObjectClassname;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getName(): string
 	{
-		return $this->dtoClassname;
+		return $this->valueObjectClassname;
 	}
 
 	/**
@@ -28,7 +28,7 @@ abstract class AbstractValueObjectSetType extends JsonType
 	{
 		$value = parent::convertToPHPValue($value, $platform);
 
-		return NULL !== $value ? call_user_func([$this->dtoClassname, 'reconstitute'], (array) $value) : NULL;
+		return NULL !== $value ? call_user_func([$this->valueObjectClassname, 'reconstitute'], (array) $value) : NULL;
 	}
 
 	/**
@@ -37,7 +37,7 @@ abstract class AbstractValueObjectSetType extends JsonType
 	public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
 	{
 		if (!$value instanceof ValueObjectSetInterface) {
-			throw ConversionException::conversionFailed($value, $this->dtoClassname);
+			throw ConversionException::conversionFailed($value, $this->valueObjectClassname);
 		}
 
 		return parent::convertToDatabaseValue($value->toArray(), $platform);

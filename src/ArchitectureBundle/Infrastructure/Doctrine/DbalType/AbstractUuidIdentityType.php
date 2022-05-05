@@ -10,18 +10,18 @@ use Ramsey\Uuid\UuidInterface;
 use Doctrine\DBAL\Types\GuidType;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AbstractUuidIdentity;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AbstractUuidIdentity;
 
 abstract class AbstractUuidIdentityType extends GuidType
 {
-	protected string $dtoClassname;
+	protected string $valueObjectClassname;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getName(): string
 	{
-		return $this->dtoClassname;
+		return $this->valueObjectClassname;
 	}
 
 	/**
@@ -31,7 +31,7 @@ abstract class AbstractUuidIdentityType extends GuidType
 	{
 		$uuid = $this->convertToUuid($value);
 
-		return NULL !== $uuid ? call_user_func([$this->dtoClassname, 'fromUuid'], $uuid) : NULL;
+		return NULL !== $uuid ? call_user_func([$this->valueObjectClassname, 'fromUuid'], $uuid) : NULL;
 	}
 
 	/**
@@ -51,7 +51,7 @@ abstract class AbstractUuidIdentityType extends GuidType
 			return (string) $value;
 		}
 
-		throw ConversionException::conversionFailed($value, $this->dtoClassname);
+		throw ConversionException::conversionFailed($value, $this->valueObjectClassname);
 	}
 
 	/**
@@ -73,7 +73,7 @@ abstract class AbstractUuidIdentityType extends GuidType
 		try {
 			$uuid = Uuid::fromString($value);
 		} catch (InvalidArgumentException $e) {
-			throw ConversionException::conversionFailed($value, $this->dtoClassname);
+			throw ConversionException::conversionFailed($value, $this->valueObjectClassname);
 		}
 
 		return $uuid;

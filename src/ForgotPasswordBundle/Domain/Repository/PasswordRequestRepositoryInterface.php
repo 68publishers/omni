@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\Repository;
 
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId;
 
 interface PasswordRequestRepositoryInterface
 {
@@ -22,7 +22,7 @@ interface PasswordRequestRepositoryInterface
 	public function save(PasswordRequest $passwordRequest): void;
 
 	/**
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Dto\PasswordRequestId $id
+	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId $id
 	 *
 	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest
 	 * @throws \SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception\PasswordRequestNotFoundException

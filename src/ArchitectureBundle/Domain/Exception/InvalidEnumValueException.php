@@ -8,46 +8,46 @@ use DomainException;
 
 final class InvalidEnumValueException extends DomainException
 {
-	private string $dtoClassname;
+	private string $valueObjectClassname;
 
 	private string $value;
 
 	/**
 	 * @param string $message
-	 * @param string $dtoClassname
+	 * @param string $valueObjectClassname
 	 * @param string $value
 	 */
-	private function __construct(string $message, string $dtoClassname, string $value)
+	private function __construct(string $message, string $valueObjectClassname, string $value)
 	{
 		parent::__construct($message);
 
-		$this->dtoClassname = $dtoClassname;
+		$this->valueObjectClassname = $valueObjectClassname;
 		$this->value = $value;
 	}
 
 	/**
-	 * @param string $dtoClassname
+	 * @param string $valueObjectClassname
 	 * @param string $value
 	 * @param array  $values
 	 *
 	 * @return static
 	 */
-	public static function create(string $dtoClassname, string $value, array $values): self
+	public static function create(string $valueObjectClassname, string $value, array $values): self
 	{
 		return new self(sprintf(
 			'Invalid value %s for enum %s. The value must be one of these: [%s].',
 			$value,
-			$dtoClassname,
+			$valueObjectClassname,
 			implode(', ', $values)
-		), $dtoClassname, $value);
+		), $valueObjectClassname, $value);
 	}
 
 	/**
 	 * @return string
 	 */
-	public function dtoClassname(): string
+	public function valueObjectClassname(): string
 	{
-		return $this->dtoClassname;
+		return $this->valueObjectClassname;
 	}
 
 	/**

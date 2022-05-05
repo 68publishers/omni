@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\Security;
 
 use Nette\Security\Role as RoleInterface;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Role as RoleDto;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Role as RoleValueObject;
 
 final class Role implements RoleInterface
 {
-	private RoleDto $role;
+	private RoleValueObject $role;
 
 	private function __construct()
 	{
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Role $role
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Role $role
 	 *
 	 * @return $this
 	 */
-	public static function fromDto(RoleDto $role): self
+	public static function fromValueObject(RoleValueObject $role): self
 	{
 		$self = new self();
 		$self->role = $role;
@@ -43,6 +43,6 @@ final class Role implements RoleInterface
 	 */
 	public function equals(self $role): string
 	{
-		return $this->role->equals(RoleDto::fromValue($role->getRoleId()));
+		return $this->role->equals(RoleValueObject::fromValue($role->getRoleId()));
 	}
 }

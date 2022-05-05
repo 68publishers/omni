@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\Event;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\Name;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Roles;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
-use SixtyEightPublishers\UserBundle\Domain\Dto\Username;
-use SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Username;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddress;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface;
 
 final class UserCreated extends AbstractDomainEvent
 {
@@ -28,12 +28,12 @@ final class UserCreated extends AbstractDomainEvent
 	private Roles $roles;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId                        $userId
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Username                      $username
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword|NULL           $password
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface $emailAddress
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Name                          $name
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Roles                         $roles
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId                        $userId
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Username                      $username
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword|NULL           $password
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface $emailAddress
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Name                          $name
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles                         $roles
 	 *
 	 * @return static
 	 */
@@ -59,7 +59,7 @@ final class UserCreated extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\UserId
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
 	 */
 	public function userId(): UserId
 	{
@@ -67,7 +67,7 @@ final class UserCreated extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\Username
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Username
 	 */
 	public function username(): Username
 	{
@@ -75,7 +75,7 @@ final class UserCreated extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword
 	 */
 	public function password(): ?HashedPassword
 	{
@@ -83,7 +83,7 @@ final class UserCreated extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddressInterface
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface
 	 */
 	public function emailAddress(): EmailAddressInterface
 	{
@@ -91,7 +91,7 @@ final class UserCreated extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\Name
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Name
 	 */
 	public function name(): Name
 	{
@@ -99,7 +99,7 @@ final class UserCreated extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\Roles
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles
 	 */
 	public function roles(): Roles
 	{

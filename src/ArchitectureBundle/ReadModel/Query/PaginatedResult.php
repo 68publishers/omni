@@ -14,8 +14,6 @@ final class PaginatedResult implements Countable, IteratorAggregate
 
 	private int $limit;
 
-	private int $totalCount;
-
 	private array $results;
 
 	private function __construct()
@@ -25,17 +23,15 @@ final class PaginatedResult implements Countable, IteratorAggregate
 	/**
 	 * @param int   $offset
 	 * @param int   $limit
-	 * @param int   $totalCount
 	 * @param array $results
 	 *
 	 * @return static
 	 */
-	public static function create(int $offset, int $limit, int $totalCount, array $results): self
+	public static function create(int $offset, int $limit, array $results): self
 	{
 		$result = new self();
 		$result->offset = $offset;
 		$result->limit = $limit;
-		$result->totalCount = $totalCount;
 		$result->results = $results;
 
 		return $result;
@@ -55,14 +51,6 @@ final class PaginatedResult implements Countable, IteratorAggregate
 	public function limit(): int
 	{
 		return $this->limit;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function totalCount(): int
-	{
-		return $this->totalCount;
 	}
 
 	/**

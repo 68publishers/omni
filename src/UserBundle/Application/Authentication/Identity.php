@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Application\Authentication;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use SixtyEightPublishers\UserBundle\ReadModel\View\IdentityView;
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use SixtyEightPublishers\UserBundle\ReadModel\Query\GetIdentityQuery;
@@ -25,7 +25,7 @@ class Identity
 	}
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId $id
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId $id
 	 *
 	 * @return static
 	 */
@@ -38,7 +38,7 @@ class Identity
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\UserId
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
 	 */
 	public function id(): UserId
 	{

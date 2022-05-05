@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Infrastructure\Repository;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
 use SixtyEightPublishers\UserBundle\Domain\Aggregate\User;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\UserBundle\Domain\Exception\UserNotFoundException;
 use SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface;

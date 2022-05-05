@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Application\Authentication;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\Password;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Password;
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use SixtyEightPublishers\UserBundle\ReadModel\View\CredentialsView;
 use SixtyEightPublishers\UserBundle\ReadModel\Query\GetCredentialsQuery;

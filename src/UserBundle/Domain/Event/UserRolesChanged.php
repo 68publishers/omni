@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\Event;
 
-use SixtyEightPublishers\UserBundle\Domain\Dto\Roles;
-use SixtyEightPublishers\UserBundle\Domain\Dto\UserId;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 final class UserRolesChanged extends AbstractDomainEvent
@@ -15,8 +15,8 @@ final class UserRolesChanged extends AbstractDomainEvent
 	private Roles $roles;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\UserId $userId
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Dto\Roles  $roles
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId $userId
+	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles  $roles
 	 *
 	 * @return static
 	 */
@@ -33,7 +33,7 @@ final class UserRolesChanged extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\UserId
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
 	 */
 	public function userId(): UserId
 	{
@@ -41,7 +41,7 @@ final class UserRolesChanged extends AbstractDomainEvent
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\Dto\Roles
+	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles
 	 */
 	public function roles(): Roles
 	{

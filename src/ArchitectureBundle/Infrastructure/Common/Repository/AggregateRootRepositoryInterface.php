@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootInterface;
 
 interface AggregateRootRepositoryInterface
 {
 	/**
-	 * @param string                                                          $classname
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId $aggregateId
+	 * @param string                                                                  $classname
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId $aggregateId
 	 *
 	 * @return object|NULL
 	 */

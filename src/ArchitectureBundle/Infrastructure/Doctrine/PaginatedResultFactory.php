@@ -34,7 +34,6 @@ final class PaginatedResultFactory
 		$paginator = new Paginator($query, $fetchJoinCollection);
 
 		$results = [];
-		$totalCount = count($paginator);
 
 		foreach ($paginator as $item) {
 			$results[] = $mapper($item);
@@ -43,7 +42,6 @@ final class PaginatedResultFactory
 		return PaginatedResult::create(
 			$paginatedQuery->offset() ?? 0,
 			$paginatedQuery->limit(),
-			$totalCount,
 			$results
 		);
 	}

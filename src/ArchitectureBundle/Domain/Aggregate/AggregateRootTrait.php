@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate;
 
 use RuntimeException;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 trait AggregateRootTrait
@@ -16,7 +16,7 @@ trait AggregateRootTrait
 	protected array $recordedEvents = [];
 
 	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId
 	 */
 	abstract public function aggregateId(): AggregateId;
 

@@ -9,7 +9,7 @@ use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use Ramsey\Uuid\UuidInterface;
 use SixtyEightPublishers\ArchitectureBundle\Event\EventInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 abstract class AbstractDomainEvent implements EventInterface
 {
@@ -82,7 +82,7 @@ abstract class AbstractDomainEvent implements EventInterface
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Dto\AggregateId
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId
 	 */
 	public function aggregateId(): AggregateId
 	{

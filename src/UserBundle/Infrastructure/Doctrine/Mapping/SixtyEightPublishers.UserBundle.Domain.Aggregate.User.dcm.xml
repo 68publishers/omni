@@ -9,19 +9,19 @@
             <index name="idx_user_created_at" columns="created_at" />
         </indexes>
 
-        <id name="id" column="id" type="SixtyEightPublishers\UserBundle\Domain\Dto\UserId" unique="true" />
+        <id name="id" column="id" type="SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId" unique="true" />
 
         <field name="createdAt" column="created_at" type="datetime_immutable" />
 
-        <field name="username" column="username" type="SixtyEightPublishers\UserBundle\Domain\Dto\Username" unique="true" />
+        <field name="username" column="username" type="SixtyEightPublishers\UserBundle\Domain\ValueObject\Username" unique="true" />
 
-        <field name="password" column="password" type="SixtyEightPublishers\UserBundle\Domain\Dto\HashedPassword" nullable="true" />
+        <field name="password" column="password" type="SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword" nullable="true" />
 
-        <field name="emailAddress" column="email_address" type="SixtyEightPublishers\ArchitectureBundle\Domain\Dto\EmailAddress" unique="true" />
+        <field name="emailAddress" column="email_address" type="SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddress" unique="true" />
 
-        <embedded name="name" class="SixtyEightPublishers\UserBundle\Domain\Dto\Name" use-column-prefix="false" />
+        <embedded name="name" class="SixtyEightPublishers\UserBundle\Domain\ValueObject\Name" use-column-prefix="false" />
 
-        <field name="roles" column="roles" type="SixtyEightPublishers\UserBundle\Domain\Dto\Roles">
+        <field name="roles" column="roles" type="SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles">
             <options>
                 <option name="jsonb">true</option>
             </options>
