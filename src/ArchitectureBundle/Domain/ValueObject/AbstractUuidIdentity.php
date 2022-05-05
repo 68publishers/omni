@@ -18,10 +18,7 @@ abstract class AbstractUuidIdentity implements IdentityInterface
 	}
 
 	/**
-	 * @param string $id
-	 *
-	 * @return static
-	 * @throws \SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidIdentityValueException
+	 * {@inheritDoc}
 	 */
 	public static function fromString(string $id): self
 	{
@@ -33,6 +30,14 @@ abstract class AbstractUuidIdentity implements IdentityInterface
 		} catch (UuidExceptionInterface $e) {
 			throw InvalidIdentityValueException::create($id, static::class);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public static function isValid(string $id): bool
+	{
+		return Uuid::isValid($id);
 	}
 
 	/**
