@@ -36,10 +36,10 @@ abstract class AbstractArrayValueObjectType extends JsonType
 	 */
 	public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
 	{
-		if (!$value instanceof ArrayValueObjectInterface) {
+		if (NULL !== $value && !$value instanceof ArrayValueObjectInterface) {
 			throw ConversionException::conversionFailed($value, $this->valueObjectClassname);
 		}
 
-		return parent::convertToDatabaseValue($value->values(), $platform);
+		return parent::convertToDatabaseValue(NULL !== $value ? $value->values() : NULL, $platform);
 	}
 }

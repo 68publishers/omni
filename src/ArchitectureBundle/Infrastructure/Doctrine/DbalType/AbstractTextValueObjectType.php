@@ -36,7 +36,7 @@ abstract class AbstractTextValueObjectType extends TextType
 	 */
 	public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
 	{
-		if (!is_string($value) && !$value instanceof StringValueObjectInterface) {
+		if (NULL !== $value && !is_string($value) && !$value instanceof StringValueObjectInterface) {
 			throw ConversionException::conversionFailed($value, $this->valueObjectClassname);
 		}
 
