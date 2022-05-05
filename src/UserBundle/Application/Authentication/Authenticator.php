@@ -33,7 +33,7 @@ final class Authenticator implements AuthenticatorInterface
 			throw AuthenticationException::userNotFound($username);
 		}
 
-		if (!$credentials->password->verify(Password::fromValue($password))) {
+		if (NULL === $credentials->password || !$credentials->password->verify(Password::fromValue($password))) {
 			throw AuthenticationException::invalidPassword($username);
 		}
 
