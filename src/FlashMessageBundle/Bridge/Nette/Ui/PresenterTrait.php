@@ -41,7 +41,7 @@ trait PresenterTrait
 		$this->doSubscribeFlashMessage($flashMessage);
 
 		if ($this->isAjax()) {
-			$component = $this->getComponent('flashMessage');
+			$component = $this->getComponent('flashMessages');
 			assert($component instanceof FlashMessageControl);
 
 			$component->redrawControl();

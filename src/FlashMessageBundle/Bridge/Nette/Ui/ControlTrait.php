@@ -27,7 +27,7 @@ trait ControlTrait
 		$this->doSubscribeFlashMessage($flashMessage);
 
 		if (NULL !== $this->getPresenter()) {
-			$component = $this->getPresenter()->getComponent('flashMessage', FALSE);
+			$component = $this->getPresenter()->getComponent('flashMessages', FALSE);
 
 			if ($component instanceof FlashMessageControl) {
 				$component->redrawControl();
