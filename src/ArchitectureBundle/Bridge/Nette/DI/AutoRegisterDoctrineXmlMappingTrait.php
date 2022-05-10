@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI;
 
 use ReflectionClass;
+use Nette\Utils\Finder;
 use SixtyEightPublishers\DoctrineBridge\DI\EntityMapping;
 
 trait AutoRegisterDoctrineXmlMappingTrait
 {
+	use ExtendedAggregatesResolverTrait;
+
 	protected ?string $xmlMappingDirectory = NULL;
 
 	/**
@@ -29,12 +32,24 @@ trait AutoRegisterDoctrineXmlMappingTrait
 			return [];
 		}
 
-		$baseNamespaceParts = array_reverse(explode('\\', $reflection->getNamespaceName()));
-		$baseNamespaceParts = array_slice($baseNamespaceParts, substr_count($directory, '..'));
-		$namespace = implode('\\', array_reverse($baseNamespaceParts)) . '\\Domain';
+		# Mapping files for ValueObjects (embeddables)
+		$entityMappings = [];
+		$resolvedTargetEntities = $this->resolveExtendedAggregates();
 
-		return [
-			new EntityMapping(EntityMapping::DRIVER_XML, $namespace, $realpath),
-		];
+		# Mapping files for Aggregates
+		foreach (Finder::findFiles('*.dcm.xml')->in($realpath) as $file) {
+			$aggregateClassname = str_replace('.', '\\', $file->getBasename('.dcm.xml'));
+
+			foreach ($resolvedTargetEntities as $originalClassname => $usedClassname) {
+				# An aggregate is extended in the project, don't load mapping for the aggregate
+				if ($originalClassname === $aggregateClassname && $originalClassname !== $usedClassname) {
+					continue 2;
+				}
+			}
+
+			$entityMappings[] = new EntityMapping(EntityMapping::DRIVER_XML, $aggregateClassname, $realpath);
+		}
+
+		return $entityMappings;
 	}
 }

@@ -8,4 +8,4 @@ services:
 		autowired: no
 		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Repository\PasswordRequestRepository
 		arguments:
-			classname: %68publishers.forgot_password_bundle.entity_classname.password_request%
+			classname: %68publishers.forgot_password_bundle.aggregate_classname.password_request%

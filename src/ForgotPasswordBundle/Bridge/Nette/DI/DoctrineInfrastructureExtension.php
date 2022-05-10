@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ForgotPasswordBundle\Bridge\Nette\DI;
 
 use Nette\DI\CompilerExtension;
-use SixtyEightPublishers\DoctrineBridge\DI\TargetEntity;
 use SixtyEightPublishers\DoctrineBridge\DI\DatabaseTypeProviderInterface;
 use SixtyEightPublishers\DoctrineBridge\DI\TargetEntityProviderInterface;
 use SixtyEightPublishers\DoctrineBridge\DI\EntityMappingProviderInterface;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\AutoRegisterDoctrineTypesTrait;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\AutoRegisterDoctrineXmlMappingTrait;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\AutoRegisterDoctrineTargetEntitiesTrait;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\DoctrineInfrastructureExtension as MainDoctrineInfrastructureExtension;
 
 final class DoctrineInfrastructureExtension extends CompilerExtension implements InfrastructureExtensionInterface, DatabaseTypeProviderInterface, TargetEntityProviderInterface, EntityMappingProviderInterface
@@ -20,6 +19,7 @@ final class DoctrineInfrastructureExtension extends CompilerExtension implements
 	use CompilerExtensionUtilsTrait;
 	use AutoRegisterDoctrineTypesTrait;
 	use AutoRegisterDoctrineXmlMappingTrait;
+	use AutoRegisterDoctrineTargetEntitiesTrait;
 
 	/**
 	 * {@inheritDoc}
@@ -33,21 +33,13 @@ final class DoctrineInfrastructureExtension extends CompilerExtension implements
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @return array
 	 */
-	public function getTargetEntities(): array
+	public function resolveExtendedAggregates(): array
 	{
-		$userBundleExtension = $this->requireCompilerExtension(ForgotPasswordBundleExtension::class);
-		assert($userBundleExtension instanceof ForgotPasswordBundleExtension);
+		$extension = $this->requireCompilerExtension(ForgotPasswordBundleExtension::class);
+		assert($extension instanceof ForgotPasswordBundleExtension);
 
-		$classname = $userBundleExtension->getConfig()->entity_classname->password_request;
-
-		if (PasswordRequest::class === $classname) {
-			return [];
-		}
-
-		return [
-			new TargetEntity(PasswordRequest::class, $classname),
-		];
+		return $extension->resolveExtendedAggregates();
 	}
 }

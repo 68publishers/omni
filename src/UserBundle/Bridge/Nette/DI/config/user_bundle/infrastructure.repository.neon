@@ -8,4 +8,4 @@ services:
 		autowired: no
 		factory: SixtyEightPublishers\UserBundle\Infrastructure\Repository\UserRepository
 		arguments:
-			classname: %68publishers.user_bundle.entity_classname.user%
+			classname: %68publishers.user_bundle.aggregate_classname.user%

@@ -13,10 +13,12 @@ use Nette\Bridges\SecurityDI\SecurityExtension;
 use SixtyEightPublishers\UserBundle\Domain\Aggregate\User;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\ArchitectureBundleExtension;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\ExtendedAggregatesResolverTrait;
 
 final class UserBundleExtension extends CompilerExtension
 {
 	use CompilerExtensionUtilsTrait;
+	use ExtendedAggregatesResolverTrait;
 
 	/**
 	 * {@inheritDoc}
@@ -24,7 +26,7 @@ final class UserBundleExtension extends CompilerExtension
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
-			'entity_classname' => Expect::structure([
+			'aggregate_classname' => Expect::structure([
 				'user' => Expect::string(User::class)
 					->assert(static function (string $classname) {
 						if (!is_a($classname, User::class, TRUE)) {
@@ -50,10 +52,20 @@ final class UserBundleExtension extends CompilerExtension
 		$this->requireCompilerExtension(SecurityExtension::class);
 		$this->requireCompilerExtension(HttpExtension::class);
 
-		$this->setBundleParameter('entity_classname', [
-			'user' => $this->config->entity_classname->user,
+		$this->setBundleParameter('aggregate_classname', [
+			'user' => $this->config->aggregate_classname->user,
 		]);
 
 		$this->loadConfigurationDir(__DIR__ . '/config/user_bundle');
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function resolveExtendedAggregates(): array
+	{
+		return [
+			User::class => $this->config->aggregate_classname->user,
+		];
 	}
 }
