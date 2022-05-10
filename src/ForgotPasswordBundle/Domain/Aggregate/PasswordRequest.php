@@ -59,7 +59,7 @@ class PasswordRequest implements AggregateRootInterface
 	 */
 	public static function requestPasswordChange(RequestPasswordChangeCommand $command, PasswordRequestExpirationProviderInterface $expirationProvider, CheckEmailAddressExistsInterface $checkEmailAddressExists): self
 	{
-		$passwordRequest = new self();
+		$passwordRequest = new static();
 
 		$passwordRequestId = NULL !== $command->passwordRequestId() ? PasswordRequestId::fromString($command->passwordRequestId()) : PasswordRequestId::new();
 		$emailAddress = ValidEmailAddress::fromValue($command->emailAddress());

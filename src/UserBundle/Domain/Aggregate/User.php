@@ -58,7 +58,7 @@ class User implements AggregateRootInterface
 	 */
 	public static function create(CreateUserCommand $command, PasswordHashAlgorithmInterface $algorithm, CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness, CheckUsernameUniquenessInterface $checkUsernameUniqueness): self
 	{
-		$user = new self();
+		$user = new static();
 
 		$userId = NULL !== $command->userId() ? UserId::fromString($command->userId()) : UserId::new();
 		$password = NULL !== $command->password() ? Password::fromValue($command->password())->createHashedPassword($algorithm) : NULL;
