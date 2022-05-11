@@ -15,7 +15,7 @@ abstract class AbstractArrayValueObject implements ArrayValueObjectInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function fromArray(array $array): ArrayValueObjectInterface
+	public static function fromArray(array $array): self
 	{
 		$valueObject = new static();
 		$valueObject->values = $array;
@@ -56,7 +56,18 @@ abstract class AbstractArrayValueObject implements ArrayValueObjectInterface
 			return FALSE;
 		}
 
-		return $this->compareValues($this->values(), $valueObject->values());
+		return $this->doCompareValues($this->values(), $valueObject->values());
+	}
+
+	/**
+	 * @param array $left
+	 * @param array $right
+	 *
+	 * @return bool
+	 */
+	protected function doCompareValues(array $left, array $right): bool
+	{
+		return $this->compareValues($left, $right);
 	}
 
 	/**

@@ -57,9 +57,9 @@ class Message implements MessageInterface
 		$parameters = $this->parameters();
 		$parameters[$name] = $value;
 
-		$command = new static();
-		$command->parameters = $parameters;
+		$message = new static();
+		$message->parameters = $parameters;
 
-		return $command;
+		return $message;
 	}
 }

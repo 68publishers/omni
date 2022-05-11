@@ -11,7 +11,7 @@ interface ArrayValueObjectInterface extends ComparableValueObjectInterface
 	 *
 	 * @return $this
 	 */
-	public function fromArray(array $array): self;
+	public static function fromArray(array $array): self;
 
 	/**
 	 * @return array
