@@ -100,12 +100,12 @@ final class DoctrineEventStore implements EventStoreInterface
 
 		if (NULL !== $criteria->createdBefore()) {
 			$qb->andWhere('created_at <= :beforeDateTime')
-				->setParameter('beforeDateTime', $criteria->createdBefore());
+				->setParameter('beforeDateTime', $criteria->createdBefore(), Types::DATETIME_IMMUTABLE);
 		}
 
 		if (NULL !== $criteria->createdAfter()) {
-			$qb->andWhere('created_at => :afterDateTime')
-				->setParameter('afterDateTime', $criteria->createdAfter());
+			$qb->andWhere('created_at >= :afterDateTime')
+				->setParameter('afterDateTime', $criteria->createdAfter(), Types::DATETIME_IMMUTABLE);
 		}
 
 		if (NULL !== $criteria->limit()) {
@@ -118,11 +118,13 @@ final class DoctrineEventStore implements EventStoreInterface
 
 		switch ($criteria->sorting()) {
 			case $criteria::SORTING_FROM_OLDEST:
-				$qb->orderBy('created_at', 'ASC');
+				$qb->orderBy('created_at', 'ASC')
+					->addOrderBy('id', 'ASC');
 
 				break;
 			case $criteria::SORTING_FROM_NEWEST:
-				$qb->orderBy('created_at', 'DESC');
+				$qb->orderBy('created_at', 'DESC')
+					->addOrderBy('id', 'DESC');
 
 				break;
 		}

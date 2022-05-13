@@ -39,7 +39,11 @@ final class CreateEventStreamSubscriber implements EventSubscriber
 		$tableName = $args->getClassTable()->getName() . '_event_stream';
 		$table = $schema->createTable($tableName);
 
-		$table->addColumn('event_id', EventId::class, ['unique' => TRUE])
+		$table->addColumn('id', 'bigint')
+			->setNotnull(TRUE)
+			->setAutoincrement(TRUE);
+
+		$table->addColumn('event_id', EventId::class)
 			->setNotnull(TRUE);
 
 		$table->addColumn('aggregate_id', AggregateId::class)
@@ -54,11 +58,14 @@ final class CreateEventStreamSubscriber implements EventSubscriber
 		$table->addColumn('parameters', 'json')
 			->setNotnull(TRUE);
 
-		$table->addColumn('metadata', 'json', ['jsonb' => TRUE])
-			->setNotnull(TRUE);
+		$table->addColumn('metadata', 'json')
+			->setNotnull(TRUE)
+			->setPlatformOption('jsonb', TRUE);
 
-		$table->setPrimaryKey(['event_id']);
+		$table->setPrimaryKey(['id']);
+		$table->addIndex(['event_id'], 'idx_' . $tableName . '_event_id');
 		$table->addIndex(['aggregate_id'], 'idx_' . $tableName . '_aggregate_id');
 		$table->addIndex(['created_at'], 'idx_' . $tableName . '_created_at');
+		$table->addUniqueIndex(['event_id'], 'uniq_' . $tableName . '_event_id');
 	}
 }
