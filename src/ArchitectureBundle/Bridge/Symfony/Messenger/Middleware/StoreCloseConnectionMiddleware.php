@@ -8,18 +8,18 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface;
 
 final class StoreCloseConnectionMiddleware implements MiddlewareInterface
 {
-	private StoreAdapterInterface $storeAdapter;
+	private PersistenceAdapterInterface $persistenceAdapter;
 
 	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface $storeAdapter
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface $persistenceAdapter
 	 */
-	public function __construct(StoreAdapterInterface $storeAdapter)
+	public function __construct(PersistenceAdapterInterface $persistenceAdapter)
 	{
-		$this->storeAdapter = $storeAdapter;
+		$this->persistenceAdapter = $persistenceAdapter;
 	}
 
 	/**
@@ -34,7 +34,7 @@ final class StoreCloseConnectionMiddleware implements MiddlewareInterface
 			return $stack->next()->handle($envelope, $stack);
 		} finally {
 			if (NULL !== $envelope->last(ConsumedByWorkerStamp::class)) {
-				$this->storeAdapter->closeConnection();
+				$this->persistenceAdapter->closeConnection();
 			}
 		}
 	}

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter;
+namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter;
 
-interface StoreAdapterInterface
+interface PersistenceAdapterInterface
 {
 	/**
 	 * @return bool

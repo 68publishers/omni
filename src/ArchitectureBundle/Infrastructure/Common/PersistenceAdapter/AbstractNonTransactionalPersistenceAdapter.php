@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter;
+namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter;
 
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Exception\TransactionException;
 
-abstract class AbstractNonTransactionalStoreAdapter implements StoreAdapterInterface
+abstract class AbstractNonTransactionalPersistenceAdapter implements PersistenceAdapterInterface
 {
 	/**
 	 * {@inheritDoc}

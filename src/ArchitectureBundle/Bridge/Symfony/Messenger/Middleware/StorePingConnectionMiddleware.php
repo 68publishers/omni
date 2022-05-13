@@ -8,18 +8,18 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface;
 
 final class StorePingConnectionMiddleware implements MiddlewareInterface
 {
-	private StoreAdapterInterface $storeAdapter;
+	private PersistenceAdapterInterface $persistenceAdapter;
 
 	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface $storeAdapter
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface $persistenceAdapter
 	 */
-	public function __construct(StoreAdapterInterface $storeAdapter)
+	public function __construct(PersistenceAdapterInterface $persistenceAdapter)
 	{
-		$this->storeAdapter = $storeAdapter;
+		$this->persistenceAdapter = $persistenceAdapter;
 	}
 
 	/**
@@ -31,7 +31,7 @@ final class StorePingConnectionMiddleware implements MiddlewareInterface
 	public function handle(Envelope $envelope, StackInterface $stack): Envelope
 	{
 		if (NULL !== $envelope->last(ConsumedByWorkerStamp::class)) {
-			$this->storeAdapter->pingConnection();
+			$this->persistenceAdapter->pingConnection();
 		}
 
 		return $stack->next()->handle($envelope, $stack);

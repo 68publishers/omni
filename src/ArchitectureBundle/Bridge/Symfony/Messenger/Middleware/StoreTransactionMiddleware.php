@@ -10,18 +10,18 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface;
 
 final class StoreTransactionMiddleware implements MiddlewareInterface
 {
-	private StoreAdapterInterface $storeAdapter;
+	private PersistenceAdapterInterface $persistenceAdapter;
 
 	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface $storeAdapter
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface $persistenceAdapter
 	 */
-	public function __construct(StoreAdapterInterface $storeAdapter)
+	public function __construct(PersistenceAdapterInterface $persistenceAdapter)
 	{
-		$this->storeAdapter = $storeAdapter;
+		$this->persistenceAdapter = $persistenceAdapter;
 	}
 
 	/**
@@ -33,21 +33,21 @@ final class StoreTransactionMiddleware implements MiddlewareInterface
 	 */
 	public function handle(Envelope $envelope, StackInterface $stack): Envelope
 	{
-		if ($this->storeAdapter->supportsTransactions()) {
-			$this->storeAdapter->beginTransaction();
+		if ($this->persistenceAdapter->supportsTransactions()) {
+			$this->persistenceAdapter->beginTransaction();
 		}
 
 		try {
 			$envelope = $stack->next()->handle($envelope, $stack);
 
-			if ($this->storeAdapter->supportsTransactions()) {
-				$this->storeAdapter->commitTransaction();
+			if ($this->persistenceAdapter->supportsTransactions()) {
+				$this->persistenceAdapter->commitTransaction();
 			}
 
 			return $envelope;
 		} catch (Throwable $exception) {
-			if ($this->storeAdapter->supportsTransactions()) {
-				$this->storeAdapter->rollbackTransaction();
+			if ($this->persistenceAdapter->supportsTransactions()) {
+				$this->persistenceAdapter->rollbackTransaction();
 			}
 
 			if ($exception instanceof HandlerFailedException) {

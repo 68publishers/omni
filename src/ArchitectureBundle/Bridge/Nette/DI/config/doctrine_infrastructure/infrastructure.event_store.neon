@@ -1,0 +1,3 @@
+services:
+	infrastructure.event_store.event_subscriber.create_event_stream:
+		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\EventSubscriber\CreateEventStreamSubscriber

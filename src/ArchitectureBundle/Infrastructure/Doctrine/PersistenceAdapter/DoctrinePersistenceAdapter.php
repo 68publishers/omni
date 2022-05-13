@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\StoreAdapter;
+namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\PersistenceAdapter;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Exception as DbalException;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Exception\TransactionException;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\StoreAdapter\StoreAdapterInterface;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface;
 
-final class DoctrineStoreAdapter implements StoreAdapterInterface
+final class DoctrinePersistenceAdapter implements PersistenceAdapterInterface
 {
 	protected ManagerRegistry $managerRegistry;
 

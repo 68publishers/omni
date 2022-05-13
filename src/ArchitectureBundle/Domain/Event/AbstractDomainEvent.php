@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Event;
 
 use DateTimeZone;
-use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
-use Ramsey\Uuid\UuidInterface;
 use SixtyEightPublishers\ArchitectureBundle\Event\EventInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 abstract class AbstractDomainEvent implements EventInterface
@@ -18,7 +17,7 @@ abstract class AbstractDomainEvent implements EventInterface
 
 	protected string $eventName;
 
-	protected UuidInterface $eventId;
+	protected EventId $eventId;
 
 	protected DateTimeImmutable $createdAt;
 
@@ -27,15 +26,15 @@ abstract class AbstractDomainEvent implements EventInterface
 	protected array $metadata;
 
 	/**
-	 * @param string                     $eventName
-	 * @param \Ramsey\Uuid\UuidInterface $eventId
-	 * @param \DateTimeImmutable         $createdAt
-	 * @param array                      $metadata
-	 * @param array                      $parameters
+	 * @param string                                                              $eventName
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId $eventId
+	 * @param \DateTimeImmutable                                                  $createdAt
+	 * @param array                                                               $metadata
+	 * @param array                                                               $parameters
 	 *
 	 * @return static
 	 */
-	public static function reconstitute(string $eventName, UuidInterface $eventId, DateTimeImmutable $createdAt, array $metadata, array $parameters): self
+	public static function reconstitute(string $eventName, EventId $eventId, DateTimeImmutable $createdAt, array $metadata, array $parameters): self
 	{
 		$event = new static();
 
@@ -58,9 +57,9 @@ abstract class AbstractDomainEvent implements EventInterface
 	}
 
 	/**
-	 * @return \Ramsey\Uuid\UuidInterface
+	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId
 	 */
-	public function eventId(): UuidInterface
+	public function eventId(): EventId
 	{
 		return $this->eventId;
 	}
@@ -188,7 +187,7 @@ abstract class AbstractDomainEvent implements EventInterface
 		$event = new static();
 
 		$event->eventName = static::class;
-		$event->eventId = Uuid::uuid4();
+		$event->eventId = EventId::new();
 		/** @noinspection PhpUnhandledExceptionInspection */
 		$event->createdAt = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 		$event->parameters = $parameters;
