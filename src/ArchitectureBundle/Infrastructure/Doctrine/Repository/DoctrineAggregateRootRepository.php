@@ -7,6 +7,7 @@ namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Reposi
 use Doctrine\ORM\EntityManagerInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AggregateDeleted;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface;
@@ -17,14 +18,18 @@ final class DoctrineAggregateRootRepository implements AggregateRootRepositoryIn
 	
 	private EventPublisherInterface $eventPublisher;
 
+	private EventStoreInterface $eventStore;
+
 	/**
 	 * @param \Doctrine\ORM\EntityManagerInterface                                                                  $em
 	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface $eventPublisher
+	 * @param \SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface                               $eventStore
 	 */
-	public function __construct(EntityManagerInterface $em, EventPublisherInterface $eventPublisher)
+	public function __construct(EntityManagerInterface $em, EventPublisherInterface $eventPublisher, EventStoreInterface $eventStore)
 	{
 		$this->em = $em;
 		$this->eventPublisher = $eventPublisher;
+		$this->eventStore = $eventStore;
 	}
 
 	/**
@@ -48,7 +53,10 @@ final class DoctrineAggregateRootRepository implements AggregateRootRepositoryIn
 			$this->em->persist($aggregateRoot);
 		}
 
-		$this->eventPublisher->publish(get_class($aggregateRoot), $aggregateRoot->aggregateId(), $events);
+		$aggregateRootClassname = get_class($aggregateRoot);
+
+		$this->eventStore->store($aggregateRootClassname, $events);
+		$this->eventPublisher->publish($aggregateRootClassname, $aggregateRoot->aggregateId(), $events);
 	}
 
 	/**
