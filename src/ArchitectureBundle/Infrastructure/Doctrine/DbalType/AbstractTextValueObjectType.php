@@ -46,4 +46,12 @@ abstract class AbstractTextValueObjectType extends TextType
 
 		return parent::convertToDatabaseValue($value, $platform);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+	{
+		return TRUE;
+	}
 }

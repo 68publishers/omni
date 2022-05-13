@@ -42,4 +42,12 @@ abstract class AbstractValueObjectSetType extends JsonType
 
 		return parent::convertToDatabaseValue(NULL !== $value ? $value->toArray() : NULL, $platform);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+	{
+		return TRUE;
+	}
 }

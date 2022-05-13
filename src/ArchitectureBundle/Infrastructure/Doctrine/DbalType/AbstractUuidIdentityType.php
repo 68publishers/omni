@@ -78,4 +78,12 @@ abstract class AbstractUuidIdentityType extends GuidType
 
 		return $uuid;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+	{
+		return TRUE;
+	}
 }

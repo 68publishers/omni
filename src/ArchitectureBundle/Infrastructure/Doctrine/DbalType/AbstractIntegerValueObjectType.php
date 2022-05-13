@@ -46,4 +46,12 @@ abstract class AbstractIntegerValueObjectType extends IntegerType
 
 		return parent::convertToDatabaseValue($value, $platform);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+	{
+		return TRUE;
+	}
 }
