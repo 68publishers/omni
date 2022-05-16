@@ -143,12 +143,17 @@ final class DoctrineEventStore implements EventStoreInterface
 	 * @param string $aggregateRootClassname
 	 *
 	 * @return string
+	 * @throws \Doctrine\DBAL\Exception
 	 */
 	private function getTableName(string $aggregateRootClassname): string
 	{
 		$classMetadata = $this->em->getClassMetadata($aggregateRootClassname);
+		$tableName = $classMetadata->getTableName();
+		$quoteCharacter = $this->em->getConnection()->getDatabasePlatform()->getIdentifierQuoteCharacter();
 
-		return $classMetadata->getTableName() . '_event_stream';
+		$tableName = trim($tableName, $quoteCharacter);
+
+		return $tableName . '_event_stream';
 	}
 
 	/**
