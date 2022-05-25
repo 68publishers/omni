@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate;
 
+use DateTimeImmutable;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AggregateDeleted;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\UnableToRecordEventOnDeletedAggregateException;
@@ -14,7 +15,7 @@ trait DeletableAggregateRootTrait
 		recordThat as _recordThat;
 	}
 
-	private bool $deleted = FALSE;
+	protected ?DateTimeImmutable $deletedAt = NULL;
 
 	/**
 	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent $event
@@ -35,7 +36,7 @@ trait DeletableAggregateRootTrait
 	 */
 	public function deleted(): bool
 	{
-		return $this->deleted;
+		return NULL !== $this->deletedAt;
 	}
 
 	/**
@@ -43,7 +44,7 @@ trait DeletableAggregateRootTrait
 	 */
 	public function delete(): void
 	{
-		if (!$this->deleted) {
+		if (!$this->deletedAt) {
 			$this->recordThat(AggregateDeleted::create($this->aggregateId()));
 		}
 	}
@@ -55,6 +56,6 @@ trait DeletableAggregateRootTrait
 	 */
 	protected function whenAggregateDeleted(AggregateDeleted $event): void
 	{
-		$this->deleted = TRUE;
+		$this->deletedAt = $event->createdAt();
 	}
 }

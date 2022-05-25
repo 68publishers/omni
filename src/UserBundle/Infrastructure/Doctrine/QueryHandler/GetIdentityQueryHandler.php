@@ -35,6 +35,7 @@ final class GetIdentityQueryHandler implements QueryHandlerInterface
 			->select('u')
 			->from(User::class, 'u')
 			->where('u.id = :id')
+			->andWhere('u.deletedAt IS NULL')
 			->setParameter('id', $query->id())
 			->getQuery()
 			->getOneOrNullResult(AbstractQuery::HYDRATE_ARRAY);

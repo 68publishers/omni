@@ -13,6 +13,8 @@ final class DoctrineInfrastructureExtension extends CompilerExtension implements
 	use CompilerExtensionUtilsTrait;
 	use AutoRegisterDoctrineTypesTrait;
 
+	public const DOCTRINE_PLATFORM_ALIAS = '68publishers.doctrine_platform';
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -22,5 +24,7 @@ final class DoctrineInfrastructureExtension extends CompilerExtension implements
 		$this->requireCompilerExtension(DoctrineBridgeExtension::class);
 		$this->checkCompilerExtensionConcurrency(InfrastructureExtensionInterface::class);
 		$this->loadConfigurationDir(__DIR__ . '/config/doctrine_infrastructure');
+
+		$this->getContainerBuilder()->addAlias(self::DOCTRINE_PLATFORM_ALIAS, $this->prefix('infrastructure.platform'));
 	}
 }

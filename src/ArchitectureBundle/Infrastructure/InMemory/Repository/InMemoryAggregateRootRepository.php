@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\Repository;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AggregateDeleted;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemoryStorageInterface;
@@ -42,28 +41,7 @@ final class InMemoryAggregateRootRepository implements AggregateRootRepositoryIn
 	{
 		$events = $aggregateRoot->popRecordedEvents();
 
-		if ($this->containsDeletedEvent($events)) {
-			$this->memoryStorage->section(get_class($aggregateRoot))->remove($aggregateRoot->aggregateId()->toString());
-		} else {
-			$this->memoryStorage->section(get_class($aggregateRoot))->add($aggregateRoot->aggregateId()->toString(), $aggregateRoot);
-		}
-
+		$this->memoryStorage->section(get_class($aggregateRoot))->add($aggregateRoot->aggregateId()->toString(), $aggregateRoot);
 		$this->eventPublisher->publish(get_class($aggregateRoot), $aggregateRoot->aggregateId(), $events);
-	}
-
-	/**
-	 * @param array $events
-	 *
-	 * @return bool
-	 */
-	private function containsDeletedEvent(array $events): bool
-	{
-		foreach ($events as $event) {
-			if ($event instanceof AggregateDeleted) {
-				return TRUE;
-			}
-		}
-
-		return FALSE;
 	}
 }

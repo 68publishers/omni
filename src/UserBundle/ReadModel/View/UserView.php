@@ -20,6 +20,8 @@ class UserView extends AbstractView
 
 	public DateTimeImmutable $createdAt;
 
+	public ?DateTimeImmutable $deletedAt = NULL;
+
 	public Username $username;
 
 	public ?HashedPassword $password = NULL;
@@ -39,6 +41,7 @@ class UserView extends AbstractView
 			# password is omitted
 			'id' => $this->id->toString(),
 			'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
+			'deletedAt' => NULL !== $this->deletedAt ? $this->deletedAt->format(DateTimeInterface::ATOM) : NULL,
 			'username' => $this->username->value(),
 			'emailAddress' => $this->emailAddress->value(),
 			'name' => [

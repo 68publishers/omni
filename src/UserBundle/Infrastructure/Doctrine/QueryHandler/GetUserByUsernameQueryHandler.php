@@ -34,7 +34,8 @@ final class GetUserByUsernameQueryHandler implements QueryHandlerInterface
 		$data = $this->em->createQueryBuilder()
 			->select('u')
 			->from(User::class, 'u')
-			->where('u.username = :username')
+			->where('LOWER(u.username) = LOWER(:username)')
+			->andWhere('u.deletedAt IS NULL')
 			->setParameter('username', $query->username())
 			->getQuery()
 			->getOneOrNullResult(AbstractQuery::HYDRATE_ARRAY);

@@ -1,0 +1,3 @@
+services:
+	infrastructure.platform:
+		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Platform\PostgreSqlPlatform

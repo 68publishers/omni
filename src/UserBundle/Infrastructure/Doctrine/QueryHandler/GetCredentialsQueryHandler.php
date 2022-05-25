@@ -34,7 +34,8 @@ final class GetCredentialsQueryHandler implements QueryHandlerInterface
 		$data = $this->em->createQueryBuilder()
 			->select('u.id, u.username, u.password')
 			->from(User::class, 'u')
-			->where('u.username = :username')
+			->where('LOWER(u.username) = LOWER(:username)')
+			->andWhere('u.deletedAt IS NULL')
 			->setParameter('username', $query->username())
 			->getQuery()
 			->getOneOrNullResult(AbstractQuery::HYDRATE_ARRAY);

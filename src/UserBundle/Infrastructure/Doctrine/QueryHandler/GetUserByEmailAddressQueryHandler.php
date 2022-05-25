@@ -34,7 +34,8 @@ final class GetUserByEmailAddressQueryHandler implements QueryHandlerInterface
 		$data = $this->em->createQueryBuilder()
 			->select('u')
 			->from(User::class, 'u')
-			->where('u.emailAddress = :emailAddress')
+			->where('LOWER(u.emailAddress) = LOWER(:emailAddress)')
+			->andWhere('u.deletedAt IS NULL')
 			->setParameter('emailAddress', $query->emailAddress())
 			->getQuery()
 			->getOneOrNullResult(AbstractQuery::HYDRATE_ARRAY);
