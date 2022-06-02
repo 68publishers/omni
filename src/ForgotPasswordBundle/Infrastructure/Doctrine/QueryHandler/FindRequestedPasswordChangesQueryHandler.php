@@ -36,7 +36,7 @@ final class FindRequestedPasswordChangesQueryHandler implements QueryHandlerInte
 		$doctrineQuery = $this->em->createQueryBuilder()
 			->select('pr')
 			->from(PasswordRequest::class, 'pr')
-			->where('pr.emailAddress = :emailAddress')
+			->where('LOWER(pr.emailAddress) = LOWER(:emailAddress)')
 			->andWhere('pr.status = :status')
 			->orderBy('pr.requestedAt', 'ASC')
 			->setParameters([
