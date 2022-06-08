@@ -1,0 +1,6 @@
+services:
+	infrastructure.read_model.batch_generator_factory:
+		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\BatchGeneratorFactory
+
+	infrastructure.read_model.paginated_result_factory:
+		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\PaginatedResultFactory

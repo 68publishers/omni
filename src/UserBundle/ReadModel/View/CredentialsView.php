@@ -18,22 +18,6 @@ class CredentialsView extends AbstractView
 	public ?HashedPassword $password = NULL;
 
 	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId              $id
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Username            $username
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword|NULL $password
-	 *
-	 * @return static
-	 */
-	public static function fromCredentials(UserId $id, Username $username, ?HashedPassword $password): self
-	{
-		return self::fromArray([
-			'id' => $id,
-			'username' => $username,
-			'password' => $password,
-		]);
-	}
-
-	/**
 	 * @return array
 	 */
 	public function jsonSerialize(): array

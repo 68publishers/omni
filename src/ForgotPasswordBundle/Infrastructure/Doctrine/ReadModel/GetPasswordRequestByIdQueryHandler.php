@@ -2,25 +2,31 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\QueryHandler;
+namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\ReadModel;
 
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest;
+use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View\PasswordRequestView;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\Query\GetPasswordRequestByIdQuery;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\DoctrineViewData;
 
 final class GetPasswordRequestByIdQueryHandler implements QueryHandlerInterface
 {
 	private EntityManagerInterface $em;
 
+	private ViewFactoryInterface $viewFactory;
+
 	/**
-	 * @param \Doctrine\ORM\EntityManagerInterface $em
+	 * @param \Doctrine\ORM\EntityManagerInterface                                         $em
+	 * @param \SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface $viewFactory
 	 */
-	public function __construct(EntityManagerInterface $em)
+	public function __construct(EntityManagerInterface $em, ViewFactoryInterface $viewFactory)
 	{
 		$this->em = $em;
+		$this->viewFactory = $viewFactory;
 	}
 
 	/**
@@ -39,6 +45,6 @@ final class GetPasswordRequestByIdQueryHandler implements QueryHandlerInterface
 			->getQuery()
 			->getOneOrNullResult(AbstractQuery::HYDRATE_ARRAY);
 
-		return NULL !== $data ? ViewFactory::createPasswordRequestView($data) : NULL;
+		return NULL !== $data ? $this->viewFactory->create(PasswordRequestView::class, DoctrineViewData::create($data)) : NULL;
 	}
 }

@@ -1,20 +1,25 @@
 services:
-	infrastructure.query_handler.get_credentials:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetCredentialsQueryHandler
+	infrastructure.read_model.view.data_transformer.user:
+		autowired: self
+		type: SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataTransformerInterface
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\UserViewDataTransformer
 
-	infrastructure.query_handler.get_identity:
+	infrastructure.read_model.query_handler.get_credentials:
 		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetIdentityQueryHandler
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetCredentialsQueryHandler
 
-	infrastructure.query_handler.get_user_by_email_address:
+	infrastructure.read_model.query_handler.get_identity:
 		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetUserByEmailAddressQueryHandler
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetIdentityQueryHandler
 
-	infrastructure.query_handler.get_user_by_id:
+	infrastructure.read_model.query_handler.get_user_by_email_address:
 		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetUserByIdQueryHandler
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetUserByEmailAddressQueryHandler
 
-	infrastructure.query_handler.get_user_by_username:
+	infrastructure.read_model.query_handler.get_user_by_id:
 		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\QueryHandler\GetUserByUsernameQueryHandler
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetUserByIdQueryHandler
+
+	infrastructure.read_model.query_handler.get_user_by_username:
+		autowired: no
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetUserByUsernameQueryHandler

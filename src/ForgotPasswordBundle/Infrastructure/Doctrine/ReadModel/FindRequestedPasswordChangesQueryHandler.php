@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\QueryHandler;
+namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\ReadModel;
 
 use Generator;
 use Doctrine\ORM\AbstractQuery;
@@ -11,19 +11,23 @@ use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\Status;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View\PasswordRequestView;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterface;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\BatchGeneratorFactory;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\Query\FindRequestedPasswordChangesQuery;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\BatchGeneratorFactory;
 
 final class FindRequestedPasswordChangesQueryHandler implements QueryHandlerInterface
 {
 	private EntityManagerInterface $em;
 
+	private BatchGeneratorFactory $batchGeneratorFactory;
+
 	/**
-	 * @param \Doctrine\ORM\EntityManagerInterface $em
+	 * @param \Doctrine\ORM\EntityManagerInterface                                                             $em
+	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\BatchGeneratorFactory $batchGeneratorFactory
 	 */
-	public function __construct(EntityManagerInterface $em)
+	public function __construct(EntityManagerInterface $em, BatchGeneratorFactory $batchGeneratorFactory)
 	{
 		$this->em = $em;
+		$this->batchGeneratorFactory = $batchGeneratorFactory;
 	}
 
 	/**
@@ -46,6 +50,6 @@ final class FindRequestedPasswordChangesQueryHandler implements QueryHandlerInte
 			->getQuery()
 			->setHydrationMode(AbstractQuery::HYDRATE_ARRAY);
 
-		return BatchGeneratorFactory::create($query, $doctrineQuery, static fn (array $data): PasswordRequestView => ViewFactory::createPasswordRequestView($data));
+		return $this->batchGeneratorFactory->create($query, $doctrineQuery, PasswordRequestView::class);
 	}
 }

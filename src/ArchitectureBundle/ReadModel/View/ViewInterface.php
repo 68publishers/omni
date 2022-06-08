@@ -9,9 +9,14 @@ use JsonSerializable;
 interface ViewInterface extends JsonSerializable
 {
 	/**
-	 * @param array $data
+	 * @param \SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataInterface $viewData
 	 *
 	 * @return static
 	 */
-	public static function fromArray(array $data): self;
+	public static function fromData(ViewDataInterface $viewData): self;
+
+	/**
+	 * @return \SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataInterface
+	 */
+	public function viewData(): ViewDataInterface;
 }

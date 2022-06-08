@@ -2,30 +2,40 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine;
+namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\PaginatedResult;
+use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\PaginatedQueryInterface;
 
 final class PaginatedResultFactory
 {
-	private function __construct()
+	private ViewFactoryInterface $viewFactory;
+
+	/**
+	 * @param \SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface $viewFactory
+	 */
+	public function __construct(ViewFactoryInterface $viewFactory)
 	{
+		$this->viewFactory = $viewFactory;
 	}
 
 	/**
 	 * @param \SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\PaginatedQueryInterface $paginatedQuery
 	 * @param \Doctrine\ORM\Query                                                              $query
-	 * @param callable                                                                         $mapper
+	 * @param string                                                                           $viewClassname
 	 * @param bool                                                                             $fetchJoinCollection
 	 *
 	 * @return \SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\PaginatedResult
 	 */
-	public static function create(PaginatedQueryInterface $paginatedQuery, Query $query, callable $mapper, bool $fetchJoinCollection = FALSE): PaginatedResult
+	public function create(PaginatedQueryInterface $paginatedQuery, Query $query, string $viewClassname, bool $fetchJoinCollection = FALSE): PaginatedResult
 	{
-		$query = $query->setMaxResults($paginatedQuery->limit());
+		$query = $query
+			->setHydrationMode(AbstractQuery::HYDRATE_ARRAY)
+			->setMaxResults($paginatedQuery->limit());
 
 		if (NULL !== $paginatedQuery->offset()) {
 			$query = $query->setFirstResult($paginatedQuery->offset());
@@ -36,7 +46,7 @@ final class PaginatedResultFactory
 		$results = [];
 
 		foreach ($paginator as $item) {
-			$results[] = $mapper($item);
+			$results[] = $this->viewFactory->create($viewClassname, DoctrineViewData::create($item));
 		}
 
 		return PaginatedResult::create(
