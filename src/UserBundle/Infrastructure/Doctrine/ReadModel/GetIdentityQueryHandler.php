@@ -7,7 +7,7 @@ namespace SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use SixtyEightPublishers\UserBundle\Domain\Aggregate\User;
-use SixtyEightPublishers\UserBundle\ReadModel\View\IdentityView;
+use SixtyEightPublishers\UserBundle\ReadModel\View\UserView;
 use SixtyEightPublishers\UserBundle\ReadModel\Query\GetIdentityQuery;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterface;
@@ -32,10 +32,10 @@ final class GetIdentityQueryHandler implements QueryHandlerInterface
 	/**
 	 * @param \SixtyEightPublishers\UserBundle\ReadModel\Query\GetIdentityQuery $query
 	 *
-	 * @return \SixtyEightPublishers\UserBundle\ReadModel\View\IdentityView|NULL
+	 * @return \SixtyEightPublishers\UserBundle\ReadModel\View\UserView|NULL
 	 * @throws \Doctrine\ORM\NonUniqueResultException
 	 */
-	public function __invoke(GetIdentityQuery $query): ?IdentityView
+	public function __invoke(GetIdentityQuery $query): ?UserView
 	{
 		$data = $this->em->createQueryBuilder()
 			->select('u')
@@ -46,6 +46,6 @@ final class GetIdentityQueryHandler implements QueryHandlerInterface
 			->getQuery()
 			->getOneOrNullResult(AbstractQuery::HYDRATE_ARRAY);
 
-		return NULL !== $data ? $this->viewFactory->create(IdentityView::class, DoctrineViewData::create($data)) : NULL;
+		return NULL !== $data ? $this->viewFactory->create(UserView::class, DoctrineViewData::create($data)) : NULL;
 	}
 }

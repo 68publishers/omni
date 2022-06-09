@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Application\Authentication;
 
+use SixtyEightPublishers\UserBundle\ReadModel\View\UserView;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
-use SixtyEightPublishers\UserBundle\ReadModel\View\IdentityView;
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use SixtyEightPublishers\UserBundle\ReadModel\Query\GetIdentityQuery;
 use SixtyEightPublishers\UserBundle\Application\Exception\IdentityException;
@@ -16,7 +16,7 @@ class Identity
 
 	protected ?QueryBusInterface $queryBus = NULL;
 
-	protected ?IdentityView $data = NULL;
+	protected ?UserView $data = NULL;
 
 	protected bool $dataLoaded = FALSE;
 
@@ -46,10 +46,10 @@ class Identity
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\UserBundle\ReadModel\View\IdentityView
+	 * @return \SixtyEightPublishers\UserBundle\ReadModel\View\UserView
 	 * @throws \SixtyEightPublishers\UserBundle\Application\Exception\IdentityException
 	 */
-	public function data(): IdentityView
+	public function data(): UserView
 	{
 		if ($this->dataLoaded) {
 			return $this->data;
@@ -61,7 +61,7 @@ class Identity
 
 		$data = $this->queryBus->dispatch(GetIdentityQuery::create($this->id()->toString()));
 
-		if (!$data instanceof IdentityView) {
+		if (!$data instanceof UserView) {
 			throw IdentityException::dataNotFound($this->id());
 		}
 

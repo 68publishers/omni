@@ -7,7 +7,7 @@ namespace SixtyEightPublishers\UserBundle\ReadModel\Query;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\AbstractQuery;
 
 /**
- * Returns IdentityView
+ * Returns UserView
  */
 final class GetIdentityQuery extends AbstractQuery
 {
