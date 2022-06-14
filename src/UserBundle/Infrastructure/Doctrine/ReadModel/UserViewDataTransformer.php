@@ -7,6 +7,7 @@ namespace SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
 use SixtyEightPublishers\UserBundle\ReadModel\View\UserView;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataInterface;
+use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataTransformerInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\DoctrineViewData;
 
@@ -23,7 +24,7 @@ final class UserViewDataTransformer implements ViewDataTransformerInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function transform(ViewDataInterface $viewData): ViewDataInterface
+	public function transform(ViewDataInterface $viewData, ViewFactoryInterface $viewFactory): ViewDataInterface
 	{
 		return $viewData
 			->with('name', Name::fromValues($viewData->get('name.firstname') ?? '', $viewData->get('name.surname') ?? ''))

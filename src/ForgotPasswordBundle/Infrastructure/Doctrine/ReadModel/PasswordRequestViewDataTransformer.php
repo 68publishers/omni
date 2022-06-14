@@ -6,6 +6,7 @@ namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\Read
 
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataInterface;
+use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View\PasswordRequestView;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataTransformerInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\DoctrineViewData;
@@ -23,7 +24,7 @@ final class PasswordRequestViewDataTransformer implements ViewDataTransformerInt
 	/**
 	 * {@inheritDoc}
 	 */
-	public function transform(ViewDataInterface $viewData): ViewDataInterface
+	public function transform(ViewDataInterface $viewData, ViewFactoryInterface $viewFactory): ViewDataInterface
 	{
 		return $viewData
 			->with('requestDeviceInfo', DeviceInfo::create($viewData->get('requestDeviceInfo.ipAddress'), $viewData->get('requestDeviceInfo.userAgent')))

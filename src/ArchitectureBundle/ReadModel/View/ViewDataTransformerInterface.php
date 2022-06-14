@@ -15,9 +15,10 @@ interface ViewDataTransformerInterface
 	public function canTransform(string $viewClassname, ViewDataInterface $viewData): bool;
 
 	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataInterface $viewData
+	 * @param \SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataInterface    $viewData
+	 * @param \SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface $viewFactory
 	 *
 	 * @return \SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewDataInterface
 	 */
-	public function transform(ViewDataInterface $viewData): ViewDataInterface;
+	public function transform(ViewDataInterface $viewData, ViewFactoryInterface $viewFactory): ViewDataInterface;
 }

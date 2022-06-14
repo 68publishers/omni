@@ -29,7 +29,7 @@ final class ViewFactory implements ViewFactoryInterface
 
 		foreach ($this->viewClassnameTransformers as $viewClassnameTransformer) {
 			if ($viewClassnameTransformer->canTransform($viewClassname, $viewData)) {
-				$viewData = $viewClassnameTransformer->transform($viewData);
+				$viewData = $viewClassnameTransformer->transform($viewData, $this);
 			}
 		}
 
