@@ -28,10 +28,11 @@ final class PaginatedResultFactory
 	 * @param \Doctrine\ORM\Query                                                              $query
 	 * @param string                                                                           $viewClassname
 	 * @param bool                                                                             $fetchJoinCollection
+	 * @param bool|NULL                                                                        $useOutputWalkers
 	 *
 	 * @return \SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\PaginatedResult
 	 */
-	public function create(PaginatedQueryInterface $paginatedQuery, Query $query, string $viewClassname, bool $fetchJoinCollection = FALSE): PaginatedResult
+	public function create(PaginatedQueryInterface $paginatedQuery, Query $query, string $viewClassname, bool $fetchJoinCollection = FALSE, ?bool $useOutputWalkers = NULL): PaginatedResult
 	{
 		$query = $query
 			->setHydrationMode(AbstractQuery::HYDRATE_ARRAY)
@@ -42,6 +43,7 @@ final class PaginatedResultFactory
 		}
 
 		$paginator = new Paginator($query, $fetchJoinCollection);
+		$paginator->setUseOutputWalkers($useOutputWalkers);
 
 		$results = [];
 

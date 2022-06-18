@@ -30,14 +30,17 @@ final class BatchGeneratorFactory
 	 * @param \Doctrine\ORM\Query                                                            $query
 	 * @param string                                                                         $viewClassname
 	 * @param bool                                                                           $fetchJoinCollection
+	 * @param bool|NULL                                                                      $useOutputWalkers
 	 *
 	 * @return \Generator
 	 */
-	public function create(BatchedQueryInterface $batchedQuery, Query $query, string $viewClassname, bool $fetchJoinCollection = FALSE): Generator
+	public function create(BatchedQueryInterface $batchedQuery, Query $query, string $viewClassname, bool $fetchJoinCollection = FALSE, ?bool $useOutputWalkers = NULL): Generator
 	{
 		$query->setHydrationMode(AbstractQuery::HYDRATE_ARRAY);
 
 		$paginator = new Paginator($query, $fetchJoinCollection);
+		$paginator->setUseOutputWalkers($useOutputWalkers);
+
 		$totalCount = count($paginator);
 
 		foreach (BatchUtils::from($totalCount, $batchedQuery->batchSize()) as [$limit, $offset]) {
