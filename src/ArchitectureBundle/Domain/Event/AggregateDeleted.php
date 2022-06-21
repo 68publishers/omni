@@ -8,13 +8,38 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 final class AggregateDeleted extends AbstractDomainEvent
 {
+	private string $aggregateClassname;
+
 	/**
+	 * @param string                                                                  $aggregateClassname
 	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId $aggregateId
 	 *
 	 * @return static
 	 */
-	public static function create(AggregateId $aggregateId): self
+	public static function create(string $aggregateClassname, AggregateId $aggregateId): self
 	{
-		return self::occur($aggregateId->toString(), []);
+		$event = self::occur($aggregateId->toString(), [
+			'aggregate_class_name' => $aggregateClassname,
+		]);
+
+		$event->aggregateClassname = $aggregateClassname;
+
+		return $event;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function aggregateClassname(): string
+	{
+		return $this->aggregateClassname;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function reconstituteState(array $parameters): void
+	{
+		$this->aggregateClassname = $parameters['aggregate_class_name'];
 	}
 }

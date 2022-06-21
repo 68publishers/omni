@@ -45,7 +45,7 @@ trait DeletableAggregateRootTrait
 	public function delete(): void
 	{
 		if (!$this->deletedAt) {
-			$this->recordThat(AggregateDeleted::create($this->aggregateId()));
+			$this->recordThat(AggregateDeleted::create(static::class, $this->aggregateId()));
 		}
 	}
 
