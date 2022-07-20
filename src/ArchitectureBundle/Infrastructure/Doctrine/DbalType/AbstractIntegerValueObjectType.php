@@ -34,7 +34,7 @@ abstract class AbstractIntegerValueObjectType extends IntegerType
 	/**
 	 * {@inheritDoc}
 	 */
-	public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
+	public function convertToDatabaseValue($value, AbstractPlatform $platform): ?int
 	{
 		if (NULL !== $value && !is_int($value) && !$value instanceof IntegerValueObjectInterface) {
 			throw ConversionException::conversionFailed($value, $this->valueObjectClassname);
