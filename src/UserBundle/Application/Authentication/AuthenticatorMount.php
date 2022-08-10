@@ -35,7 +35,7 @@ final class AuthenticatorMount implements AuthenticatorInterface
 	 */
 	public function authenticate(string $username, string $password): Identity
 	{
-		if (FALSE === strpos($username, self::SEPARATOR)) {
+		if (FALSE === mb_strpos($username, self::SEPARATOR)) {
 			if (NULL === $this->defaultAuthenticator) {
 				throw AuthenticatorResolvingException::missingDefault();
 			}

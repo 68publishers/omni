@@ -33,6 +33,6 @@ final class CsrfTokenFactory implements CsrfTokenFactoryInterface
 
 		$hash = hash_hmac('sha1', $component . $this->session->getId(), $section['token'], TRUE);
 
-		return str_replace('/', '_', substr(base64_encode($hash), 0, 8));
+		return str_replace('/', '_', mb_substr(base64_encode($hash), 0, 8));
 	}
 }

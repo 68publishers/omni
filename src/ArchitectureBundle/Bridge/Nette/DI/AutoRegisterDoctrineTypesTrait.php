@@ -33,7 +33,7 @@ trait AutoRegisterDoctrineTypesTrait
 		}
 
 		$baseNamespaceParts = array_reverse(explode('\\', $reflection->getNamespaceName()));
-		$baseNamespaceParts = array_slice($baseNamespaceParts, substr_count($directory, '..'));
+		$baseNamespaceParts = array_slice($baseNamespaceParts, mb_substr_count($directory, '..'));
 
 		$bundleRootNamespacePart = reset($baseNamespaceParts);
 		$namespace = implode('\\', array_reverse($baseNamespaceParts));

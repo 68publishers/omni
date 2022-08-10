@@ -20,7 +20,7 @@ use SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface;
  *
  *
  * @method NetteUser getUser()
- * @method mixed getParameter($key)
+ * @method mixed     getParameter($key)
  */
 trait LogoutPresenterTrait
 {

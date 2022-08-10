@@ -13,8 +13,8 @@ use Nette\InvalidStateException;
 /**
  * @property-read \Nette\DI\Compiler $compiler
  *
- * @method void loadDefinitionsFromConfig(array $config)
- * @method array loadFromFile(string $path)
+ * @method void             loadDefinitionsFromConfig(array $config)
+ * @method array            loadFromFile(string $path)
  * @method ContainerBuilder getContainerBuilder()
  */
 trait CompilerExtensionUtilsTrait
@@ -102,7 +102,7 @@ trait CompilerExtensionUtilsTrait
 		$reflection = new ReflectionClass($this);
 
 		$bundleName = preg_replace('#Extension$#', '', $reflection->getShortName());
-		$bundleName = strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($bundleName)));
+		$bundleName = mb_strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($bundleName)));
 
 		$builder->parameters['68publishers'][$bundleName][$name] = $value;
 	}

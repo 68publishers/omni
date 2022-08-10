@@ -10,7 +10,7 @@ use SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\
 use SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageControlFactoryInterface;
 
 /**
- * @method bool isAjax()
+ * @method bool       isAjax()
  * @method IComponent getComponent(string $name, bool $throw = TRUE)
  */
 trait PresenterTrait

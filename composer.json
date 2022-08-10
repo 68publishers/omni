@@ -20,7 +20,7 @@
 		"68publishers/doctrine-bridge": "^0.2.1",
 		"doctrine/migrations": "^3.5",
 		"doctrine/orm": "^2.12",
-		"friendsofphp/php-cs-fixer": "^2.19",
+		"friendsofphp/php-cs-fixer": "^3.9",
 		"latte/latte": "^2.11",
 		"nette/application": "^3.1",
 		"nette/security": "^3.1",
