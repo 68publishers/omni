@@ -56,7 +56,8 @@ final class CreateEventStreamSubscriber implements EventSubscriber
 			->setNotnull(TRUE);
 
 		$table->addColumn('parameters', 'json')
-			->setNotnull(TRUE);
+			->setNotnull(TRUE)
+			->setPlatformOption('jsonb', TRUE);
 
 		$table->addColumn('metadata', 'json')
 			->setNotnull(TRUE)
