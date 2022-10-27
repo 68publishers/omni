@@ -1,0 +1,7 @@
+allowNoHandlers: yes
+singleHandlerPerMessage: no
+middleware:
+	- Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware(event_bus)
+	- Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware
+	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\OriginalExceptionMiddleware
+panel: %debugMode%

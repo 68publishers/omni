@@ -22,9 +22,14 @@ trait CompilerExtensionUtilsTrait
 	/**
 	 * @param string $extensionClassname
 	 * @param bool   $throw
+	 * @psalm-param class-string<T> $extensionClassname
 	 *
 	 * @return \Nette\DI\CompilerExtension|NULL
+	 * @psalm-return T
+	 *
 	 * @throws \Nette\InvalidStateException
+	 *
+	 * @template T
 	 */
 	protected function requireCompilerExtension(string $extensionClassname, bool $throw = TRUE): ?CompilerExtension
 	{
