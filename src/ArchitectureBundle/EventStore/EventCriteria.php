@@ -11,6 +11,8 @@ final class EventCriteria
 {
 	public const SORTING_FROM_OLDEST = 'oldest';
 	public const SORTING_FROM_NEWEST = 'newest';
+	public const SORTING_FROM_LOWEST_POSITION= 'lowest_position';
+	public const SORTING_FROM_HIGHEST_POSITION= 'highest_position';
 
 	private string $aggregateRootClassname;
 
@@ -145,6 +147,28 @@ final class EventCriteria
 	{
 		$criteria = clone $this;
 		$criteria->sorting = self::SORTING_FROM_OLDEST;
+
+		return $criteria;
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function withLowestPositionSorting(): self
+	{
+		$criteria = clone $this;
+		$criteria->sorting = self::SORTING_FROM_LOWEST_POSITION;
+
+		return $criteria;
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function withHighestPositionSorting(): self
+	{
+		$criteria = clone $this;
+		$criteria->sorting = self::SORTING_FROM_HIGHEST_POSITION;
 
 		return $criteria;
 	}

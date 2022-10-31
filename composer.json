@@ -40,7 +40,8 @@
 			"SixtyEightPublishers\\ArchitectureBundle\\": "src/ArchitectureBundle/",
 			"SixtyEightPublishers\\UserBundle\\": "src/UserBundle/",
 			"SixtyEightPublishers\\ForgotPasswordBundle\\": "src/ForgotPasswordBundle/",
-			"SixtyEightPublishers\\FlashMessageBundle\\": "src/FlashMessageBundle/"
+			"SixtyEightPublishers\\FlashMessageBundle\\": "src/FlashMessageBundle/",
+			"SixtyEightPublishers\\ProjectionBundle\\": "src/ProjectionBundle/"
 		}
 	}
 }
