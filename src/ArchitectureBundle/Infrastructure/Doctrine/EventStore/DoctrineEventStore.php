@@ -117,12 +117,15 @@ final class DoctrineEventStore implements EventStoreInterface
 			case $criteria::SORTING_FROM_NEWEST:
 				$qb->orderBy('created_at', 'DESC')
 					->addOrderBy('id', 'DESC');
+
 				break;
 			case $criteria::SORTING_FROM_LOWEST_POSITION:
 				$qb->orderBy('id', 'ASC');
+
 				break;
 			case $criteria::SORTING_FROM_HIGHEST_POSITION:
 				$qb->orderBy('id', 'DESC');
+
 				break;
 		}
 
