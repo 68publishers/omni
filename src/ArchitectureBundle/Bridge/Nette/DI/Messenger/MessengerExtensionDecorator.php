@@ -6,8 +6,8 @@ namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger;
 
 use Nette\DI\Helpers;
 use Nette\DI\Compiler;
-use Nette\Schema\Schema;
 use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 use Nette\Schema\Context;
 use Nette\Schema\Processor;
 use Nette\DI\CompilerExtension;

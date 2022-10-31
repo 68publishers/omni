@@ -51,4 +51,12 @@ final class EventStoreDecorator implements EventStoreInterface
 	{
 		return $this->eventStore->find($criteria);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function count(EventCriteria $criteria): int
+	{
+		return $this->eventStore->count($criteria);
+	}
 }
