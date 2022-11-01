@@ -1,0 +1,2 @@
+services:
+	console.command.reset_projection: SixtyEightPublishers\ProjectionBundle\Bridge\Symfony\Console\Command\ResetProjectionCommand

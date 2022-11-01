@@ -33,7 +33,7 @@ final class ProjectionStoreDecorator implements ProjectionStoreInterface
 	{
 		$this->inner->resetProjection($projectionClassname);
 
-		$projectionModel = $this->projectionModelLocator->resolveForProjection($projectionClassname);
+		$projectionModel = $this->projectionModelLocator->resolveForProjectionClassname($projectionClassname);
 
 		if (NULL === $projectionModel) {
 			return;

@@ -74,9 +74,9 @@ final class EventStoreReceiver implements ReceiverInterface, MessageCountAwareIn
 		usort(
 			$events,
 			static fn (AbstractDomainEvent $left, AbstractDomainEvent $right): int =>
-			[$left->createdAt(), $left->metadata()[self::METADATA_AGGREGATE_CLASSNAME], $left->metadata()[EventStoreInterface::METADATA_POSITION]]
+			[$left->metadata()[self::METADATA_AGGREGATE_CLASSNAME], $left->metadata()[EventStoreInterface::METADATA_POSITION]]
 			<=>
-			[$right->createdAt(), $right->metadata()[self::METADATA_AGGREGATE_CLASSNAME], $right->metadata()[EventStoreInterface::METADATA_POSITION]]
+			[$right->metadata()[self::METADATA_AGGREGATE_CLASSNAME], $right->metadata()[EventStoreInterface::METADATA_POSITION]]
 		);
 
 		foreach ($events as $event) {

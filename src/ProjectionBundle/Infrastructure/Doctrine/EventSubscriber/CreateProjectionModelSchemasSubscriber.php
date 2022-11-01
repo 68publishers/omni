@@ -26,6 +26,9 @@ final class CreateProjectionModelSchemasSubscriber implements EventSubscriber
 		];
 	}
 
+	/**
+	 * @throws \Doctrine\DBAL\Schema\SchemaException
+	 */
 	public function postGenerateSchema(GenerateSchemaEventArgs $args): void
 	{
 		$schema = $args->getSchema();

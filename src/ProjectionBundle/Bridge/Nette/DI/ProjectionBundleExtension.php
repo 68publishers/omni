@@ -12,6 +12,7 @@ use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\InvalidConfigurationException;
 use Laminas\Code\Reflection\ClassReflection;
 use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionInterface;
+use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionClassnameResolver;
 use SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelInterface;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger\MessageBusConfiguration;
@@ -35,6 +36,7 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 		$this->loadConfigurationDir(__DIR__ . '/config/projection_bundle');
 
 		$builder = $this->getContainerBuilder();
+		$projectionClassnames = [];
 
 		foreach ($this->getConfig() as $i => $projection) {
 			$classname = $projection;
@@ -64,7 +66,13 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 				->setArgument('projectionClassname', $classname)
 				->setAutowired(FALSE)
 				->addTag('messenger.receiver.alias', $classname::projectionName());
+
+			$projectionClassnames[] = $classname;
 		}
+
+		$builder->addDefinition($this->prefix('projection_classname_resolver'))
+			->setType(ProjectionClassnameResolver::class)
+			->setArguments([$projectionClassnames]);
 	}
 
 	/**
@@ -75,7 +83,8 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 		$builder = $this->getContainerBuilder();
 		$locatorDefinition = $builder->getDefinition($this->prefix('projection_model.locator.default'));
 		assert($locatorDefinition instanceof ServiceDefinition);
-		$projectionModelServiceNames = [];
+		$serviceNamesByProjectionClassnames = [];
+		$serviceNamesByProjectionNames = [];
 
 		foreach ($builder->findByType(ProjectionModelInterface::class) as $serviceName => $projectionModelDefinition) {
 			$type = $projectionModelDefinition->getType();
@@ -87,10 +96,15 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 				));
 			}
 
-			$projectionModelServiceNames[call_user_func([$type, 'projectionClassname'])] = $serviceName;
+			$projectionClassname = call_user_func([$type, 'projectionClassname']);
+			$projectionName = call_user_func([$projectionClassname, 'projectionName']);
+
+			$serviceNamesByProjectionClassnames[$projectionClassname] = $serviceName;
+			$serviceNamesByProjectionNames[$projectionName] = $serviceName;
 		}
 
-		$locatorDefinition->setArgument('projectionModelServiceNames', $projectionModelServiceNames);
+		$locatorDefinition->setArgument('serviceNamesByProjectionClassnames', $serviceNamesByProjectionClassnames);
+		$locatorDefinition->setArgument('serviceNamesByProjectionNames', $serviceNamesByProjectionNames);
 	}
 
 	public function provideMessageBusConfigurations(): iterable

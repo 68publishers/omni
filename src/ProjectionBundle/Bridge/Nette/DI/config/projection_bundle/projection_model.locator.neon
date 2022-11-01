@@ -8,4 +8,5 @@ services:
 		autowired: no
 		factory: SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelLocator
 		arguments:
-			projectionModelServiceNames: []
+			serviceNamesByProjectionClassnames: []
+			serviceNamesByProjectionNames: []

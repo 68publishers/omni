@@ -47,7 +47,7 @@ abstract class AbstractProjection implements ProjectionInterface
 			return $this->resolvedProjectionModel;
 		}
 
-		$this->resolvedProjectionModel = $this->projectionModelLocator->resolveForProjection(static::class);
+		$this->resolvedProjectionModel = $this->projectionModelLocator->resolveForProjectionClassname(static::class);
 
 		if (NULL === $this->resolvedProjectionModel) {
 			throw new RuntimeException(sprintf(
