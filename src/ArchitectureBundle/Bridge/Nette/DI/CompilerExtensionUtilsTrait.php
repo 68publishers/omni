@@ -96,18 +96,21 @@ trait CompilerExtensionUtilsTrait
 	}
 
 	/**
-	 * @param string $name
-	 * @param mixed  $value
+	 * @param string      $name
+	 * @param mixed       $value
+	 * @param string|NULL $bundleName
 	 *
 	 * @return void
 	 */
-	protected function setBundleParameter(string $name, $value): void
+	protected function setBundleParameter(string $name, $value, ?string $bundleName = NULL): void
 	{
 		$builder = $this->getContainerBuilder();
 		$reflection = new ReflectionClass($this);
 
-		$bundleName = preg_replace('#Extension$#', '', $reflection->getShortName());
-		$bundleName = mb_strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($bundleName)));
+		if (NULL === $bundleName) {
+			$bundleName = preg_replace('#Extension$#', '', $reflection->getShortName());
+			$bundleName = mb_strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($bundleName)));
+		}
 
 		$builder->parameters['68publishers'][$bundleName][$name] = $value;
 	}

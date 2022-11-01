@@ -12,7 +12,7 @@ final class EventDefinition
 
 	public ?string $methodName;
 
-	public function __construct(string $aggregateRootClassname, string $eventClassname, ?string $methodName)
+	public function __construct(string $aggregateRootClassname, string $eventClassname, ?string $methodName = NULL)
 	{
 		$this->aggregateRootClassname = $aggregateRootClassname;
 		$this->eventClassname = $eventClassname;

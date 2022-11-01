@@ -17,10 +17,13 @@ use SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreInterfa
 
 final class DoctrineProjectionStore implements ProjectionStoreInterface
 {
+	private string $tableName;
+
 	private EntityManagerInterface $em;
 
-	public function __construct(EntityManagerInterface $em)
+	public function __construct(string $tableName, EntityManagerInterface $em)
 	{
+		$this->tableName = $tableName;
 		$this->em = $em;
 	}
 
@@ -47,7 +50,7 @@ final class DoctrineProjectionStore implements ProjectionStoreInterface
 
 			$qb = $connection->createQueryBuilder()
 				->select('aggregate_name, position')
-				->from('projection')
+				->from($this->getTableName())
 				->where('projection_name = :projectionName')
 				->andWhere('aggregate_name IN (:aggregateNames)')
 				->setParameter('projectionName', $projectionClassname::projectionName(), 'string')
@@ -70,17 +73,19 @@ final class DoctrineProjectionStore implements ProjectionStoreInterface
 	 */
 	public function updateLastPosition(string $projectionClassname, string $aggregateClassname, string $position): bool
 	{
+		assert(is_subclass_of($projectionClassname, ProjectionInterface::class, TRUE));
+
 		$connection = $this->em->getConnection();
 		$now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
 		try {
 			$result = 0 < (int) $connection->update(
-				'projection',
+				$this->getTableName(),
 				[
 					'position' => $position,
 				],
 				[
-					'projection_name' => $projectionClassname,
+					'projection_name' => $projectionClassname::projectionName(),
 					'aggregate_name' => $aggregateClassname,
 					'last_update_at' => $now,
 				],
@@ -88,16 +93,16 @@ final class DoctrineProjectionStore implements ProjectionStoreInterface
 					'position' => Types::BIGINT,
 					'projection_name' => Types::STRING,
 					'aggregate_name' => Types::STRING,
-					'last_update_at' => Types::DATE_IMMUTABLE,
+					'last_update_at' => Types::DATETIME_IMMUTABLE,
 				]
 			);
 
 			if (!$result) {
 				$result = 0 < (int) $connection->insert(
-					'projection',
+					$this->getTableName(),
 					[
 						'position' => $position,
-						'projection_name' => $projectionClassname,
+						'projection_name' => $projectionClassname::projectionName(),
 						'aggregate_name' => $aggregateClassname,
 						'created_at' => $now,
 						'last_update_at' => $now,
@@ -106,8 +111,8 @@ final class DoctrineProjectionStore implements ProjectionStoreInterface
 						'position' => Types::BIGINT,
 						'projection_name' => Types::STRING,
 						'aggregate_name' => Types::STRING,
-						'created_at' => Types::DATE_IMMUTABLE,
-						'last_update_at' => Types::DATE_IMMUTABLE,
+						'created_at' => Types::DATETIME_IMMUTABLE,
+						'last_update_at' => Types::DATETIME_IMMUTABLE,
 					]
 				);
 			}
@@ -116,5 +121,31 @@ final class DoctrineProjectionStore implements ProjectionStoreInterface
 		}
 
 		return $result;
+	}
+
+	public function resetProjection(string $projectionClassname): void
+	{
+		assert(is_subclass_of($projectionClassname, ProjectionInterface::class, TRUE));
+
+		$connection = $this->em->getConnection();
+
+		try {
+			$connection->delete(
+				$this->getTableName(),
+				[
+					'projection_name' => $projectionClassname::projectionName(),
+				],
+				[
+					'projection_name' => Types::STRING,
+				]
+			);
+		} catch (DbalException $e) {
+			throw ProjectionStoreException::unableToResetProjection($projectionClassname, $e instanceof RetryableException, $e);
+		}
+	}
+
+	private function getTableName(): string
+	{
+		return $this->em->getConnection()->quoteIdentifier($this->tableName);
 	}
 }

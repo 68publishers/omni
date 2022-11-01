@@ -16,4 +16,9 @@ interface ProjectionStoreInterface
 	 * @throws \SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException
 	 */
 	public function updateLastPosition(string $projectionClassname, string $aggregateClassname, string $position): bool;
+
+	/**
+	 * @throws \SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException
+	 */
+	public function resetProjection(string $projectionClassname): void;
 }

@@ -11,6 +11,13 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 
 final class CreateProjectionSchemaSubscriber implements EventSubscriber
 {
+	private string $tableName;
+
+	public function __construct(string $tableName)
+	{
+		$this->tableName = $tableName;
+	}
+
 	public function getSubscribedEvents(): array
 	{
 		return [
@@ -24,7 +31,7 @@ final class CreateProjectionSchemaSubscriber implements EventSubscriber
 	public function postGenerateSchema(GenerateSchemaEventArgs $args): void
 	{
 		$schema = $args->getSchema();
-		$table = $schema->createTable('projection');
+		$table = $schema->createTable($this->tableName);
 
 		$table->addColumn('id', Types::BIGINT)
 			->setNotnull(TRUE)
@@ -46,6 +53,6 @@ final class CreateProjectionSchemaSubscriber implements EventSubscriber
 			->setNotnull(TRUE);
 
 		$table->setPrimaryKey(['id']);
-		$table->addUniqueIndex(['projection_name', 'aggregate_name'], 'uniq_projection_projection_name_aggregate_name');
+		$table->addUniqueIndex(['projection_name', 'aggregate_name'], 'uniq_' . $this->tableName . '_projection_name_aggregate_name');
 	}
 }

@@ -1,0 +1,11 @@
+services:
+	projection_model.locator:
+		autowired: SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelLocatorInterface
+		type: SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelLocatorInterface
+		factory: @extension.projection_model.locator.default
+
+	projection_model.locator.default:
+		autowired: no
+		factory: SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelLocator
+		arguments:
+			projectionModelServiceNames: []
