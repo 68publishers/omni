@@ -11,9 +11,10 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
 {
 	private const INDEX_OPTION_CASE_INSENSITIVE = 'case-insensitive';
 	private const INDEX_OPTION_INCLUDE = 'include';
+	private const INDEX_OPTION_DESC = 'desc';
 
 	/**
-	 * Adds option 'case-insensitive' for indexes
+	 * Adds options 'case-insensitive' and 'desc' for indexes
 	 *
 	 * {@inheritDoc}
 	 */
@@ -21,14 +22,15 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
 	{
 		$quotedColumns = $index->getQuotedColumns($this);
 
-		if (!$index->hasOption(self::INDEX_OPTION_CASE_INSENSITIVE)) {
-			return implode(', ', $quotedColumns);
-		}
-
-		$ciColumns = $index->getOption(self::INDEX_OPTION_CASE_INSENSITIVE);
+		$ciColumns = $index->hasOption(self::INDEX_OPTION_CASE_INSENSITIVE) ? $index->getOption(self::INDEX_OPTION_CASE_INSENSITIVE) : [];
+		$descColumns = $index->hasOption(self::INDEX_OPTION_DESC) ? $index->getOption(self::INDEX_OPTION_DESC) : [];
 
 		if (!is_array($ciColumns)) {
 			$ciColumns = explode(',', (string) $ciColumns);
+		}
+
+		if (!is_array($descColumns)) {
+			$descColumns = explode(',', (string) $descColumns);
 		}
 
 		$columns = array_combine($index->getUnquotedColumns(), $quotedColumns);
@@ -36,6 +38,10 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
 		foreach ($columns as $name => $quoted) {
 			if (in_array($name, $ciColumns, TRUE)) {
 				$columns[$name] = 'lower(' . $quoted . ')';
+			}
+
+			if (in_array($name, $descColumns, TRUE)) {
+				$columns[$name] = $quoted . ' DESC';
 			}
 		}
 
