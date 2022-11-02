@@ -1,0 +1,10 @@
+allowNoHandlers: yes
+singleHandlerPerMessage: no
+middleware:
+	- Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware(projection_bus)
+	- Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware
+	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\OriginalExceptionMiddleware
+	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\StorePingConnectionMiddleware
+	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\StoreCloseConnectionMiddleware
+	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\StoreTransactionMiddleware
+panel: %debugMode%

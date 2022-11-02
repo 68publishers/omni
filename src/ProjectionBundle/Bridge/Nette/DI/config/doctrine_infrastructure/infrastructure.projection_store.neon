@@ -1,0 +1,18 @@
+services:
+	# projection store
+	infrastructure.projection_store:
+		autowired: SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreInterface
+		type: SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreInterface
+		factory: @extension.infrastructure.projection_store.decorator
+
+	infrastructure.projection_store.decorator:
+		autowired: no
+		factory: SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreDecorator
+		arguments:
+			inner: @extension.infrastructure.projection_store.doctrine
+
+	infrastructure.projection_store.doctrine:
+		autowired: no
+		factory: SixtyEightPublishers\ProjectionBundle\Infrastructure\Doctrine\DoctrineProjectionStore
+		arguments:
+			tableName: %68publishers.projection_bundle_doctrine.projection_table_name%

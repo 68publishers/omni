@@ -6,32 +6,43 @@ namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI;
 
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
+use SixtyEightPublishers\ArchitectureBundle\Event\EventHandlerInterface;
+use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
+use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterface;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger\MessageBusConfiguration;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger\MessengerExtensionDecorator;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger\MessageBusConfigurationsProviderInterface;
 
-final class ArchitectureBundleExtension extends CompilerExtension
+final class ArchitectureBundleExtension extends CompilerExtension implements MessageBusConfigurationsProviderInterface
 {
 	use CompilerExtensionUtilsTrait;
 
+	public const COMMAND_BUS_NAME = 'command_bus';
+	public const QUERY_BUS_NAME = 'query_bus';
+	public const EVENT_BUS_NAME = 'event_bus';
+
 	public const EXTENSION_POSTFIX_MESSENGER = 'messenger';
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function setCompiler(Compiler $compiler, string $name): self
 	{
 		parent::setCompiler($compiler, $name);
 
-		$compiler->addExtension(sprintf('%s.%s', $name, self::EXTENSION_POSTFIX_MESSENGER), new ConfiguredMessengerExtension());
+		$compiler->addExtension(sprintf('%s.%s', $name, self::EXTENSION_POSTFIX_MESSENGER), new MessengerExtensionDecorator());
 
 		return $this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function loadConfiguration(): void
 	{
 		$this->requireCompilerExtension(InfrastructureExtensionInterface::class);
 		$this->setBundleParameter('extension_name', $this->name);
 		$this->loadConfigurationDir(__DIR__ . '/config/architecture_bundle');
+	}
+
+	public function provideMessageBusConfigurations(): iterable
+	{
+		yield MessageBusConfiguration::fromFile(self::COMMAND_BUS_NAME, __DIR__ . '/config/message_bus/command_bus.neon', [CommandHandlerInterface::class]);
+		yield MessageBusConfiguration::fromFile(self::QUERY_BUS_NAME, __DIR__ . '/config/message_bus/query_bus.neon', [QueryHandlerInterface::class]);
+		yield MessageBusConfiguration::fromFile(self::EVENT_BUS_NAME, __DIR__ . '/config/message_bus/event_bus.neon', [EventHandlerInterface::class]);
 	}
 }

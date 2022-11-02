@@ -11,6 +11,8 @@ final class EventCriteria
 {
 	public const SORTING_FROM_OLDEST = 'oldest';
 	public const SORTING_FROM_NEWEST = 'newest';
+	public const SORTING_FROM_LOWEST_POSITION= 'lowest_position';
+	public const SORTING_FROM_HIGHEST_POSITION= 'highest_position';
 
 	private string $aggregateRootClassname;
 
@@ -19,6 +21,12 @@ final class EventCriteria
 	private ?DateTimeImmutable $createdBefore = NULL;
 
 	private ?DateTimeImmutable $createdAfter = NULL;
+
+	private ?string $positionGreaterThan = NULL;
+
+	private ?string $positionLessThan = NULL;
+
+	private array $eventNames = [];
 
 	private string $sorting = self::SORTING_FROM_NEWEST;
 
@@ -83,6 +91,45 @@ final class EventCriteria
 	}
 
 	/**
+	 * @param string $position
+	 *
+	 * @return $this
+	 */
+	public function withPositionGreaterThan(string $position): self
+	{
+		$criteria = clone $this;
+		$criteria->positionGreaterThan = $position;
+
+		return $criteria;
+	}
+
+	/**
+	 * @param string $position
+	 *
+	 * @return $this
+	 */
+	public function withPositionLessThan(string $position): self
+	{
+		$criteria = clone $this;
+		$criteria->positionLessThan = $position;
+
+		return $criteria;
+	}
+
+	/**
+	 * @param array<string> $eventNames
+	 *
+	 * @return $this
+	 */
+	public function withEventNames(array $eventNames): self
+	{
+		$criteria = clone $this;
+		$criteria->eventNames = $eventNames;
+
+		return $criteria;
+	}
+
+	/**
 	 * @return $this
 	 */
 	public function withNewestSorting(): self
@@ -100,6 +147,28 @@ final class EventCriteria
 	{
 		$criteria = clone $this;
 		$criteria->sorting = self::SORTING_FROM_OLDEST;
+
+		return $criteria;
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function withLowestPositionSorting(): self
+	{
+		$criteria = clone $this;
+		$criteria->sorting = self::SORTING_FROM_LOWEST_POSITION;
+
+		return $criteria;
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function withHighestPositionSorting(): self
+	{
+		$criteria = clone $this;
+		$criteria->sorting = self::SORTING_FROM_HIGHEST_POSITION;
 
 		return $criteria;
 	}
@@ -149,6 +218,30 @@ final class EventCriteria
 	public function createdAfter(): ?DateTimeImmutable
 	{
 		return $this->createdAfter;
+	}
+
+	/**
+	 * @return string|NULL
+	 */
+	public function positionGreaterThan(): ?string
+	{
+		return $this->positionGreaterThan;
+	}
+
+	/**
+	 * @return string|NULL
+	 */
+	public function positionLessThan(): ?string
+	{
+		return $this->positionLessThan;
+	}
+
+	/**
+	 * @return array<string>
+	 */
+	public function eventNames(): array
+	{
+		return $this->eventNames;
 	}
 
 	/**
