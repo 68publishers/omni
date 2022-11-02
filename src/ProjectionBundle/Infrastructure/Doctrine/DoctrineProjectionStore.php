@@ -83,11 +83,11 @@ final class DoctrineProjectionStore implements ProjectionStoreInterface
 				$this->getTableName(),
 				[
 					'position' => $position,
+					'last_update_at' => $now,
 				],
 				[
 					'projection_name' => $projectionClassname::projectionName(),
 					'aggregate_name' => $aggregateClassname,
-					'last_update_at' => $now,
 				],
 				[
 					'position' => Types::BIGINT,
