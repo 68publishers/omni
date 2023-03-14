@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ProjectionBundle\Bridge\Symfony\Messenger\Transport;
 
+use Throwable;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Exception\LogicException;
@@ -69,6 +70,8 @@ final class EventStoreReceiver implements ReceiverInterface, MessageCountAwareIn
 			}
 
 			return;
+		} catch (Throwable $e) {
+			throw new TransportException($e->getMessage(), 0, $e);
 		}
 
 		usort(
