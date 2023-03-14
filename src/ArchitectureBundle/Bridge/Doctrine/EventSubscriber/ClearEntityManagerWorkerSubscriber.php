@@ -26,8 +26,10 @@ final class ClearEntityManagerWorkerSubscriber implements EventSubscriberInterfa
 	 */
 	public static function getSubscribedEvents(): iterable
 	{
-		yield WorkerMessageHandledEvent::class => 'onWorkerMessageHandled';
-		yield WorkerMessageFailedEvent::class => 'onWorkerMessageFailed';
+		return [
+			WorkerMessageHandledEvent::class => 'onWorkerMessageHandled',
+			WorkerMessageFailedEvent::class => 'onWorkerMessageFailed',
+		];
 	}
 
 	/**
