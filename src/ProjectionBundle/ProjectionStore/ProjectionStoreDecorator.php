@@ -4,47 +4,43 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ProjectionBundle\ProjectionStore;
 
-use Throwable;
 use SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelLocatorInterface;
+use Throwable;
+use function get_class;
 
 final class ProjectionStoreDecorator implements ProjectionStoreInterface
 {
-	private ProjectionStoreInterface $inner;
+    public function __construct(
+        private readonly ProjectionStoreInterface $inner,
+        private readonly ProjectionModelLocatorInterface $projectionModelLocator,
+    ) {}
 
-	private ProjectionModelLocatorInterface $projectionModelLocator;
+    public function findLastPositions(string $projectionClassname): array
+    {
+        return $this->inner->findLastPositions($projectionClassname);
+    }
 
-	public function __construct(ProjectionStoreInterface $inner, ProjectionModelLocatorInterface $projectionModelLocator)
-	{
-		$this->inner = $inner;
-		$this->projectionModelLocator = $projectionModelLocator;
-	}
+    public function updateLastPosition(string $projectionClassname, string $aggregateClassname, string $position): bool
+    {
+        return $this->inner->updateLastPosition($projectionClassname, $aggregateClassname, $position);
+    }
 
-	public function findLastPositions(string $projectionClassname): array
-	{
-		return $this->inner->findLastPositions($projectionClassname);
-	}
+    public function resetProjection(string $projectionClassname): void
+    {
+        $this->inner->resetProjection($projectionClassname);
 
-	public function updateLastPosition(string $projectionClassname, string $aggregateClassname, string $position): bool
-	{
-		return $this->inner->updateLastPosition($projectionClassname, $aggregateClassname, $position);
-	}
+        $projectionModel = $this->projectionModelLocator->resolveForProjectionClassname($projectionClassname);
 
-	public function resetProjection(string $projectionClassname): void
-	{
-		$this->inner->resetProjection($projectionClassname);
+        if (null === $projectionModel) {
+            return;
+        }
 
-		$projectionModel = $this->projectionModelLocator->resolveForProjectionClassname($projectionClassname);
-
-		if (NULL === $projectionModel) {
-			return;
-		}
-
-		try {
-			$projectionModel->reset();
-		} catch (ProjectionStoreException $e) {
-			throw $e;
-		} catch (Throwable $e) {
-			throw ProjectionStoreException::unableToResetProjectionModel($projectionClassname, get_class($projectionModel), FALSE, $e);
-		}
-	}
+        try {
+            $projectionModel->reset();
+        } catch (ProjectionStoreException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            throw ProjectionStoreException::unableToResetProjectionModel($projectionClassname, get_class($projectionModel), false, $e);
+        }
+    }
 }

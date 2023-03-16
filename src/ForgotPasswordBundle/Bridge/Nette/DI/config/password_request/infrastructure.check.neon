@@ -1,5 +1,0 @@
-services:
-	infrastructure.check.email_address_exists:
-		autowired: SixtyEightPublishers\ForgotPasswordBundle\Domain\CheckEmailAddressExistsInterface
-		type: SixtyEightPublishers\ForgotPasswordBundle\Domain\CheckEmailAddressExistsInterface
-		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\CheckEmailAddressExists

@@ -7,46 +7,37 @@ namespace SixtyEightPublishers\FlashMessageBundle\Infrastructure\NetteSession;
 use Nette\Http\Session;
 use Nette\Http\SessionSection;
 use SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessage;
-use SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessageId;
 use SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessageCollectionInterface;
+use SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessageId;
+use function array_values;
+use function iterator_to_array;
+use function str_replace;
 
 final class NetteSessionFlashMessageCollection implements FlashMessageCollectionInterface
 {
-	private SessionSection $section;
+    private SessionSection $section;
 
-	/**
-	 * @param \Nette\Http\Session $session
-	 */
-	public function __construct(Session $session)
-	{
-		$this->section = $session->getSection(str_replace('\\', '.', FlashMessage::class));
-	}
+    public function __construct(Session $session)
+    {
+        $this->section = $session->getSection(str_replace('\\', '.', FlashMessage::class));
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function add(FlashMessage $flashMessage): void
-	{
-		if (!$this->section->offsetExists($flashMessage->id()->toString())) {
-			$this->section->set($flashMessage->id()->toString(), $flashMessage);
-		}
-	}
+    public function add(FlashMessage $flashMessage): void
+    {
+        if (null === $this->section->get($flashMessage->getId()->toNative())) {
+            $this->section->set($flashMessage->getId()->toNative(), $flashMessage);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function remove(FlashMessageId $id): void
-	{
-		if ($this->section->offsetExists($id->toString())) {
-			$this->section->remove($id->toString());
-		}
-	}
+    public function remove(FlashMessageId $id): void
+    {
+        if ($this->section->get($id->toNative())) {
+            $this->section->remove($id->toNative());
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function all(): array
-	{
-		return array_values(iterator_to_array($this->section));
-	}
+    public function all(): array
+    {
+        return array_values(iterator_to_array($this->section));
+    }
 }

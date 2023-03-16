@@ -4,49 +4,59 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\CommandHandler;
 
-use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
-use SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand;
-use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
 use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
-use SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface;
-use SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface;
-use SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface;
+use SixtyEightPublishers\UserBundle\Domain\AttributesGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand;
+use SixtyEightPublishers\UserBundle\Domain\EmailAddressGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\PasswordGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
+use SixtyEightPublishers\UserBundle\Domain\UsernameGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\UserRepositoryInterface;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 
 final class UpdateUserCommandHandler implements CommandHandlerInterface
 {
-	private UserRepositoryInterface $userRepository;
+    public function __construct(
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly PasswordHashAlgorithmInterface $algorithm,
+        private readonly ?PasswordGuardInterface $passwordGuard = null,
+        private readonly ?UsernameGuardInterface $usernameGuard = null,
+        private readonly ?EmailAddressGuardInterface $emailAddressGuard = null,
+        private readonly ?AttributesGuardInterface $attributesGuard = null,
+    ) {}
 
-	private PasswordHashAlgorithmInterface $algorithm;
+    public function __invoke(UpdateUserCommand $command): void
+    {
+        $user = $this->userRepository->get(UserId::fromNative($command->userId));
 
-	private CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness;
+        if (null !== $command->username) {
+            $user->changeUsername($command->username, $this->usernameGuard);
+        }
 
-	private CheckUsernameUniquenessInterface $checkUsernameUniqueness;
+        if (null !== $command->password) {
+            $user->changePassword($command->password, $this->algorithm, $this->passwordGuard);
+        }
 
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface   $userRepository
-	 * @param \SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface       $algorithm
-	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness
-	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface     $checkUsernameUniqueness
-	 */
-	public function __construct(UserRepositoryInterface $userRepository, PasswordHashAlgorithmInterface $algorithm, CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness, CheckUsernameUniquenessInterface $checkUsernameUniqueness)
-	{
-		$this->userRepository = $userRepository;
-		$this->algorithm = $algorithm;
-		$this->checkEmailAddressUniqueness = $checkEmailAddressUniqueness;
-		$this->checkUsernameUniqueness = $checkUsernameUniqueness;
-	}
+        if (null !== $command->emailAddress) {
+            $user->changeEmailAddress($command->emailAddress, $this->emailAddressGuard);
+        }
 
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand $command
-	 *
-	 * @return void
-	 */
-	public function __invoke(UpdateUserCommand $command): void
-	{
-		$user = $this->userRepository->get(UserId::fromString($command->userId()));
+        if (null !== $command->active) {
+            $user->changeActiveState($command->active);
+        }
 
-		$user->update($command, $this->algorithm, $this->checkEmailAddressUniqueness, $this->checkUsernameUniqueness);
+        if (null !== $command->firstname || null !== $command->surname) {
+            $user->changeName($command->firstname, $command->surname);
+        }
 
-		$this->userRepository->save($user);
-	}
+        if (null !== $command->roles) {
+            $user->changeRoles($command->roles);
+        }
+
+        if (null !== $command->attributes) {
+            $user->addAttributes($command->attributes, $this->attributesGuard);
+        }
+
+        $this->userRepository->save($user);
+    }
 }

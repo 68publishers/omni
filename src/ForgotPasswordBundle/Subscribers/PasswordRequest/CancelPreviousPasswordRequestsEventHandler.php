@@ -4,56 +4,40 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Subscribers\PasswordRequest;
 
-use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
-use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\Batch;
 use SixtyEightPublishers\ArchitectureBundle\Bus\CommandBusInterface;
+use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use SixtyEightPublishers\ArchitectureBundle\Event\EventHandlerInterface;
-use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View\PasswordRequestView;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeRequested;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\CancelPasswordRequestCommand;
-use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\Query\FindRequestedPasswordChangesQuery;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeRequested;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId;
+use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\Query\FindIdsOfRequestedPasswordChangesQuery;
+use function assert;
 
 final class CancelPreviousPasswordRequestsEventHandler implements EventHandlerInterface
 {
-	private QueryBusInterface $queryBus;
+    public function __construct(
+        private readonly QueryBusInterface $queryBus,
+        private readonly CommandBusInterface $commandBus,
+    ) {}
 
-	private CommandBusInterface $commandBus;
+    public function __invoke(PasswordChangeRequested $event): void
+    {
+        $currentId = PasswordRequestId::fromUuid($event->getAggregateId()->toUuid());
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface   $queryBus
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Bus\CommandBusInterface $commandBus
-	 */
-	public function __construct(QueryBusInterface $queryBus, CommandBusInterface $commandBus)
-	{
-		$this->queryBus = $queryBus;
-		$this->commandBus = $commandBus;
-	}
+        foreach ($this->queryBus->dispatch(new FindIdsOfRequestedPasswordChangesQuery($event->getEmailAddress()->toNative())) as $passwordRequestId) {
+            assert($passwordRequestId instanceof PasswordRequestId);
 
-	/**
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeRequested $event
-	 *
-	 * @return void
-	 */
-	public function __invoke(PasswordChangeRequested $event): void
-	{
-		foreach ($this->queryBus->dispatch(FindRequestedPasswordChangesQuery::create($event->emailAddress()->value())) as $batch) {
-			assert($batch instanceof Batch);
+            if ($currentId->equals($passwordRequestId)) {
+                continue;
+            }
 
-			foreach ($batch as $item) {
-				assert($item instanceof PasswordRequestView);
+            $deviceInfo = $event->getRequestDeviceInfo();
 
-				if ($event->passwordRequestId()->equals($item->id)) {
-					continue;
-				}
-
-				$deviceInfo = $event->requestDeviceInfo();
-
-				$this->commandBus->dispatch(CancelPasswordRequestCommand::create(
-					$item->id->toString(),
-					$deviceInfo->ipAddress()->value(),
-					$deviceInfo->userAgent()->value()
-				));
-			}
-		}
-	}
+            $this->commandBus->dispatch(new CancelPasswordRequestCommand(
+                $passwordRequestId->toNative(),
+                $deviceInfo->getIpAddress()->toNative(),
+                $deviceInfo->getUserAgent()->toNative(),
+            ));
+        }
+    }
 }

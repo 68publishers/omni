@@ -4,30 +4,14 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\ReadModel\Query;
 
-use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\AbstractQuery;
+use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryInterface;
 
 /**
- * Returns CredentialsView
+ * Returns ?Credentials
  */
-final class GetCredentialsQuery extends AbstractQuery
+final class GetCredentialsQuery implements QueryInterface
 {
-	/**
-	 * @param string $username
-	 *
-	 * @return static
-	 */
-	public static function create(string $username): self
-	{
-		return self::fromParameters([
-			'username' => $username,
-		]);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function username(): string
-	{
-		return $this->getParam('username');
-	}
+    public function __construct(
+        public readonly string $username,
+    ) {}
 }

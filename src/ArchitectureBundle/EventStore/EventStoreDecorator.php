@@ -4,59 +4,39 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\EventStore;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
+use function array_map;
 
 final class EventStoreDecorator implements EventStoreInterface
 {
-	private EventStoreInterface $eventStore;
+    public function __construct(
+        private readonly EventStoreInterface $eventStore,
+        private readonly EventMetadataExtenderInterface $eventMetadataExtender,
+    ) {}
 
-	private EventMetadataExtenderInterface $eventMetadataExtender;
+    public function store(string $aggregateRootClassname, array $events): void
+    {
+        $events = array_map(
+            fn (AbstractDomainEvent $event): AbstractDomainEvent => $this->eventMetadataExtender->extendMetadata($event),
+            $events,
+        );
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface            $eventStore
-	 * @param \SixtyEightPublishers\ArchitectureBundle\EventStore\EventMetadataExtenderInterface $eventMetadataExtender
-	 */
-	public function __construct(EventStoreInterface $eventStore, EventMetadataExtenderInterface $eventMetadataExtender)
-	{
-		$this->eventStore = $eventStore;
-		$this->eventMetadataExtender = $eventMetadataExtender;
-	}
+        $this->eventStore->store($aggregateRootClassname, $events);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function store(string $aggregateRootClassname, array $events): void
-	{
-		$events = array_map(
-			fn (AbstractDomainEvent $event): AbstractDomainEvent => $this->eventMetadataExtender->extendMetadata($event),
-			$events
-		);
+    public function get(string $aggregateRootClassname, EventId $eventId): ?AbstractDomainEvent
+    {
+        return $this->eventStore->get($aggregateRootClassname, $eventId);
+    }
 
-		$this->eventStore->store($aggregateRootClassname, $events);
-	}
+    public function find(EventCriteria $criteria): array
+    {
+        return $this->eventStore->find($criteria);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function get(string $aggregateRootClassname, EventId $eventId): ?AbstractDomainEvent
-	{
-		return $this->eventStore->get($aggregateRootClassname, $eventId);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function find(EventCriteria $criteria): array
-	{
-		return $this->eventStore->find($criteria);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function count(EventCriteria $criteria): int
-	{
-		return $this->eventStore->count($criteria);
-	}
+    public function count(EventCriteria $criteria): int
+    {
+        return $this->eventStore->count($criteria);
+    }
 }

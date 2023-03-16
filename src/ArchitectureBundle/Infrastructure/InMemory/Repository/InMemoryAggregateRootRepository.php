@@ -4,44 +4,30 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\Repository;
 
+use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Aggregate\AggregateRootInterface;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemoryStorageInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemoryStorageInterface;
+use function get_class;
 
 final class InMemoryAggregateRootRepository implements AggregateRootRepositoryInterface
 {
-	private MemoryStorageInterface $memoryStorage;
+    public function __construct(
+        private readonly MemoryStorageInterface $memoryStorage,
+        private readonly EventPublisherInterface $eventPublisher,
+    ) {}
 
-	private EventPublisherInterface $eventPublisher;
+    public function loadAggregateRoot(string $classname, AggregateId $aggregateId): ?object
+    {
+        return $this->memoryStorage->section($classname)->get($aggregateId->toNative());
+    }
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemoryStorageInterface               $memoryStorage
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface $eventPublisher
-	 */
-	public function __construct(MemoryStorageInterface $memoryStorage, EventPublisherInterface $eventPublisher)
-	{
-		$this->memoryStorage = $memoryStorage;
-		$this->eventPublisher = $eventPublisher;
-	}
+    public function saveAggregateRoot(AggregateRootInterface $aggregateRoot): void
+    {
+        $events = $aggregateRoot->popRecordedEvents();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function loadAggregateRoot(string $classname, AggregateId $aggregateId): ?object
-	{
-		return $this->memoryStorage->section($classname)->get($aggregateId->toString());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function saveAggregateRoot(AggregateRootInterface $aggregateRoot): void
-	{
-		$events = $aggregateRoot->popRecordedEvents();
-
-		$this->memoryStorage->section(get_class($aggregateRoot))->add($aggregateRoot->aggregateId()->toString(), $aggregateRoot);
-		$this->eventPublisher->publish(get_class($aggregateRoot), $aggregateRoot->aggregateId(), $events);
-	}
+        $this->memoryStorage->section(get_class($aggregateRoot))->add($aggregateRoot->getAggregateId()->toNative(), $aggregateRoot);
+        $this->eventPublisher->publish(get_class($aggregateRoot), $aggregateRoot->getAggregateId(), $events);
+    }
 }

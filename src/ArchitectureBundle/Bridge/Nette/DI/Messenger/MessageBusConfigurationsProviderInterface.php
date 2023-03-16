@@ -6,8 +6,8 @@ namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger;
 
 interface MessageBusConfigurationsProviderInterface
 {
-	/**
-	 * @return iterable|\SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger\MessageBusConfiguration[]
-	 */
-	public function provideMessageBusConfigurations(): iterable;
+    /**
+     * @return iterable<MessageBusConfiguration>
+     */
+    public function provideMessageBusConfigurations(): iterable;
 }

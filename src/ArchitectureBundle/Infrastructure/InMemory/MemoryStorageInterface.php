@@ -6,15 +6,10 @@ namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory;
 
 interface MemoryStorageInterface
 {
-	/**
-	 * @param string $name
-	 *
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemorySectionInterface
-	 */
-	public function section(string $name): MemorySectionInterface;
+    public function section(string $name): MemorySectionInterface;
 
-	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemorySectionInterface[]
-	 */
-	public function all(): array;
+    /**
+     * @return array<MemorySectionInterface>
+     */
+    public function all(): array;
 }

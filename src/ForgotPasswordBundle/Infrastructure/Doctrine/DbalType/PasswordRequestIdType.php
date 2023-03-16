@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\DbalType;
 
+use Doctrine\DBAL\Types\GuidType;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType\ValueObjectTypeTrait;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType\AbstractUuidIdentityType;
 
-final class PasswordRequestIdType extends AbstractUuidIdentityType
+final class PasswordRequestIdType extends GuidType
 {
-	protected string $valueObjectClassname = PasswordRequestId::class;
+    use ValueObjectTypeTrait;
+
+    protected function getValueObjectClassname(): string
+    {
+        return PasswordRequestId::class;
+    }
 }

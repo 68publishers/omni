@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui;
 
 use Nette\ComponentModel\IComponent;
-use SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessage;
 use SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageControl;
 use SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageControlFactoryInterface;
+use SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessage;
 
 /**
  * @method bool       isAjax()
@@ -15,44 +15,31 @@ use SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\
  */
 trait PresenterTrait
 {
-	use FlashMessageTrait {
-		subscribeFlashMessage as private doSubscribeFlashMessage;
-	}
+    use FlashMessageTrait {
+        subscribeFlashMessage as private doSubscribeFlashMessage;
+    }
 
-	private FlashMessageControlFactoryInterface $flashMessageControlFactory;
+    private FlashMessageControlFactoryInterface $flashMessageControlFactory;
 
-	/**
-	 * @param \SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageControlFactoryInterface $flashMessageControlFactory
-	 *
-	 * @return void
-	 */
-	public function injectFlashMessageControlFactory(FlashMessageControlFactoryInterface $flashMessageControlFactory): void
-	{
-		$this->flashMessageControlFactory = $flashMessageControlFactory;
-	}
+    public function injectFlashMessageControlFactory(FlashMessageControlFactoryInterface $flashMessageControlFactory): void
+    {
+        $this->flashMessageControlFactory = $flashMessageControlFactory;
+    }
 
-	/**
-	 * @param \SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessage $flashMessage
-	 *
-	 * @return void
-	 */
-	protected function subscribeFlashMessage(FlashMessage $flashMessage): void
-	{
-		$this->doSubscribeFlashMessage($flashMessage);
+    protected function subscribeFlashMessage(FlashMessage $flashMessage): void
+    {
+        $this->doSubscribeFlashMessage($flashMessage);
 
-		if ($this->isAjax()) {
-			$component = $this->getComponent('flashMessages');
-			assert($component instanceof FlashMessageControl);
+        if ($this->isAjax()) {
+            $component = $this->getComponent('flashMessages');
+            assert($component instanceof FlashMessageControl);
 
-			$component->redrawControl();
-		}
-	}
+            $component->redrawControl();
+        }
+    }
 
-	/**
-	 * @return \SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageControl
-	 */
-	protected function createComponentFlashMessages(): FlashMessageControl
-	{
-		return $this->flashMessageControlFactory->create();
-	}
+    protected function createComponentFlashMessages(): FlashMessageControl
+    {
+        return $this->flashMessageControlFactory->create();
+    }
 }

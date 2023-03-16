@@ -4,31 +4,15 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\ValueObject;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AbstractValueObjectSet;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectSetTrait;
 
-final class Roles extends AbstractValueObjectSet
+final class Roles implements ValueObjectInterface
 {
-	public const ITEM_CLASSNAME = Role::class;
+    use ValueObjectSetTrait;
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Role
-	 */
-	protected static function reconstituteItem($value): Role
-	{
-		return Role::fromValue($value);
-	}
-
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Role $item
-	 *
-	 * @return string
-	 */
-	protected static function exportItem($item): string
-	{
-		assert($item instanceof Role);
-
-		return $item->value();
-	}
+    protected static function getItemClassname(): string
+    {
+        return Role::class;
+    }
 }

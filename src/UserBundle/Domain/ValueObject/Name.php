@@ -4,62 +4,46 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\ValueObject;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ComparableValueObjectInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\CompositeValueObjectTrait;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
+use function array_filter;
+use function implode;
 
-final class Name implements ComparableValueObjectInterface
+final class Name implements ValueObjectInterface
 {
-	private string $firstname;
+    use CompositeValueObjectTrait;
 
-	private string $surname;
+    public function __construct(
+        private readonly Firstname $firstname,
+        private readonly Surname $surname,
+    ) {}
 
-	private function __construct()
-	{
-	}
+    protected static function fromNativeFactory(callable $factory): static
+    {
+        return new self(
+            $factory(Firstname::class, 'firstname'),
+            $factory(Surname::class, 'surname'),
+        );
+    }
 
-	/**
-	 * @param string $firstname
-	 * @param string $surname
-	 *
-	 * @return static
-	 */
-	public static function fromValues(string $firstname, string $surname): self
-	{
-		$name = new self();
-		$name->firstname = $firstname;
-		$name->surname = $surname;
+    public function getFirstname(): Firstname
+    {
+        return $this->firstname;
+    }
 
-		return $name;
-	}
+    public function getSurname(): Surname
+    {
+        return $this->surname;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function firstname(): string
-	{
-		return $this->firstname;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function surname(): string
-	{
-		return $this->surname;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function name(): string
-	{
-		return implode(' ', array_filter([$this->firstname(), $this->surname()], static fn (string $part): bool => !empty($part)));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function equals(ComparableValueObjectInterface $valueObject): bool
-	{
-		return $valueObject instanceof self && $valueObject->firstname() === $this->firstname() && $valueObject->surname() === $this->surname();
-	}
+    public function getName(): string
+    {
+        return implode(
+            ' ',
+            array_filter(
+                [$this->getFirstname()->toNative(), $this->getSurname()->toNative()],
+                static fn (string $part): bool => !empty($part),
+            ),
+        );
+    }
 }

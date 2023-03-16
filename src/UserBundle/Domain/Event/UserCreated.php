@@ -4,118 +4,71 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\Event;
 
+use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Active;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Attributes;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\EmailAddress;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Username;
-use SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddress;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface;
 
 final class UserCreated extends AbstractDomainEvent
 {
-	private UserId $userId;
+    public static function create(
+        UserId $userId,
+        Username $username,
+        HashedPassword $password,
+        EmailAddress $emailAddress,
+        Active $active,
+        Name $name,
+        Roles $roles,
+        Attributes $attributes,
+    ): self {
+        return self::occur($userId->toNative(), [
+            'username' => $username,
+            'password' => $password,
+            'email_address' => $emailAddress,
+            'active' => $active,
+            'name' => $name,
+            'roles' => $roles,
+            'attributes' => $attributes,
+        ]);
+    }
 
-	private Username $username;
+    public function getUsername(): Username
+    {
+        return Username::fromNative($this->parameters['username']);
+    }
 
-	private ?HashedPassword $password = NULL;
+    public function getPassword(): HashedPassword
+    {
+        return HashedPassword::fromNative($this->parameters['password']);
+    }
 
-	private EmailAddressInterface $emailAddress;
+    public function getEmailAddress(): EmailAddress
+    {
+        return EmailAddress::fromNative($this->parameters['email_address']);
+    }
 
-	private Name $name;
+    public function getActive(): Active
+    {
+        return Active::fromNative($this->parameters['active']);
+    }
 
-	private Roles $roles;
+    public function getName(): Name
+    {
+        return Name::fromNative($this->parameters['name']);
+    }
 
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId                        $userId
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Username                      $username
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword|NULL           $password
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface $emailAddress
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Name                          $name
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles                         $roles
-	 *
-	 * @return static
-	 */
-	public static function create(UserId $userId, Username $username, ?HashedPassword $password, EmailAddressInterface $emailAddress, Name $name, Roles $roles): self
-	{
-		$event = self::occur($userId->toString(), [
-			'username' => $username->value(),
-			'password' => NULL !== $password ? $password->value() : NULL,
-			'email_address' => $emailAddress->value(),
-			'firstname' => $name->firstname(),
-			'surname' => $name->surname(),
-			'roles' => $roles->toArray(),
-		]);
+    public function getRoles(): Roles
+    {
+        return Roles::fromNative($this->parameters['roles']);
+    }
 
-		$event->userId = $userId;
-		$event->username = $username;
-		$event->password = $password;
-		$event->emailAddress = $emailAddress;
-		$event->name = $name;
-		$event->roles = $roles;
-
-		return $event;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
-	 */
-	public function userId(): UserId
-	{
-		return $this->userId;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Username
-	 */
-	public function username(): Username
-	{
-		return $this->username;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword
-	 */
-	public function password(): ?HashedPassword
-	{
-		return $this->password;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface
-	 */
-	public function emailAddress(): EmailAddressInterface
-	{
-		return $this->emailAddress;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Name
-	 */
-	public function name(): Name
-	{
-		return $this->name;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles
-	 */
-	public function roles(): Roles
-	{
-		return $this->roles;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function reconstituteState(array $parameters): void
-	{
-		$this->userId = UserId::fromUuid($this->aggregateId()->id());
-		$this->username = Username::fromValue($parameters['username']);
-		$this->password = isset($parameters['password']) ? HashedPassword::fromValue($parameters['password']) : NULL;
-		$this->emailAddress = EmailAddress::fromValue($parameters['email_address']);
-		$this->name = Name::fromValues($parameters['firstname'], $parameters['surname']);
-		$this->roles = Roles::reconstitute($parameters['roles']);
-	}
+    public function getAttributes(): Attributes
+    {
+        return Attributes::fromNative($this->parameters['attributes']);
+    }
 }

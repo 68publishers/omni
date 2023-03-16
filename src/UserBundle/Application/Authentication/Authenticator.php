@@ -4,42 +4,32 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Application\Authentication;
 
-use SixtyEightPublishers\UserBundle\Domain\ValueObject\Password;
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
-use SixtyEightPublishers\UserBundle\ReadModel\View\CredentialsView;
-use SixtyEightPublishers\UserBundle\ReadModel\Query\GetCredentialsQuery;
 use SixtyEightPublishers\UserBundle\Application\Exception\AuthenticationException;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Password;
+use SixtyEightPublishers\UserBundle\ReadModel\Query\GetCredentialsQuery;
+use SixtyEightPublishers\UserBundle\ReadModel\View\Credentials;
 
 final class Authenticator implements AuthenticatorInterface
 {
-	private QueryBusInterface $queryBus;
+    public function __construct(
+        private readonly QueryBusInterface $queryBus,
+    ) {}
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface $queryBus
-	 */
-	public function __construct(QueryBusInterface $queryBus)
-	{
-		$this->queryBus = $queryBus;
-	}
+    public function authenticate(string $username, string $password): Identity
+    {
+        $credentials = $this->queryBus->dispatch(new GetCredentialsQuery($username));
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function authenticate(string $username, string $password): Identity
-	{
-		$credentials = $this->queryBus->dispatch(GetCredentialsQuery::create($username));
+        if (!$credentials instanceof Credentials) {
+            throw AuthenticationException::userNotFound($username);
+        }
 
-		if (!$credentials instanceof CredentialsView) {
-			throw AuthenticationException::userNotFound($username);
-		}
+        if (!$credentials->password->verify(Password::fromNative($password))) {
+            throw AuthenticationException::invalidPassword($username);
+        }
 
-		if (NULL === $credentials->password || !$credentials->password->verify(Password::fromValue($password))) {
-			throw AuthenticationException::invalidPassword($username);
-		}
+        $identity = Identity::createSleeping($credentials->userId->toNative());
 
-		$identity = Identity::createSleeping($credentials->id);
-		$identityDecorator = IdentityDecorator::newInstance();
-
-		return $identityDecorator->wakeupIdentity($identity, $this->queryBus);
-	}
+        return IdentityDecorator::newInstance()->wakeupIdentity($identity, $this->queryBus);
+    }
 }

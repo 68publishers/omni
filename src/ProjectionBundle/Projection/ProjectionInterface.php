@@ -8,10 +8,10 @@ use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 interface ProjectionInterface extends MessageSubscriberInterface
 {
-	public static function projectionName(): string;
+    public static function getProjectionName(): string;
 
-	/**
-	 * @return iterable<EventDefinition>
-	 */
-	public static function defineEvents(): iterable;
+    /**
+     * @return iterable<EventDefinition>
+     */
+    public static function defineEvents(): iterable;
 }

@@ -8,10 +8,5 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 interface EventMetadataExtenderInterface
 {
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent $event
-	 *
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent
-	 */
-	public function extendMetadata(AbstractDomainEvent $event): AbstractDomainEvent;
+    public function extendMetadata(AbstractDomainEvent $event): AbstractDomainEvent;
 }

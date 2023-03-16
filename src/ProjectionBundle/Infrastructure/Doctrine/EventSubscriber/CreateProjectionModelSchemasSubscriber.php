@@ -4,39 +4,37 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ProjectionBundle\Infrastructure\Doctrine\EventSubscriber;
 
-use Doctrine\ORM\Tools\ToolEvents;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Doctrine\ORM\Tools\ToolEvents;
 use SixtyEightPublishers\ProjectionBundle\Infrastructure\Doctrine\AbstractProjectionModel;
 use SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelLocatorInterface;
 
 final class CreateProjectionModelSchemasSubscriber implements EventSubscriber
 {
-	private ProjectionModelLocatorInterface $projectionModelLocator;
+    public function __construct(
+        private readonly ProjectionModelLocatorInterface $projectionModelLocator,
+    ) {}
 
-	public function __construct(ProjectionModelLocatorInterface $projectionModelLocator)
-	{
-		$this->projectionModelLocator = $projectionModelLocator;
-	}
+    public function getSubscribedEvents(): array
+    {
+        return [
+            ToolEvents::postGenerateSchema,
+        ];
+    }
 
-	public function getSubscribedEvents(): array
-	{
-		return [
-			ToolEvents::postGenerateSchema,
-		];
-	}
+    /**
+     * @throws SchemaException
+     */
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
+    {
+        $schema = $args->getSchema();
 
-	/**
-	 * @throws \Doctrine\DBAL\Schema\SchemaException
-	 */
-	public function postGenerateSchema(GenerateSchemaEventArgs $args): void
-	{
-		$schema = $args->getSchema();
-
-		foreach ($this->projectionModelLocator->all() as $projectionModel) {
-			if ($projectionModel instanceof AbstractProjectionModel) {
-				$projectionModel->createSchema($schema);
-			}
-		}
-	}
+        foreach ($this->projectionModelLocator->all() as $projectionModel) {
+            if ($projectionModel instanceof AbstractProjectionModel) {
+                $projectionModel->createSchema($schema);
+            }
+        }
+    }
 }

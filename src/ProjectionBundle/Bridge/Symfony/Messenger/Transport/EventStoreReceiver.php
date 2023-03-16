@@ -4,168 +4,170 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ProjectionBundle\Bridge\Symfony\Messenger\Transport;
 
-use Throwable;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Stamp\BusNameStamp;
-use Symfony\Component\Messenger\Exception\LogicException;
-use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventCriteria;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
-use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionInterface;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreException;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
-use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionInterface;
 use SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException;
 use SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Throwable;
+use function assert;
+use function is_subclass_of;
+use function usort;
 
 final class EventStoreReceiver implements ReceiverInterface, MessageCountAwareInterface
 {
-	private const MAX_RETRIES = 3;
-	private const METADATA_AGGREGATE_CLASSNAME = '__aggregate_classname';
+    private const MAX_RETRIES = 3;
+    private const METADATA_AGGREGATE_CLASSNAME = '__aggregate_classname';
 
-	private int $retryingSafetyCounter = 0;
+    private int $retryingSafetyCounter = 0;
 
-	private string $projectionClassname;
+    /** @var array<class-string, array<int, class-string>>|null */
+    private ?array $eventClassnames = null;
 
-	private EventStoreInterface $eventStore;
+    /**
+     * @param class-string<ProjectionInterface> $projectionClassname
+     */
+    public function __construct(
+        private readonly string $projectionClassname,
+        private readonly EventStoreInterface $eventStore,
+        private readonly ProjectionStoreInterface $projectionStore,
+    ) {
+        assert(is_subclass_of($this->projectionClassname, ProjectionInterface::class, true));
+    }
 
-	private ProjectionStoreInterface $projectionStore;
+    public function get(): iterable
+    {
+        $events = [];
 
-	private ?array $eventClassnames = NULL;
+        try {
+            $lastPositions = $this->projectionStore->findLastPositions($this->projectionClassname);
 
-	public function __construct(string $projectionClassname, EventStoreInterface $eventStore, ProjectionStoreInterface $projectionStore)
-	{
-		assert(is_subclass_of($projectionClassname, ProjectionInterface::class, TRUE));
+            foreach ($lastPositions as $aggregateClassname => $position) {
+                $criteria = EventCriteria::create($aggregateClassname)
+                    ->withPositionGreaterThan($position)
+                    ->withEventNames($this->getEventClassnames()[$aggregateClassname] ?? [])
+                    ->withLowestPositionSorting()
+                    ->withSize(20, null);
 
-		$this->projectionClassname = $projectionClassname;
-		$this->eventStore = $eventStore;
-		$this->projectionStore = $projectionStore;
-	}
+                foreach ($this->eventStore->find($criteria) as $event) {
+                    $events[] = $event->withMetadata([self::METADATA_AGGREGATE_CLASSNAME => $aggregateClassname], true);
+                }
+            }
+        } catch (EventStoreException|ProjectionStoreException $e) {
+            if (++$this->retryingSafetyCounter >= self::MAX_RETRIES || !$e->retryable) {
+                $this->retryingSafetyCounter = 0;
 
-	public function get(): iterable
-	{
-		$events = [];
+                throw new TransportException($e->getMessage(), 0, $e);
+            }
 
-		try {
-			$lastPositions = $this->projectionStore->findLastPositions($this->projectionClassname);
+            return;
+        } catch (Throwable $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
 
-			foreach ($lastPositions as $aggregateClassname => $position) {
-				$criteria = EventCriteria::create($aggregateClassname)
-					->withPositionGreaterThan($position)
-					->withEventNames($this->getEventClassnames()[$aggregateClassname] ?? [])
-					->withLowestPositionSorting()
-					->withSize(20, NULL);
+        usort(
+            $events,
+            static fn (AbstractDomainEvent $left, AbstractDomainEvent $right): int =>
+            [$left->getMetadata()[self::METADATA_AGGREGATE_CLASSNAME], $left->getMetadata()[EventStoreInterface::METADATA_POSITION]]
+            <=>
+            [$right->getMetadata()[self::METADATA_AGGREGATE_CLASSNAME], $right->getMetadata()[EventStoreInterface::METADATA_POSITION]],
+        );
 
-				foreach ($this->eventStore->find($criteria) as $event) {
-					$events[] = $event->withMetadata([self::METADATA_AGGREGATE_CLASSNAME => $aggregateClassname], TRUE);
-				}
-			}
-		} catch (EventStoreException|ProjectionStoreException $e) {
-			if (++$this->retryingSafetyCounter >= self::MAX_RETRIES || !$e->retryable()) {
-				$this->retryingSafetyCounter = 0;
+        foreach ($events as $event) {
+            assert($event instanceof AbstractDomainEvent);
 
-				throw new TransportException($e->getMessage(), 0, $e);
-			}
+            $envelope = new Envelope($event, [
+                new BusNameStamp('projection_bus'),
+                new TransportMessageIdStamp([
+                    'projection' => $this->projectionClassname,
+                    'aggregate_classname' => $event->getMetadata()[self::METADATA_AGGREGATE_CLASSNAME],
+                    'position' => (string) $event->getMetadata()[EventStoreInterface::METADATA_POSITION],
+                ]),
+            ]);
 
-			return;
-		} catch (Throwable $e) {
-			throw new TransportException($e->getMessage(), 0, $e);
-		}
+            yield $envelope;
+        }
+    }
 
-		usort(
-			$events,
-			static fn (AbstractDomainEvent $left, AbstractDomainEvent $right): int =>
-			[$left->metadata()[self::METADATA_AGGREGATE_CLASSNAME], $left->metadata()[EventStoreInterface::METADATA_POSITION]]
-			<=>
-			[$right->metadata()[self::METADATA_AGGREGATE_CLASSNAME], $right->metadata()[EventStoreInterface::METADATA_POSITION]]
-		);
+    public function ack(Envelope $envelope): void
+    {
+        $this->updateLastPosition($envelope);
+    }
 
-		foreach ($events as $event) {
-			assert($event instanceof AbstractDomainEvent);
+    public function reject(Envelope $envelope): void
+    {
+        $this->updateLastPosition($envelope);
+    }
 
-			$envelope = new Envelope($event, [
-				new BusNameStamp('projection_bus'),
-				new TransportMessageIdStamp([
-					'projection' => $this->projectionClassname,
-					'aggregate_classname' => $event->metadata()[self::METADATA_AGGREGATE_CLASSNAME],
-					'position' => (string) $event->metadata()[EventStoreInterface::METADATA_POSITION],
-				]),
-			]);
+    public function getMessageCount(): int
+    {
+        try {
+            $lastPositions = $this->projectionStore->findLastPositions($this->projectionClassname);
+            $total = 0;
 
-			yield $envelope;
-		}
-	}
+            foreach ($lastPositions as $aggregateClassname => $position) {
+                $criteria = EventCriteria::create($aggregateClassname)
+                    ->withPositionGreaterThan($position)
+                    ->withEventNames($this->getEventClassnames()[$aggregateClassname] ?? []);
 
-	public function ack(Envelope $envelope): void
-	{
-		$this->updateLastPosition($envelope);
-	}
+                $total += $this->eventStore->count($criteria);
+            }
 
-	public function reject(Envelope $envelope): void
-	{
-		$this->updateLastPosition($envelope);
-	}
+            return $total;
+        } catch (ProjectionStoreException|EventStoreException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+    }
 
-	public function getMessageCount(): int
-	{
-		try {
-			$lastPositions = $this->projectionStore->findLastPositions($this->projectionClassname);
-			$total = 0;
+    private function updateLastPosition(Envelope $envelope): void
+    {
+        $idStamp = $envelope->last(TransportMessageIdStamp::class);
 
-			foreach ($lastPositions as $aggregateClassname => $position) {
-				$criteria = EventCriteria::create($aggregateClassname)
-					->withPositionGreaterThan($position)
-					->withEventNames($this->getEventClassnames()[$aggregateClassname] ?? []);
+        if (!$idStamp instanceof TransportMessageIdStamp) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
+        }
 
-				$total += $this->eventStore->count($criteria);
-			}
+        $id = $idStamp->getId();
 
-			return $total;
-		} catch (ProjectionStoreException|EventStoreException $e) {
-			throw new TransportException($e->getMessage(), 0, $e);
-		}
-	}
+        if (!isset($id['projection'], $id['aggregate_classname'], $id['position']) || $id['projection'] !== $this->projectionClassname) {
+            throw new LogicException('Invalid TransportMessageIdStamp passed into the recepiver.');
+        }
 
-	private function updateLastPosition(Envelope $envelope): void
-	{
-		$idStamp = $envelope->last(TransportMessageIdStamp::class);
+        try {
+            $this->projectionStore->updateLastPosition($id['projection'], $id['aggregate_classname'], $id['position']);
+        } catch (ProjectionStoreException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+    }
 
-		if (!$idStamp instanceof TransportMessageIdStamp) {
-			throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
-		}
+    /**
+     * @return array<class-string, array<int, class-string>>
+     */
+    private function getEventClassnames(): array
+    {
+        if (null !== $this->eventClassnames) {
+            return $this->eventClassnames;
+        }
 
-		$id = $idStamp->getId();
+        $eventClassnames = [];
 
-		if (!isset($id['projection'], $id['aggregate_classname'], $id['position']) || $id['projection'] !== $this->projectionClassname) {
-			throw new LogicException('Invalid TransportMessageIdStamp passed into the recepiver.');
-		}
+        foreach ($this->projectionClassname::defineEvents() as $eventDefinition) {
+            if (!isset($eventClassnames[$eventDefinition->aggregateRootClassname])) {
+                $eventClassnames[$eventDefinition->aggregateRootClassname] = [];
+            }
 
-		try {
-			$this->projectionStore->updateLastPosition($id['projection'], $id['aggregate_classname'], $id['position']);
-		} catch (ProjectionStoreException $e) {
-			throw new TransportException($e->getMessage(), 0, $e);
-		}
-	}
+            $eventClassnames[$eventDefinition->aggregateRootClassname][] = $eventDefinition->eventClassname;
+        }
 
-	/**
-	 * @return array<string, array<string>>
-	 */
-	private function getEventClassnames(): array
-	{
-		if (NULL !== $this->eventClassnames) {
-			return $this->eventClassnames;
-		}
-
-		foreach ($this->projectionClassname::defineEvents() as $eventDefinition) {
-			if (!isset($this->eventClassnames[$eventDefinition->aggregateRootClassname])) {
-				$this->eventClassnames[$eventDefinition->aggregateRootClassname] = [];
-			}
-
-			$this->eventClassnames[$eventDefinition->aggregateRootClassname][] = $eventDefinition->eventClassname;
-		}
-
-		return $this->eventClassnames;
-	}
+        return $this->eventClassnames = $eventClassnames;
+    }
 }

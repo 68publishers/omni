@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\DbalType;
 
+use Doctrine\DBAL\Types\GuidType;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType\ValueObjectTypeTrait;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType\AbstractUuidIdentityType;
 
-final class UserIdType extends AbstractUuidIdentityType
+final class UserIdType extends GuidType
 {
-	protected string $valueObjectClassname = UserId::class;
+    use ValueObjectTypeTrait;
+
+    protected function getValueObjectClassname(): string
+    {
+        return UserId::class;
+    }
 }

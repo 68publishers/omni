@@ -8,21 +8,12 @@ use DateTimeImmutable;
 
 final class PasswordRequestExpirationProvider implements PasswordRequestExpirationProviderInterface
 {
-	private string $dateTimeModifier;
+    public function __construct(
+        private readonly string $dateTimeModifier = '+1 hour',
+    ) {}
 
-	/**
-	 * @param string $dateTimeModifier
-	 */
-	public function __construct(string $dateTimeModifier = '+1 hour')
-	{
-		$this->dateTimeModifier = $dateTimeModifier;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function provideExpiration(DateTimeImmutable $requestedAt): DateTimeImmutable
-	{
-		return $requestedAt->modify($this->dateTimeModifier);
-	}
+    public function provideExpiration(DateTimeImmutable $requestedAt): DateTimeImmutable
+    {
+        return $requestedAt->modify($this->dateTimeModifier);
+    }
 }

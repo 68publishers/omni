@@ -4,45 +4,22 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\ValueObject;
 
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\NullableStringValueTrait;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
 use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\StringValueObjectInterface;
 
-final class Password implements StringValueObjectInterface
+final class Password implements ValueObjectInterface
 {
-	private string $value;
+    use NullableStringValueTrait;
 
-	private function __construct()
-	{
-	}
+    public function createHashedPassword(PasswordHashAlgorithmInterface $algorithm): HashedPassword
+    {
+        if ($this->isNull()) {
+            return HashedPassword::null();
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public static function fromValue(string $value): self
-	{
-		$password = new self();
-		$password->value = $value;
-
-		return $password;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function value(): string
-	{
-		return $this->value;
-	}
-
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface $algorithm
-	 *
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword
-	 */
-	public function createHashedPassword(PasswordHashAlgorithmInterface $algorithm): HashedPassword
-	{
-		return HashedPassword::fromValue(
-			$algorithm->hash($this->value())
-		);
-	}
+        return HashedPassword::fromNative(
+            $algorithm->hash((string) $this->toNative()),
+        );
+    }
 }

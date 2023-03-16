@@ -6,19 +6,26 @@ namespace SixtyEightPublishers\ProjectionBundle\ProjectionStore;
 
 interface ProjectionStoreInterface
 {
-	/**
-	 * @return array<string, string>
-	 * @throws \SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException
-	 */
-	public function findLastPositions(string $projectionClassname): array;
+    /**
+     * @param class-string $projectionClassname
+     *
+     * @return array<class-string, string>
+     * @throws ProjectionStoreException
+     */
+    public function findLastPositions(string $projectionClassname): array;
 
-	/**
-	 * @throws \SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException
-	 */
-	public function updateLastPosition(string $projectionClassname, string $aggregateClassname, string $position): bool;
+    /**
+     * @param class-string $projectionClassname
+     * @param class-string $aggregateClassname
+     *
+     * @throws ProjectionStoreException
+     */
+    public function updateLastPosition(string $projectionClassname, string $aggregateClassname, string $position): bool;
 
-	/**
-	 * @throws \SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException
-	 */
-	public function resetProjection(string $projectionClassname): void;
+    /**
+     * @param class-string $projectionClassname
+     *
+     * @throws ProjectionStoreException
+     */
+    public function resetProjection(string $projectionClassname): void;
 }

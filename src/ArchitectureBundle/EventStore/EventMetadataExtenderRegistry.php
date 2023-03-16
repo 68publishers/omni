@@ -8,25 +8,23 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 
 final class EventMetadataExtenderRegistry implements EventMetadataExtenderInterface
 {
-	private array $eventMetadataExtenders;
+    /** @var array<EventMetadataExtenderInterface> */
+    private readonly array $eventMetadataExtenders;
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\EventStore\EventMetadataExtenderInterface[] $eventMetadataExtenders
-	 */
-	public function __construct(array $eventMetadataExtenders)
-	{
-		$this->eventMetadataExtenders = (static fn (EventMetadataExtenderInterface ...$eventMetadataExtenders): array => $eventMetadataExtenders)(...$eventMetadataExtenders);
-	}
+    /**
+     * @param array<EventMetadataExtenderInterface> $eventMetadataExtenders
+     */
+    public function __construct(array $eventMetadataExtenders)
+    {
+        $this->eventMetadataExtenders = (static fn (EventMetadataExtenderInterface ...$eventMetadataExtenders): array => $eventMetadataExtenders)(...$eventMetadataExtenders);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function extendMetadata(AbstractDomainEvent $event): AbstractDomainEvent
-	{
-		foreach ($this->eventMetadataExtenders as $eventMetadataExtender) {
-			$event = $eventMetadataExtender->extendMetadata($event);
-		}
+    public function extendMetadata(AbstractDomainEvent $event): AbstractDomainEvent
+    {
+        foreach ($this->eventMetadataExtenders as $eventMetadataExtender) {
+            $event = $eventMetadataExtender->extendMetadata($event);
+        }
 
-		return $event;
-	}
+        return $event;
+    }
 }

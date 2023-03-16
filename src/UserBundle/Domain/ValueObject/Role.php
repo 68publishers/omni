@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\ValueObject;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AbstractStringValueObject;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\StringValueTrait;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
 
-final class Role extends AbstractStringValueObject
+final class Role implements ValueObjectInterface
 {
+    use StringValueTrait;
 }

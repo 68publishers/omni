@@ -4,208 +4,168 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Event;
 
-use DateTimeZone;
 use DateTimeImmutable;
-use SixtyEightPublishers\ArchitectureBundle\Event\EventInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
+use DateTimeInterface;
+use DateTimeZone;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
+use SixtyEightPublishers\ArchitectureBundle\Event\EventInterface;
+use function array_map;
+use function array_merge;
 
 abstract class AbstractDomainEvent implements EventInterface
 {
-	protected const METADATA_AGGREGATE_ID = '_aggregate_id';
-	protected const METADATA_AGGREGATE_VERSION = '_aggregate_version';
+    protected const METADATA_AGGREGATE_ID = '_aggregate_id';
+    protected const METADATA_AGGREGATE_VERSION = '_aggregate_version';
 
-	protected string $eventName;
+    /** @var class-string $eventName */
+    protected string $eventName;
 
-	protected EventId $eventId;
+    protected EventId $eventId;
 
-	protected DateTimeImmutable $createdAt;
+    protected DateTimeImmutable $createdAt;
 
-	protected array $parameters;
+    /** @var array<string, mixed> */
+    protected array $parameters;
 
-	protected array $metadata;
+    /** @var array<string, mixed> */
+    protected array $metadata;
 
-	/**
-	 * @param string                                                              $eventName
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId $eventId
-	 * @param \DateTimeImmutable                                                  $createdAt
-	 * @param array                                                               $metadata
-	 * @param array                                                               $parameters
-	 *
-	 * @return static
-	 */
-	public static function reconstitute(string $eventName, EventId $eventId, DateTimeImmutable $createdAt, array $metadata, array $parameters): self
-	{
-		$event = new static();
+    private function __construct() {}
 
-		$event->eventName = $eventName;
-		$event->eventId = $eventId;
-		$event->createdAt = $createdAt;
-		$event->parameters = $parameters;
-		$event->metadata = $metadata;
-		$event->reconstituteState($parameters);
+    /**
+     * @param class-string         $eventName
+     * @param array<string, mixed> $metadata
+     * @param array<string, mixed> $parameters
+     */
+    public static function reconstitute(string $eventName, EventId $eventId, DateTimeImmutable $createdAt, array $metadata, array $parameters): static
+    {
+        $event = new static(); // @phpstan-ignore-line
 
-		return $event;
-	}
+        $event->eventName = $eventName;
+        $event->eventId = $eventId;
+        $event->createdAt = $createdAt;
+        $event->parameters = $parameters;
+        $event->metadata = $metadata;
 
-	/**
-	 * @return string
-	 */
-	public function eventName(): string
-	{
-		return $this->eventName;
-	}
+        return $event;
+    }
 
-	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId
-	 */
-	public function eventId(): EventId
-	{
-		return $this->eventId;
-	}
+    /**
+     * @return class-string
+     */
+    public function getEventName(): string
+    {
+        return $this->eventName;
+    }
 
-	/**
-	 * @return \DateTimeImmutable
-	 */
-	public function createdAt(): DateTimeImmutable
-	{
-		return $this->createdAt;
-	}
+    public function getEventId(): EventId
+    {
+        return $this->eventId;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function metadata(): array
-	{
-		return $this->metadata;
-	}
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
 
-	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId
-	 */
-	public function aggregateId(): AggregateId
-	{
-		return AggregateId::fromString($this->metadata[self::METADATA_AGGREGATE_ID]);
-	}
+    /**
+     * @return array<string, mixed>
+     */
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function version(): int
-	{
-		return $this->metadata[self::METADATA_AGGREGATE_VERSION];
-	}
+    public function getAggregateId(): AggregateId
+    {
+        return AggregateId::fromNative($this->metadata[self::METADATA_AGGREGATE_ID]);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function parameters(): array
-	{
-		return $this->parameters;
-	}
+    public function getVersion(): int
+    {
+        return $this->metadata[self::METADATA_AGGREGATE_VERSION];
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function hasParam(string $name): bool
-	{
-		return array_key_exists($name, $this->parameters);
-	}
+    /**
+     * @return array<string, mixed>
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function getParam(string $name)
-	{
-		return $this->parameters[$name] ?? NULL;
-	}
+    public function withVersion(int $version): static
+    {
+        $event = clone $this;
+        $event->metadata[self::METADATA_AGGREGATE_VERSION] = $version;
 
-	/**
-	 * @param string $name
-	 * @param $value
-	 *
-	 * @return $this
-	 */
-	public function withParam(string $name, $value): self
-	{
-		$event = clone $this;
-		$event->metadata[$name] = $value;
+        return $event;
+    }
 
-		return $event;
-	}
+    /**
+     * @param array<string, mixed> $metadata
+     */
+    public function withMetadata(array $metadata, bool $merge = false): static
+    {
+        $event = clone $this;
+        $event->metadata = $merge ? array_merge($event->getMetadata(), $metadata) : $metadata;
 
-	/**
-	 * @param int $version
-	 *
-	 * @return $this
-	 */
-	public function withVersion(int $version): self
-	{
-		$event = clone $this;
-		$event->metadata[self::METADATA_AGGREGATE_VERSION] = $version;
+        return $event;
+    }
 
-		return $event;
-	}
+    /**
+     * @return array{event_name: class-string, event_id: string, created_at: DateTimeImmutable, parameters: array<string, mixed>, metadata: array<string, mixed>}
+     */
+    public function toArray(): array
+    {
+        return [
+            'event_name' => $this->eventName,
+            'event_id' => $this->eventId->toNative(),
+            'created_at' => $this->getCreatedAt(),
+            'parameters' => $this->getParameters(),
+            'metadata' => $this->metadata,
+        ];
+    }
 
-	/**
-	 * @param array $metadata
-	 * @param bool  $merge
-	 *
-	 * @return $this
-	 */
-	public function withMetadata(array $metadata, bool $merge = FALSE): self
-	{
-		$event = clone $this;
-		$event->metadata = $merge ? array_merge($event->metadata(), $metadata) : $metadata;
+    /**
+     * @param array<string, mixed> $parameters
+     *
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    protected static function occur(string $aggregateId, array $parameters = []): static
+    {
+        $event = new static();  // @phpstan-ignore-line
 
-		return $event;
-	}
+        $event->eventName = static::class;
+        $event->eventId = EventId::new();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $event->createdAt = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $event->parameters = array_map(
+            static function (mixed $value): mixed {
+                if ($value instanceof ValueObjectInterface) {
+                    return $value->toNative();
+                }
 
-	/**
-	 * @return array
-	 */
-	public function toArray(): array
-	{
-		return [
-			'event_name' => $this->eventName,
-			'event_id' => $this->eventId->toString(),
-			'created_at' => $this->createdAt(),
-			'parameters' => $this->parameters(),
-			'metadata' => $this->metadata,
-		];
-	}
+                if ($value instanceof DateTimeInterface) {
+                    return $value->format(DateTimeInterface::ATOM);
+                }
 
-	/**
-	 * @param string $aggregateId
-	 * @param array  $parameters
-	 *
-	 * @return static
-	 * @noinspection PhpDocMissingThrowsInspection
-	 */
-	protected static function occur(string $aggregateId, array $parameters = []): self
-	{
-		$event = new static();
+                if ($value instanceof DateTimeZone) {
+                    return $value->getName();
+                }
 
-		$event->eventName = static::class;
-		$event->eventId = EventId::new();
-		/** @noinspection PhpUnhandledExceptionInspection */
-		$event->createdAt = new DateTimeImmutable('now', new DateTimeZone('UTC'));
-		$event->parameters = $parameters;
+                return $value;
+            },
+            $parameters,
+        );
 
-		$event->metadata = [
-			self::METADATA_AGGREGATE_ID => $aggregateId,
-			self::METADATA_AGGREGATE_VERSION => 1, // initial
-		];
+        $event->metadata = [
+            self::METADATA_AGGREGATE_ID => $aggregateId,
+            self::METADATA_AGGREGATE_VERSION => 1, // initial
+        ];
 
-		return $event;
-	}
-
-	/**
-	 * @param array $parameters
-	 *
-	 * @return void
-	 */
-	protected function reconstituteState(array $parameters): void
-	{
-	}
+        return $event;
+    }
 }

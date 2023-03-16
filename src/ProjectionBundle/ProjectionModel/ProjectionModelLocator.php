@@ -5,60 +5,57 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ProjectionBundle\ProjectionModel;
 
 use Nette\DI\Container;
+use function array_key_exists;
+use function array_merge;
+use function array_unique;
+use function assert;
 
 final class ProjectionModelLocator implements ProjectionModelLocatorInterface
 {
-	private array $serviceNamesByProjectionClassnames;
+    /**
+     * @param array<class-string, string> $serviceNamesByProjectionClassnames
+     * @param array<string, string>       $serviceNamesByProjectionNames
+     */
+    public function __construct(
+        private readonly array $serviceNamesByProjectionClassnames,
+        private readonly array $serviceNamesByProjectionNames,
+        private readonly Container $container,
+    ) {}
 
-	private array $serviceNamesByProjectionNames;
+    public function resolveForProjectionClassname(string $projectionClassname): ?ProjectionModelInterface
+    {
+        if (array_key_exists($projectionClassname, $this->serviceNamesByProjectionClassnames)) {
+            $projectionModel = $this->container->getService($this->serviceNamesByProjectionClassnames[$projectionClassname]);
 
-	private Container $container;
+            assert($projectionModel instanceof ProjectionModelInterface);
 
-	/**
-	 * @param array<string, string> $serviceNamesByProjectionClassnames
-	 * @param array<string, string> $serviceNamesByProjectionNames
-	 */
-	public function __construct(array $serviceNamesByProjectionClassnames, array $serviceNamesByProjectionNames, Container $container)
-	{
-		$this->serviceNamesByProjectionClassnames = $serviceNamesByProjectionClassnames;
-		$this->serviceNamesByProjectionNames = $serviceNamesByProjectionNames;
-		$this->container = $container;
-	}
+            return $projectionModel;
+        }
 
-	public function resolveForProjectionClassname(string $projectionClassname): ?ProjectionModelInterface
-	{
-		if (array_key_exists($projectionClassname, $this->serviceNamesByProjectionClassnames)) {
-			$projectionModel = $this->container->getService($this->serviceNamesByProjectionClassnames[$projectionClassname]);
+        return null;
+    }
 
-			assert($projectionModel instanceof ProjectionModelInterface);
+    public function resolveForProjectionName(string $projectionName): ?ProjectionModelInterface
+    {
+        if (array_key_exists($projectionName, $this->serviceNamesByProjectionNames)) {
+            $projectionModel = $this->container->getService($this->serviceNamesByProjectionNames[$projectionName]);
 
-			return $projectionModel;
-		}
+            assert($projectionModel instanceof ProjectionModelInterface);
 
-		return NULL;
-	}
+            return $projectionModel;
+        }
 
-	public function resolveForProjectionName(string $projectionName): ?ProjectionModelInterface
-	{
-		if (array_key_exists($projectionName, $this->serviceNamesByProjectionNames)) {
-			$projectionModel = $this->container->getService($this->serviceNamesByProjectionNames[$projectionName]);
+        return null;
+    }
 
-			assert($projectionModel instanceof ProjectionModelInterface);
+    public function all(): iterable
+    {
+        foreach (array_unique(array_merge($this->serviceNamesByProjectionClassnames, $this->serviceNamesByProjectionNames)) as $projectionModelServiceName) {
+            $projectionModel = $this->container->getService($projectionModelServiceName);
 
-			return $projectionModel;
-		}
+            assert($projectionModel instanceof ProjectionModelInterface);
 
-		return NULL;
-	}
-
-	public function all(): iterable
-	{
-		foreach (array_unique(array_merge($this->serviceNamesByProjectionClassnames, $this->serviceNamesByProjectionNames)) as $projectionModelServiceName) {
-			$projectionModel = $this->container->getService($projectionModelServiceName);
-
-			assert($projectionModel instanceof ProjectionModelInterface);
-
-			yield $projectionModel;
-		}
-	}
+            yield $projectionModel;
+        }
+    }
 }

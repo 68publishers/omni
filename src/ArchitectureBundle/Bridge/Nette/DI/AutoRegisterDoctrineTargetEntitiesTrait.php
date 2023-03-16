@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI;
 
-use SixtyEightPublishers\DoctrineBridge\DI\TargetEntity;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\TargetEntity;
 
 trait AutoRegisterDoctrineTargetEntitiesTrait
 {
-	use ExtendedAggregatesResolverTrait;
+    use ExtendedAggregatesResolverTrait;
 
-	/**
-	 * @return \SixtyEightPublishers\DoctrineBridge\DI\TargetEntity[]
-	 */
-	public function getTargetEntities(): array
-	{
-		$targetEntities = [];
+    /**
+     * @return array<TargetEntity>
+     */
+    public function getTargetEntities(): array
+    {
+        $targetEntities = [];
 
-		foreach ($this->resolveExtendedAggregates() as $originalClassname => $usedClassname) {
-			if ($originalClassname !== $usedClassname) {
-				$targetEntities[] = new TargetEntity($originalClassname, $usedClassname);
-			}
-		}
+        foreach ($this->resolveExtendedAggregates() as $originalClassname => $usedClassname) {
+            if ($originalClassname !== $usedClassname) {
+                $targetEntities[] = new TargetEntity($originalClassname, $usedClassname);
+            }
+        }
 
-		return $targetEntities;
-	}
+        return $targetEntities;
+    }
 }

@@ -4,56 +4,33 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ComparableValueObjectInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\CompositeValueObjectTrait;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
 
-final class DeviceInfo implements ComparableValueObjectInterface
+final class DeviceInfo implements ValueObjectInterface
 {
-	private IpAddressInterface $ipAddress;
+    use CompositeValueObjectTrait;
 
-	private UserAgent $userAgent;
+    public function __construct(
+        private readonly IpAddress $ipAddress,
+        private readonly UserAgent $userAgent,
+    ) {}
 
-	private function __construct()
-	{
-	}
+    protected static function fromNativeFactory(callable $factory): static
+    {
+        return new self(
+            $factory(IpAddress::class, 'ip_address'),
+            $factory(UserAgent::class, 'user_agent'),
+        );
+    }
 
-	/**
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\IpAddressInterface $ipAddress
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\UserAgent          $userAgent
-	 *
-	 * @return static
-	 */
-	public static function create(IpAddressInterface $ipAddress, UserAgent $userAgent): self
-	{
-		$deviceInfo = new self();
-		$deviceInfo->ipAddress = $ipAddress;
-		$deviceInfo->userAgent = $userAgent;
+    public function getIpAddress(): IpAddress
+    {
+        return $this->ipAddress;
+    }
 
-		return $deviceInfo;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\IpAddressInterface
-	 */
-	public function ipAddress(): IpAddressInterface
-	{
-		return $this->ipAddress;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\UserAgent
-	 */
-	public function userAgent(): UserAgent
-	{
-		return $this->userAgent;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function equals(ComparableValueObjectInterface $valueObject): bool
-	{
-		return $valueObject instanceof self
-			&& $this->ipAddress()->equals($valueObject->ipAddress())
-			&& $this->userAgent()->equals($valueObject->userAgent());
-	}
+    public function getUserAgent(): UserAgent
+    {
+        return $this->userAgent;
+    }
 }

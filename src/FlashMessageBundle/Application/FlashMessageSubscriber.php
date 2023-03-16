@@ -9,21 +9,12 @@ use SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessageCollectionInterfa
 
 final class FlashMessageSubscriber implements FlashMessageSubscriberInterface
 {
-	private FlashMessageCollectionInterface $flashMessageCollection;
+    public function __construct(
+        private readonly FlashMessageCollectionInterface $flashMessageCollection,
+    ) {}
 
-	/**
-	 * @param \SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessageCollectionInterface $flashMessageCollection
-	 */
-	public function __construct(FlashMessageCollectionInterface $flashMessageCollection)
-	{
-		$this->flashMessageCollection = $flashMessageCollection;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function subscribe(FlashMessage $flashMessage): void
-	{
-		$this->flashMessageCollection->add($flashMessage);
-	}
+    public function subscribe(FlashMessage $flashMessage): void
+    {
+        $this->flashMessageCollection->add($flashMessage);
+    }
 }

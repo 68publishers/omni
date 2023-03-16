@@ -6,31 +6,17 @@ namespace SixtyEightPublishers\ArchitectureBundle\ReadModel\Query;
 
 interface BatchedQueryInterface extends QueryInterface
 {
-	/**
-	 * Size of a batch
-	 *
-	 * @return int
-	 */
-	public function batchSize(): int;
+    /**
+     * Size of a batch
+     */
+    public function getBatchSize(): int;
 
-	/**
-	 * Static offset for queries e.g. LIMIT ... OFFSET <static-offset>. Useful when you are iterating over batches and deleting the entities.
-	 *
-	 * @return int
-	 */
-	public function staticOffset(): ?int;
+    /**
+     * Static offset for queries e.g. LIMIT ... OFFSET <static-offset>. Useful when you are iterating over batches and deleting the entities.
+     */
+    public function getStaticOffset(): ?int;
 
-	/**
-	 * @param int $batchSize
-	 *
-	 * @return $this
-	 */
-	public function withBatchSize(int $batchSize): self;
+    public function withBatchSize(int $batchSize): static;
 
-	/**
-	 * @param int|NULL $staticOffset
-	 *
-	 * @return $this
-	 */
-	public function withStaticOffset(?int $staticOffset): self;
+    public function withStaticOffset(?int $staticOffset): static;
 }

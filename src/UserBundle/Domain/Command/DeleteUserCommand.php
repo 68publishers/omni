@@ -4,27 +4,11 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\Command;
 
-use SixtyEightPublishers\ArchitectureBundle\Command\AbstractCommand;
+use SixtyEightPublishers\ArchitectureBundle\Command\CommandInterface;
 
-final class DeleteUserCommand extends AbstractCommand
+final class DeleteUserCommand implements CommandInterface
 {
-	/**
-	 * @param string $userId
-	 *
-	 * @return static
-	 */
-	public static function create(string $userId): self
-	{
-		return self::fromParameters([
-			'user_id' => $userId,
-		]);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function userId(): string
-	{
-		return $this->getParam('user_id');
-	}
+    public function __construct(
+        public readonly string $userId,
+    ) {}
 }

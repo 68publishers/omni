@@ -4,43 +4,30 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter;
 
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Exception\TransactionException;
+
 interface PersistenceAdapterInterface
 {
-	/**
-	 * @return bool
-	 */
-	public function supportsTransactions(): bool;
+    public function supportsTransactions(): bool;
 
-	/**
-	 * @return void
-	 * @throws \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Exception\TransactionException
-	 */
-	public function beginTransaction(): void;
+    /**
+     * @throws TransactionException
+     */
+    public function beginTransaction(): void;
 
-	/**
-	 * @return void
-	 * @throws \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Exception\TransactionException
-	 */
-	public function commitTransaction(): void;
+    /**
+     * @throws TransactionException
+     */
+    public function commitTransaction(): void;
 
-	/**
-	 * @return void
-	 * @throws \SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Exception\TransactionException
-	 */
-	public function rollbackTransaction(): void;
+    /**
+     * @throws TransactionException
+     */
+    public function rollbackTransaction(): void;
 
-	/**
-	 * @return bool
-	 */
-	public function hasActiveTransaction(): bool;
+    public function hasActiveTransaction(): bool;
 
-	/**
-	 * @return void
-	 */
-	public function pingConnection(): void;
+    public function pingConnection(): void;
 
-	/**
-	 * @return void
-	 */
-	public function closeConnection(): void;
+    public function closeConnection(): void;
 }

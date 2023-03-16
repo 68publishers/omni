@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\Ui;
 
+use Nette\Application\AbortException;
+use Nette\Application\ForbiddenRequestException;
 use Nette\InvalidStateException;
 use Nette\Security\User as NetteUser;
-use Nette\Application\ForbiddenRequestException;
 use SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface;
+use function assert;
+use function sprintf;
 
 /**
  * For links use:
@@ -18,83 +21,73 @@ use SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface;
  * ]);
  * </code>
  *
- *
  * @method NetteUser getUser()
  * @method mixed     getParameter($key)
  */
 trait LogoutPresenterTrait
 {
-	protected string $tokenName = '_sec';
+    protected string $tokenName = '_sec';
 
-	private CsrfTokenFactoryInterface $csrfTokenFactory;
+    private CsrfTokenFactoryInterface $csrfTokenFactory;
 
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface $csrfTokenFactory
-	 *
-	 * @return void
-	 */
-	public function injectCsrfTokenFactory(CsrfTokenFactoryInterface $csrfTokenFactory): void
-	{
-		$this->csrfTokenFactory = $csrfTokenFactory;
-	}
+    public function injectCsrfTokenFactory(CsrfTokenFactoryInterface $csrfTokenFactory): void
+    {
+        $this->csrfTokenFactory = $csrfTokenFactory;
+    }
 
-	/**
-	 * @return void
-	 * @throws \Nette\Application\ForbiddenRequestException
-	 * @throws \Nette\Application\AbortException
-	 */
-	public function startup(): void
-	{
-		/** @noinspection PhpUndefinedClassInspection */
-		parent::startup();
+    /**
+     * @throws ForbiddenRequestException
+     * @throws AbortException
+     */
+    public function startup(): void
+    {
+        /** @noinspection PhpUndefinedClassInspection */
+        parent::startup();
 
-		$user = $this->getUser();
-		assert($user instanceof NetteUser);
+        $user = $this->getUser();
+        assert($user instanceof NetteUser);
 
-		if (!$user->isLoggedIn()) {
-			$this->handleUserNotLoggedIn();
-		}
+        if (!$user->isLoggedIn()) {
+            $this->handleUserNotLoggedIn();
+        }
 
-		if ($this->getParameter($this->tokenName) !== $this->csrfTokenFactory->create(static::class)) {
-			$this->handleInvalidToken();
-		}
+        if ($this->getParameter($this->tokenName) !== $this->csrfTokenFactory->create(static::class)) {
+            $this->handleInvalidToken();
+        }
 
-		$user->logout();
-		$this->handleUserLoggedOut();
+        $user->logout();
+        $this->handleUserLoggedOut();
 
-		throw new InvalidStateException(sprintf(
-			'Method %s::handleUserLoggedOut() must redirect when the user is logged out.',
-			__CLASS__
-		));
-	}
+        throw new InvalidStateException(sprintf(
+            'Method %s::handleUserLoggedOut() must redirect when the user is logged out.',
+            __CLASS__,
+        ));
+    }
 
-	/**
-	 * Do redirect in this method, you can also add flash messages etc.
-	 *
-	 * @return void
-	 * @throws \Nette\Application\AbortException
-	 */
-	abstract protected function handleUserLoggedOut(): void;
+    /**
+     * Do redirect in this method, you can also add flash messages etc.
+     *
+     * @throws AbortException
+     */
+    abstract protected function handleUserLoggedOut(): void;
 
-	/**
-	 * Use can override the default behavior
-	 *
-	 * @return void
-	 * @throws \Nette\Application\ForbiddenRequestException
-	 */
-	protected function handleUserNotLoggedIn(): void
-	{
-		throw new ForbiddenRequestException('');
-	}
+    /**
+     * Use can override the default behavior
+     *
+     * @throws ForbiddenRequestException
+     */
+    protected function handleUserNotLoggedIn(): void
+    {
+        throw new ForbiddenRequestException('');
+    }
 
-	/**
-	 * Use can override the default behavior
-	 *
-	 * @return void
-	 * @throws \Nette\Application\ForbiddenRequestException
-	 */
-	protected function handleInvalidToken(): void
-	{
-		throw new ForbiddenRequestException('');
-	}
+    /**
+     * Use can override the default behavior
+     *
+     * @throws ForbiddenRequestException
+     */
+    protected function handleInvalidToken(): void
+    {
+        throw new ForbiddenRequestException('');
+    }
 }

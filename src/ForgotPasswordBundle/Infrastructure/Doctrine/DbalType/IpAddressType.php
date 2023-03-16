@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\DbalType;
 
+use Doctrine\DBAL\Types\StringType;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType\ValueObjectTypeTrait;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\IpAddress;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType\AbstractStringValueObjectType;
 
-final class IpAddressType extends AbstractStringValueObjectType
+final class IpAddressType extends StringType
 {
-	protected string $valueObjectClassname = IpAddress::class;
+    use ValueObjectTypeTrait;
+
+    protected function getValueObjectClassname(): string
+    {
+        return IpAddress::class;
+    }
 }

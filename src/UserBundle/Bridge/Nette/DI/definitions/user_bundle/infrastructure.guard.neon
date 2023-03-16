@@ -1,0 +1,10 @@
+services:
+	infrastructure.guard.email_address:
+		autowired: SixtyEightPublishers\UserBundle\Domain\EmailAddressGuardInterface
+		type: SixtyEightPublishers\UserBundle\Domain\EmailAddressGuardInterface
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\UniqueEmailAddressGuard
+
+	infrastructure.guard.username:
+		autowired: SixtyEightPublishers\UserBundle\Domain\UsernameGuardInterface
+		type: SixtyEightPublishers\UserBundle\Domain\UsernameGuardInterface
+		factory: SixtyEightPublishers\UserBundle\Infrastructure\UniqueUsernameGuard

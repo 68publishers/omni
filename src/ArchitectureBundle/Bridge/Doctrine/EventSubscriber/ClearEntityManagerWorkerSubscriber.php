@@ -11,50 +11,35 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 
 final class ClearEntityManagerWorkerSubscriber implements EventSubscriberInterface
 {
-	private ManagerRegistry $managerRegistry;
+    private ManagerRegistry $managerRegistry;
 
-	/**
-	 * @param \Doctrine\Persistence\ManagerRegistry $managerRegistry
-	 */
-	public function __construct(ManagerRegistry $managerRegistry)
-	{
-		$this->managerRegistry = $managerRegistry;
-	}
+    public function __construct(ManagerRegistry $managerRegistry)
+    {
+        $this->managerRegistry = $managerRegistry;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public static function getSubscribedEvents(): iterable
-	{
-		return [
-			WorkerMessageHandledEvent::class => 'onWorkerMessageHandled',
-			WorkerMessageFailedEvent::class => 'onWorkerMessageFailed',
-		];
-	}
+    public static function getSubscribedEvents(): iterable
+    {
+        return [
+            WorkerMessageHandledEvent::class => 'onWorkerMessageHandled',
+            WorkerMessageFailedEvent::class => 'onWorkerMessageFailed',
+        ];
+    }
 
-	/**
-	 * @return void
-	 */
-	public function onWorkerMessageHandled(): void
-	{
-		$this->clearEntityManagers();
-	}
+    public function onWorkerMessageHandled(): void
+    {
+        $this->clearEntityManagers();
+    }
 
-	/**
-	 * @return void
-	 */
-	public function onWorkerMessageFailed(): void
-	{
-		$this->clearEntityManagers();
-	}
+    public function onWorkerMessageFailed(): void
+    {
+        $this->clearEntityManagers();
+    }
 
-	/**
-	 * @return void
-	 */
-	private function clearEntityManagers(): void
-	{
-		foreach ($this->managerRegistry->getManagers() as $manager) {
-			$manager->clear();
-		}
-	}
+    private function clearEntityManagers(): void
+    {
+        foreach ($this->managerRegistry->getManagers() as $manager) {
+            $manager->clear();
+        }
+    }
 }

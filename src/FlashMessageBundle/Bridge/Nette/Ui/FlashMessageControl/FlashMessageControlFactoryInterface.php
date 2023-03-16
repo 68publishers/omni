@@ -6,8 +6,5 @@ namespace SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageCo
 
 interface FlashMessageControlFactoryInterface
 {
-	/**
-	 * @return \SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageControl
-	 */
-	public function create(): FlashMessageControl;
+    public function create(): FlashMessageControl;
 }

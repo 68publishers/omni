@@ -8,43 +8,28 @@ use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Exception\Tran
 
 abstract class AbstractNonTransactionalPersistenceAdapter implements PersistenceAdapterInterface
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function supportsTransactions(): bool
-	{
-		return FALSE;
-	}
+    public function supportsTransactions(): bool
+    {
+        return false;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function beginTransaction(): void
-	{
-		throw TransactionException::unableToBeginTransaction('The storage is non transactional.');
-	}
+    public function beginTransaction(): void
+    {
+        throw TransactionException::unableToBeginTransaction('The storage is non transactional.');
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function commitTransaction(): void
-	{
-		throw TransactionException::unableToCommitTransaction('The storage is non transactional.');
-	}
+    public function commitTransaction(): void
+    {
+        throw TransactionException::unableToCommitTransaction('The storage is non transactional.');
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function rollbackTransaction(): void
-	{
-		throw TransactionException::unableToRollbackTransaction('The storage is non transactional.');
-	}
+    public function rollbackTransaction(): void
+    {
+        throw TransactionException::unableToRollbackTransaction('The storage is non transactional.');
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function hasActiveTransaction(): bool
-	{
-		return FALSE;
-	}
+    public function hasActiveTransaction(): bool
+    {
+        return false;
+    }
 }

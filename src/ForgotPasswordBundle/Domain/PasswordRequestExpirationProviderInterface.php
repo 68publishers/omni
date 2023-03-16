@@ -8,10 +8,5 @@ use DateTimeImmutable;
 
 interface PasswordRequestExpirationProviderInterface
 {
-	/**
-	 * @param \DateTimeImmutable $requestedAt
-	 *
-	 * @return \DateTimeImmutable
-	 */
-	public function provideExpiration(DateTimeImmutable $requestedAt): DateTimeImmutable;
+    public function provideExpiration(DateTimeImmutable $requestedAt): DateTimeImmutable;
 }

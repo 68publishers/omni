@@ -5,36 +5,20 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Application\Exception;
 
 use Exception;
-use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
+use function sprintf;
 
 final class IdentityException extends Exception
 {
-	/**
-	 * @param string $message
-	 */
-	private function __construct(string $message)
-	{
-		parent::__construct($message);
-	}
+    public static function unableToRetrieveDataFromSleepingIdentity(): self
+    {
+        return new self('Unable to retrieve data from a sleeping identity.');
+    }
 
-	/**
-	 * @return static
-	 */
-	public static function unableToRetrieveDataFromSleepingIdentity(): self
-	{
-		return new self('Unable to retrieve data from sleeping identity.');
-	}
-
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId $userId
-	 *
-	 * @return static
-	 */
-	public static function dataNotFound(UserId $userId): self
-	{
-		return new self(sprintf(
-			'Data for user %s not found.',
-			$userId->toString()
-		));
-	}
+    public static function dataNotFound(string $userId): self
+    {
+        return new self(sprintf(
+            'Data for the user %s not found.',
+            $userId,
+        ));
+    }
 }

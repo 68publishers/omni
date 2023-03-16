@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\DbalType;
 
+use Doctrine\DBAL\Types\StringType;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType\ValueObjectTypeTrait;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Username;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\DbalType\AbstractStringValueObjectType;
 
-final class UsernameType extends AbstractStringValueObjectType
+final class UsernameType extends StringType
 {
-	protected string $valueObjectClassname = Username::class;
+    use ValueObjectTypeTrait;
+
+    protected function getValueObjectClassname(): string
+    {
+        return Username::class;
+    }
 }

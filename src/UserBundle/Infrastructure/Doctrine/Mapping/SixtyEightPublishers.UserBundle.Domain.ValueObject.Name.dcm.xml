@@ -5,8 +5,8 @@
                                       https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
     <embeddable name="SixtyEightPublishers\UserBundle\Domain\ValueObject\Name">
-        <field name="firstname" column="firstname" type="string" />
-        <field name="surname" column="surname" type="string" />
+        <field name="firstname" column="firstname" type="SixtyEightPublishers\UserBundle\Domain\ValueObject\Firstname" />
+        <field name="surname" column="surname" type="SixtyEightPublishers\UserBundle\Domain\ValueObject\Surname" />
     </embeddable>
 
 </doctrine-mapping>

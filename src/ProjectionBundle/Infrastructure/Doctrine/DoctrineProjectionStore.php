@@ -4,148 +4,150 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ProjectionBundle\Infrastructure\Doctrine;
 
-use DateTimeZone;
 use DateTimeImmutable;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManagerInterface;
+use DateTimeZone;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception as DbalException;
 use Doctrine\DBAL\Exception\RetryableException;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionInterface;
 use SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException;
 use SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreInterface;
+use function array_fill_keys;
+use function array_unique;
+use function assert;
+use function is_subclass_of;
 
 final class DoctrineProjectionStore implements ProjectionStoreInterface
 {
-	private string $tableName;
+    public function __construct(
+        private readonly string $tableName,
+        private readonly EntityManagerInterface $em,
+    ) {}
 
-	private EntityManagerInterface $em;
+    public function findLastPositions(string $projectionClassname): array
+    {
+        assert(is_subclass_of($projectionClassname, ProjectionInterface::class, true));
 
-	public function __construct(string $tableName, EntityManagerInterface $em)
-	{
-		$this->tableName = $tableName;
-		$this->em = $em;
-	}
+        $aggregateClassnames = [];
 
-	public function findLastPositions(string $projectionClassname): array
-	{
-		assert(is_subclass_of($projectionClassname, ProjectionInterface::class, TRUE));
+        foreach ($projectionClassname::defineEvents() as $event) {
+            $aggregateClassnames[] = $event->aggregateRootClassname;
+        }
 
-		$aggregateClassnames = [];
+        $aggregateClassnames = array_unique($aggregateClassnames);
 
-		foreach ($projectionClassname::defineEvents() as $event) {
-			$aggregateClassnames[] = $event->aggregateRootClassname;
-		}
+        if (empty($aggregateClassnames)) {
+            return [];
+        }
 
-		$aggregateClassnames = array_unique($aggregateClassnames);
+        $result = array_fill_keys($aggregateClassnames, '0');
 
-		if (empty($aggregateClassnames)) {
-			return [];
-		}
+        try {
+            $connection = $this->em->getConnection();
 
-		$result = array_fill_keys($aggregateClassnames, '0');
+            $qb = $connection->createQueryBuilder()
+                ->select('aggregate_name, position')
+                ->from($this->getTableName())
+                ->where('projection_name = :projectionName')
+                ->andWhere('aggregate_name IN (:aggregateNames)')
+                ->setParameter('projectionName', $projectionClassname::getProjectionName(), 'string')
+                ->setParameter('aggregateNames', $aggregateClassnames, ArrayParameterType::STRING);
 
-		try {
-			$connection = $this->em->getConnection();
+            $statement = $qb->executeQuery();
 
-			$qb = $connection->createQueryBuilder()
-				->select('aggregate_name, position')
-				->from($this->getTableName())
-				->where('projection_name = :projectionName')
-				->andWhere('aggregate_name IN (:aggregateNames)')
-				->setParameter('projectionName', $projectionClassname::projectionName(), 'string')
-				->setParameter('aggregateNames', $aggregateClassnames, Connection::PARAM_STR_ARRAY);
+            while (false !== ($data = $statement->fetchAssociative())) {
+                /** @var class-string $aggregateName */
+                $aggregateName = $data['aggregate_name'];
+                $result[$aggregateName] = (string) $data['position'];
+            }
+        } catch (DbalException $e) {
+            throw ProjectionStoreException::unableToFindLastPositions($projectionClassname, $e instanceof RetryableException, $e);
+        }
 
-			$statement = $qb->executeQuery();
+        return $result;
+    }
 
-			while (FALSE !== ($data = $statement->fetchAssociative())) {
-				$result[$data['aggregate_name']] = (string) $data['position'];
-			}
-		} catch (DbalException $e) {
-			throw ProjectionStoreException::unableToFindLastPositions($projectionClassname, $e instanceof RetryableException, $e);
-		}
+    /**
+     * @throws Exception
+     */
+    public function updateLastPosition(string $projectionClassname, string $aggregateClassname, string $position): bool
+    {
+        assert(is_subclass_of($projectionClassname, ProjectionInterface::class, true));
 
-		return $result;
-	}
+        $connection = $this->em->getConnection();
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
-	/**
-	 * @throws \Exception
-	 */
-	public function updateLastPosition(string $projectionClassname, string $aggregateClassname, string $position): bool
-	{
-		assert(is_subclass_of($projectionClassname, ProjectionInterface::class, TRUE));
+        try {
+            $result = 0 < (int) $connection->update(
+                $this->getTableName(),
+                [
+                    'position' => $position,
+                    'last_update_at' => $now,
+                ],
+                [
+                    'projection_name' => $projectionClassname::getProjectionName(),
+                    'aggregate_name' => $aggregateClassname,
+                ],
+                [
+                    'position' => Types::BIGINT,
+                    'projection_name' => Types::STRING,
+                    'aggregate_name' => Types::STRING,
+                    'last_update_at' => Types::DATETIME_IMMUTABLE,
+                ],
+            );
 
-		$connection = $this->em->getConnection();
-		$now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+            if (!$result) {
+                $result = 0 < (int) $connection->insert(
+                    $this->getTableName(),
+                    [
+                        'position' => $position,
+                        'projection_name' => $projectionClassname::getProjectionName(),
+                        'aggregate_name' => $aggregateClassname,
+                        'created_at' => $now,
+                        'last_update_at' => $now,
+                    ],
+                    [
+                        'position' => Types::BIGINT,
+                        'projection_name' => Types::STRING,
+                        'aggregate_name' => Types::STRING,
+                        'created_at' => Types::DATETIME_IMMUTABLE,
+                        'last_update_at' => Types::DATETIME_IMMUTABLE,
+                    ],
+                );
+            }
+        } catch (DbalException $e) {
+            throw ProjectionStoreException::unableToUpdateLastPosition($projectionClassname, $aggregateClassname, $e instanceof RetryableException, $e);
+        }
 
-		try {
-			$result = 0 < (int) $connection->update(
-				$this->getTableName(),
-				[
-					'position' => $position,
-					'last_update_at' => $now,
-				],
-				[
-					'projection_name' => $projectionClassname::projectionName(),
-					'aggregate_name' => $aggregateClassname,
-				],
-				[
-					'position' => Types::BIGINT,
-					'projection_name' => Types::STRING,
-					'aggregate_name' => Types::STRING,
-					'last_update_at' => Types::DATETIME_IMMUTABLE,
-				]
-			);
+        return $result;
+    }
 
-			if (!$result) {
-				$result = 0 < (int) $connection->insert(
-					$this->getTableName(),
-					[
-						'position' => $position,
-						'projection_name' => $projectionClassname::projectionName(),
-						'aggregate_name' => $aggregateClassname,
-						'created_at' => $now,
-						'last_update_at' => $now,
-					],
-					[
-						'position' => Types::BIGINT,
-						'projection_name' => Types::STRING,
-						'aggregate_name' => Types::STRING,
-						'created_at' => Types::DATETIME_IMMUTABLE,
-						'last_update_at' => Types::DATETIME_IMMUTABLE,
-					]
-				);
-			}
-		} catch (DbalException $e) {
-			throw ProjectionStoreException::unableToUpdateLastPosition($projectionClassname, $aggregateClassname, $e instanceof RetryableException, $e);
-		}
+    public function resetProjection(string $projectionClassname): void
+    {
+        assert(is_subclass_of($projectionClassname, ProjectionInterface::class, true));
 
-		return $result;
-	}
+        $connection = $this->em->getConnection();
 
-	public function resetProjection(string $projectionClassname): void
-	{
-		assert(is_subclass_of($projectionClassname, ProjectionInterface::class, TRUE));
+        try {
+            $connection->delete(
+                $this->getTableName(),
+                [
+                    'projection_name' => $projectionClassname::getProjectionName(),
+                ],
+                [
+                    'projection_name' => Types::STRING,
+                ],
+            );
+        } catch (DbalException $e) {
+            throw ProjectionStoreException::unableToResetProjection($projectionClassname, $e instanceof RetryableException, $e);
+        }
+    }
 
-		$connection = $this->em->getConnection();
-
-		try {
-			$connection->delete(
-				$this->getTableName(),
-				[
-					'projection_name' => $projectionClassname::projectionName(),
-				],
-				[
-					'projection_name' => Types::STRING,
-				]
-			);
-		} catch (DbalException $e) {
-			throw ProjectionStoreException::unableToResetProjection($projectionClassname, $e instanceof RetryableException, $e);
-		}
-	}
-
-	private function getTableName(): string
-	{
-		return $this->em->getConnection()->quoteIdentifier($this->tableName);
-	}
+    private function getTableName(): string
+    {
+        return $this->em->getConnection()->quoteIdentifier($this->tableName);
+    }
 }

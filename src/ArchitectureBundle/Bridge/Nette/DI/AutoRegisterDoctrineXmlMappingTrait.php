@@ -4,52 +4,56 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI;
 
-use ReflectionClass;
 use Nette\Utils\Finder;
-use SixtyEightPublishers\DoctrineBridge\DI\EntityMapping;
+use ReflectionClass;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\EntityMapping;
+use function dirname;
+use function file_exists;
+use function realpath;
+use function str_replace;
 
 trait AutoRegisterDoctrineXmlMappingTrait
 {
-	use ExtendedAggregatesResolverTrait;
+    use ExtendedAggregatesResolverTrait;
 
-	protected ?string $xmlMappingDirectory = NULL;
+    protected ?string $xmlMappingDirectory = null;
 
-	/**
-	 * @return \SixtyEightPublishers\DoctrineBridge\DI\EntityMapping[]
-	 */
-	public function getEntityMappings(): array
-	{
-		$directory = $this->xmlMappingDirectory;
-		$reflection = new ReflectionClass($this);
+    /**
+     * @return array<EntityMapping>
+     */
+    public function getEntityMappings(): array
+    {
+        $directory = $this->xmlMappingDirectory;
+        $reflection = new ReflectionClass($this);
 
-		if (NULL === $directory) {
-			$directory = dirname($reflection->getFileName()) . '/../../../Infrastructure/Doctrine/Mapping';
-		}
+        if (null === $directory) {
+            $directory = dirname((string) $reflection->getFileName()) . '/../../../Infrastructure/Doctrine/Mapping';
+        }
 
-		$realpath = realpath($directory);
+        $realpath = realpath($directory);
 
-		if (FALSE === $realpath || !file_exists($realpath)) {
-			return [];
-		}
+        if (false === $realpath || !file_exists($realpath)) {
+            return [];
+        }
 
-		# Mapping files for ValueObjects (embeddables)
-		$entityMappings = [];
-		$resolvedTargetEntities = $this->resolveExtendedAggregates();
+        # Mapping files for ValueObjects (embeddables)
+        $entityMappings = [];
+        $resolvedTargetEntities = $this->resolveExtendedAggregates();
 
-		# Mapping files for Aggregates
-		foreach (Finder::findFiles('*.dcm.xml')->in($realpath) as $file) {
-			$aggregateClassname = str_replace('.', '\\', $file->getBasename('.dcm.xml'));
+        # Mapping files for Aggregates
+        foreach (Finder::findFiles('*.dcm.xml')->in($realpath) as $file) {
+            $aggregateClassname = str_replace('.', '\\', $file->getBasename('.dcm.xml'));
 
-			foreach ($resolvedTargetEntities as $originalClassname => $usedClassname) {
-				# An aggregate is extended in the project, don't load mapping for the aggregate
-				if ($originalClassname === $aggregateClassname && $originalClassname !== $usedClassname) {
-					continue 2;
-				}
-			}
+            foreach ($resolvedTargetEntities as $originalClassname => $usedClassname) {
+                # An aggregate is extended in the project, don't load mapping for the aggregate
+                if ($originalClassname === $aggregateClassname && $originalClassname !== $usedClassname) {
+                    continue 2;
+                }
+            }
 
-			$entityMappings[] = new EntityMapping(EntityMapping::DRIVER_XML, $aggregateClassname, $realpath);
-		}
+            $entityMappings[] = new EntityMapping(EntityMapping::DRIVER_XML, $aggregateClassname, $realpath);
+        }
 
-		return $entityMappings;
-	}
+        return $entityMappings;
+    }
 }

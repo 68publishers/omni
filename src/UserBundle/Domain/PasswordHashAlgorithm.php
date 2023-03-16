@@ -5,39 +5,31 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Domain;
 
 use SixtyEightPublishers\UserBundle\Domain\Exception\PasswordException;
+use function error_get_last;
+use function password_hash;
 
 final class PasswordHashAlgorithm implements PasswordHashAlgorithmInterface
 {
-	/** @var string|int */
-	private $algo;
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function __construct(
+        private readonly string|int $algo = PASSWORD_DEFAULT,
+        private readonly array $options = [],
+    ) {}
 
-	private array $options;
+    public function hash(string $rawPassword): string
+    {
+        if ('' === $rawPassword) {
+            throw PasswordException::emptyPassword();
+        }
 
-	/**
-	 * @param string|int $algo
-	 * @param array      $options
-	 */
-	public function __construct($algo = PASSWORD_DEFAULT, array $options = [])
-	{
-		$this->algo = $algo;
-		$this->options = $options;
-	}
+        $hash = @password_hash($rawPassword, $this->algo, $this->options);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function hash(string $rawPassword): string
-	{
-		if ('' === $rawPassword) {
-			throw PasswordException::emptyPassword();
-		}
+        if (!$hash) {
+            throw PasswordException::unableToHashPassword(error_get_last()['message'] ?? 'Unknown error.');
+        }
 
-		$hash = @password_hash($rawPassword, $this->algo, $this->options);
-
-		if (!$hash) {
-			throw PasswordException::cantHashPassword(error_get_last()['message']);
-		}
-
-		return $hash;
-	}
+        return $hash;
+    }
 }

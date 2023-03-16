@@ -4,47 +4,31 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\CommandHandler;
 
-use SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand;
-use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
 use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
-use SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface;
-use SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface;
-use SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface;
+use SixtyEightPublishers\UserBundle\Domain\AttributesGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand;
+use SixtyEightPublishers\UserBundle\Domain\EmailAddressGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\PasswordGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
+use SixtyEightPublishers\UserBundle\Domain\User;
+use SixtyEightPublishers\UserBundle\Domain\UsernameGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\UserRepositoryInterface;
 
 final class CreateUserCommandHandler implements CommandHandlerInterface
 {
-	private UserRepositoryInterface $userRepository;
+    public function __construct(
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly PasswordHashAlgorithmInterface $algorithm,
+        private readonly ?PasswordGuardInterface $passwordGuard = null,
+        private readonly ?UsernameGuardInterface $usernameGuard = null,
+        private readonly ?EmailAddressGuardInterface $emailAddressGuard = null,
+        private readonly ?AttributesGuardInterface $attributesGuard = null,
+    ) {}
 
-	private PasswordHashAlgorithmInterface $algorithm;
+    public function __invoke(CreateUserCommand $command): void
+    {
+        $user = User::create($command, $this->algorithm, $this->passwordGuard, $this->usernameGuard, $this->emailAddressGuard, $this->attributesGuard);
 
-	private CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness;
-
-	private CheckUsernameUniquenessInterface $checkUsernameUniqueness;
-
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface   $userRepository
-	 * @param \SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface       $algorithm
-	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness
-	 * @param \SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface     $checkUsernameUniqueness
-	 */
-	public function __construct(UserRepositoryInterface $userRepository, PasswordHashAlgorithmInterface $algorithm, CheckEmailAddressUniquenessInterface $checkEmailAddressUniqueness, CheckUsernameUniquenessInterface $checkUsernameUniqueness)
-	{
-		$this->userRepository = $userRepository;
-		$this->algorithm = $algorithm;
-		$this->checkEmailAddressUniqueness = $checkEmailAddressUniqueness;
-		$this->checkUsernameUniqueness = $checkUsernameUniqueness;
-	}
-
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand $command
-	 *
-	 * @return void
-	 */
-	public function __invoke(CreateUserCommand $command): void
-	{
-		$classname = $this->userRepository->classname();
-		$user = $classname::create($command, $this->algorithm, $this->checkEmailAddressUniqueness, $this->checkUsernameUniqueness);
-
-		$this->userRepository->save($user);
-	}
+        $this->userRepository->save($user);
+    }
 }

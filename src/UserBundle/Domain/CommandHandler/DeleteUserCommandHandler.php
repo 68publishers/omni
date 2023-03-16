@@ -4,33 +4,22 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\CommandHandler;
 
-use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
-use SixtyEightPublishers\UserBundle\Domain\Command\DeleteUserCommand;
 use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
-use SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface;
+use SixtyEightPublishers\UserBundle\Domain\Command\DeleteUserCommand;
+use SixtyEightPublishers\UserBundle\Domain\UserRepositoryInterface;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 
 final class DeleteUserCommandHandler implements CommandHandlerInterface
 {
-	private UserRepositoryInterface $userRepository;
+    public function __construct(
+        private readonly UserRepositoryInterface $userRepository,
+    ) {}
 
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface $userRepository
-	 */
-	public function __construct(UserRepositoryInterface $userRepository)
-	{
-		$this->userRepository = $userRepository;
-	}
+    public function __invoke(DeleteUserCommand $command): void
+    {
+        $user = $this->userRepository->get(UserId::fromNative($command->userId));
+        $user->delete();
 
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\Command\DeleteUserCommand $command
-	 *
-	 * @return void
-	 */
-	public function __invoke(DeleteUserCommand $command): void
-	{
-		$user = $this->userRepository->get(UserId::fromString($command->userId()));
-		$user->delete();
-
-		$this->userRepository->save($user);
-	}
+        $this->userRepository->save($user);
+    }
 }

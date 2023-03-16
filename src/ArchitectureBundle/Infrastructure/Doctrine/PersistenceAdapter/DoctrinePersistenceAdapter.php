@@ -4,118 +4,90 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\PersistenceAdapter;
 
+use Doctrine\DBAL\Exception as DbalException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Exception as DbalException;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Exception\TransactionException;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface;
+use function assert;
 
 final class DoctrinePersistenceAdapter implements PersistenceAdapterInterface
 {
-	protected ManagerRegistry $managerRegistry;
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly ?string $entityManagerName = null,
+    ) {}
 
-	protected ?string $entityManagerName;
+    public function supportsTransactions(): bool
+    {
+        return true;
+    }
 
-	/**
-	 * @param \Doctrine\Persistence\ManagerRegistry $managerRegistry
-	 * @param string|NULL                           $entityManagerName
-	 */
-	public function __construct(ManagerRegistry $managerRegistry, ?string $entityManagerName = NULL)
-	{
-		$this->managerRegistry = $managerRegistry;
-		$this->entityManagerName = $entityManagerName;
-	}
+    public function beginTransaction(): void
+    {
+        try {
+            $this->resolveEntityManager()->getConnection()->beginTransaction();
+        } catch (DbalException $e) {
+            throw TransactionException::unableToBeginTransaction($e->getMessage());
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function supportsTransactions(): bool
-	{
-		return TRUE;
-	}
+    public function commitTransaction(): void
+    {
+        try {
+            $em = $this->resolveEntityManager();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function beginTransaction(): void
-	{
-		try {
-			$this->resolveEntityManager()->getConnection()->beginTransaction();
-		} catch (DbalException $e) {
-			throw TransactionException::unableToBeginTransaction($e->getMessage());
-		}
-	}
+            $em->flush();
+            $em->getConnection()->commit();
+        } catch (DbalException $e) {
+            throw TransactionException::unableToCommitTransaction($e->getMessage());
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function commitTransaction(): void
-	{
-		try {
-			$em = $this->resolveEntityManager();
+    public function rollbackTransaction(): void
+    {
+        try {
+            $this->resolveEntityManager()->getConnection()->rollBack();
+        } catch (DbalException $e) {
+            throw TransactionException::unableToRollbackTransaction($e->getMessage());
+        }
+    }
 
-			$em->flush();
-			$em->getConnection()->commit();
-		} catch (DbalException $e) {
-			throw TransactionException::unableToCommitTransaction($e->getMessage());
-		}
-	}
+    public function hasActiveTransaction(): bool
+    {
+        return $this->resolveEntityManager()->getConnection()->isTransactionActive();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function rollbackTransaction(): void
-	{
-		try {
-			$this->resolveEntityManager()->getConnection()->rollBack();
-		} catch (DbalException $e) {
-			throw TransactionException::unableToRollbackTransaction($e->getMessage());
-		}
-	}
+    /**
+     * @throws DbalException
+     */
+    public function pingConnection(): void
+    {
+        $em = $this->resolveEntityManager();
+        $connection = $em->getConnection();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function hasActiveTransaction(): bool
-	{
-		return $this->resolveEntityManager()->getConnection()->isTransactionActive();
-	}
+        try {
+            $connection->executeQuery($connection->getDatabasePlatform()->getDummySelectSQL());
+        } catch (DBALException $e) {
+            $connection->close();
+            $connection->connect();
+        }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @throws \Doctrine\DBAL\Exception
-	 */
-	public function pingConnection(): void
-	{
-		$em = $this->resolveEntityManager();
-		$connection = $em->getConnection();
+        if (!$em->isOpen()) {
+            $this->managerRegistry->resetManager($this->entityManagerName);
+        }
+    }
 
-		try {
-			$connection->executeQuery($connection->getDatabasePlatform()->getDummySelectSQL());
-		} catch (DBALException $e) {
-			$connection->close();
-			$connection->connect();
-		}
+    public function closeConnection(): void
+    {
+        $this->resolveEntityManager()->getConnection()->close();
+    }
 
-		if (!$em->isOpen()) {
-			$this->managerRegistry->resetManager($this->entityManagerName);
-		}
-	}
+    private function resolveEntityManager(): EntityManagerInterface
+    {
+        $em = $this->managerRegistry->getManager($this->entityManagerName);
+        assert($em instanceof EntityManagerInterface);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function closeConnection(): void
-	{
-		$this->resolveEntityManager()->getConnection()->close();
-	}
-
-	/**
-	 * @return \Doctrine\ORM\EntityManagerInterface
-	 */
-	private function resolveEntityManager(): EntityManagerInterface
-	{
-		return $this->managerRegistry->getManager($this->entityManagerName);
-	}
+        return $em;
+    }
 }

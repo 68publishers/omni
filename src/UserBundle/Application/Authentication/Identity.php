@@ -4,99 +4,80 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Application\Authentication;
 
-use SixtyEightPublishers\UserBundle\ReadModel\View\UserView;
-use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
-use SixtyEightPublishers\UserBundle\ReadModel\Query\GetIdentityQuery;
 use SixtyEightPublishers\UserBundle\Application\Exception\IdentityException;
+use SixtyEightPublishers\UserBundle\ReadModel\Query\GetIdentityDataQuery;
+use SixtyEightPublishers\UserBundle\ReadModel\View\IdentityData;
 
 class Identity
 {
-	protected UserId $id;
+    protected string $id;
 
-	protected ?QueryBusInterface $queryBus = NULL;
+    protected ?QueryBusInterface $queryBus = null;
 
-	protected ?UserView $data = NULL;
+    protected ?IdentityData $data = null;
 
-	protected bool $dataLoaded = FALSE;
+    protected bool $dataLoaded = false;
 
-	protected function __construct()
-	{
-	}
+    protected function __construct() {}
 
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId $id
-	 *
-	 * @return static
-	 */
-	public static function createSleeping(UserId $id): self
-	{
-		$identity = new static();
-		$identity->id = $id;
+    public static function createSleeping(string $id): static
+    {
+        $identity = new static(); // @phpstan-ignore-line
+        $identity->id = $id;
 
-		return $identity;
-	}
+        return $identity;
+    }
 
-	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
-	 */
-	public function id(): UserId
-	{
-		return $this->id;
-	}
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @return \SixtyEightPublishers\UserBundle\ReadModel\View\UserView
-	 * @throws \SixtyEightPublishers\UserBundle\Application\Exception\IdentityException
-	 */
-	public function data(): UserView
-	{
-		if ($this->dataLoaded) {
-			return $this->data;
-		}
+    /**
+     * @throws IdentityException
+     */
+    public function getData(): IdentityData
+    {
+        if ($this->dataLoaded) {
+            if (null === $this->data) {
+                throw IdentityException::dataNotFound($this->getId());
+            }
 
-		if (NULL === $this->queryBus) {
-			throw IdentityException::unableToRetrieveDataFromSleepingIdentity();
-		}
+            return $this->data;
+        }
 
-		$data = $this->queryBus->dispatch(GetIdentityQuery::create($this->id()->toString()));
+        if (null === $this->queryBus) {
+            throw IdentityException::unableToRetrieveDataFromSleepingIdentity();
+        }
 
-		if (!$data instanceof UserView) {
-			throw IdentityException::dataNotFound($this->id());
-		}
+        $data = $this->queryBus->dispatch(new GetIdentityDataQuery($this->getId()));
 
-		$this->dataLoaded = TRUE;
+        if (!$data instanceof IdentityData) {
+            throw IdentityException::dataNotFound($this->getId());
+        }
 
-		return $this->data = $data;
-	}
+        $this->dataLoaded = true;
 
-	/**
-	 * @return void
-	 */
-	public function reload(): void
-	{
-		$this->dataLoaded = FALSE;
-		$this->data = NULL;
-	}
+        return $this->data = $data;
+    }
 
-	/**
-	 * @return $this
-	 */
-	protected function sleep(): self
-	{
-		return static::createSleeping($this->id);
-	}
+    public function reload(): void
+    {
+        $this->dataLoaded = false;
+        $this->data = null;
+    }
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface $queryBus
-	 *
-	 * @return $this
-	 */
-	protected function wakeup(QueryBusInterface $queryBus): self
-	{
-		$identity = static::createSleeping($this->id);
-		$identity->queryBus = $queryBus;
+    protected function sleep(): self
+    {
+        return static::createSleeping($this->id);
+    }
 
-		return $identity;
-	}
+    protected function wakeup(QueryBusInterface $queryBus): self
+    {
+        $identity = static::createSleeping($this->id);
+        $identity->queryBus = $queryBus;
+
+        return $identity;
+    }
 }

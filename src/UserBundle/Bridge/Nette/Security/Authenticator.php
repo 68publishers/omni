@@ -4,90 +4,64 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\Security;
 
-use Nette\Security\IIdentity as NetteIdentityInterface;
-use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use Nette\Security\Authenticator as NetteAuthenticatorInterface;
-use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use Nette\Security\IdentityHandler as NetteIdentityHandlerInterface;
-use SixtyEightPublishers\UserBundle\Application\Exception\IdentityException;
+use Nette\Security\IIdentity as NetteIdentityInterface;
+use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
+use SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface;
 use SixtyEightPublishers\UserBundle\Application\Authentication\IdentityDecorator;
 use SixtyEightPublishers\UserBundle\Application\Exception\AuthenticationException;
-use SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface;
+use SixtyEightPublishers\UserBundle\Application\Exception\IdentityException;
+use function assert;
 
 final class Authenticator implements NetteAuthenticatorInterface, NetteIdentityHandlerInterface
 {
-	private QueryBusInterface $queryBus;
+    public function __construct(
+        private readonly QueryBusInterface $queryBus,
+        private readonly AuthenticatorInterface $authenticator,
+    ) {}
 
-	private AuthenticatorInterface $authenticator;
+    /**
+     * @throws AuthenticationException
+     */
+    public function authenticate(string $user, string $password): NetteIdentityInterface
+    {
+        $identity = $this->authenticator->authenticate($user, $password);
+        $identity = Identity::of($identity);
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface                     $queryBus
-	 * @param \SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface $authenticator
-	 */
-	public function __construct(QueryBusInterface $queryBus, AuthenticatorInterface $authenticator)
-	{
-		$this->queryBus = $queryBus;
-		$this->authenticator = $authenticator;
-	}
+        try {
+            $identity->getData();
+        } catch (IdentityException $e) {
+            throw AuthenticationException::fromIdentityException($e);
+        }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @throws \SixtyEightPublishers\UserBundle\Application\Exception\AuthenticationException
-	 */
-	public function authenticate(string $user, string $password): NetteIdentityInterface
-	{
-		$identity = $this->authenticator->authenticate($user, $password);
-		$identity = Identity::of($identity);
+        return $identity;
+    }
 
-		try {
-			$identity->data();
-		} catch (IdentityException $e) {
-			throw AuthenticationException::fromIdentityException($e);
-		}
+    public function sleepIdentity(NetteIdentityInterface $identity): NetteIdentityInterface
+    {
+        $sleepingIdentity = IdentityDecorator::newInstance()->sleepIdentity($this->transformIdentity($identity));
+        assert($sleepingIdentity instanceof NetteIdentityInterface);
 
-		return $identity;
-	}
+        return $sleepingIdentity;
+    }
 
-	/**
-	 * @param \Nette\Security\IIdentity $identity
-	 *
-	 * @return \Nette\Security\IIdentity
-	 */
-	public function sleepIdentity(NetteIdentityInterface $identity): NetteIdentityInterface
-	{
-		$sleepingIdentity = IdentityDecorator::newInstance()->sleepIdentity($this->transformIdentity($identity));
-		assert($sleepingIdentity instanceof NetteIdentityInterface);
+    public function wakeupIdentity(NetteIdentityInterface $identity): ?NetteIdentityInterface
+    {
+        $wakeupIdentity = IdentityDecorator::newInstance()->wakeupIdentity($this->transformIdentity($identity), $this->queryBus);
+        assert($wakeupIdentity instanceof NetteIdentityInterface);
 
-		return $sleepingIdentity;
-	}
+        try {
+            $wakeupIdentity->getData();
+        } catch (IdentityException $e) {
+            return null;
+        }
 
-	/**
-	 * @param \Nette\Security\IIdentity $identity
-	 *
-	 * @return \Nette\Security\IIdentity|NULL
-	 */
-	public function wakeupIdentity(NetteIdentityInterface $identity): ?NetteIdentityInterface
-	{
-		$wakeupIdentity = IdentityDecorator::newInstance()->wakeupIdentity($this->transformIdentity($identity), $this->queryBus);
-		assert($wakeupIdentity instanceof NetteIdentityInterface);
+        return $wakeupIdentity;
+    }
 
-		try {
-			$wakeupIdentity->data();
-		} catch (IdentityException $e) {
-			return NULL;
-		}
-
-		return $wakeupIdentity;
-	}
-
-	/**
-	 * @param \Nette\Security\IIdentity $identity
-	 *
-	 * @return \SixtyEightPublishers\UserBundle\Bridge\Nette\Security\Identity
-	 */
-	private function transformIdentity(NetteIdentityInterface $identity): Identity
-	{
-		return !$identity instanceof Identity ? Identity::createSleeping(UserId::fromString((string) $identity->getId())) : $identity;
-	}
+    private function transformIdentity(NetteIdentityInterface $identity): Identity
+    {
+        return !$identity instanceof Identity ? Identity::createSleeping($identity->getId()) : $identity;
+    }
 }

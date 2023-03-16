@@ -4,90 +4,63 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory;
 
+use function array_filter;
+use function array_values;
+
 final class MemorySection implements MemorySectionInterface
 {
-	private string $name;
+    /** @var array<object> */
+    private array $storage = [];
 
-	/** @var object[]  */
-	private array $storage = [];
+    public function __construct(
+        private readonly string $name,
+    ) {}
 
-	/**
-	 * @param string $name
-	 */
-	public function __construct(string $name)
-	{
-		$this->name = $name;
-	}
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function name(): string
-	{
-		return $this->name;
-	}
+    public function has(string $id): bool
+    {
+        return isset($this->storage[$id]);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function has(string $id): bool
-	{
-		return isset($this->storage[$id]);
-	}
+    public function get(string $id): ?object
+    {
+        return $this->storage[$id] ?? null;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function get(string $id): ?object
-	{
-		return $this->storage[$id] ?? NULL;
-	}
+    public function add(string $id, object $object): void
+    {
+        $this->storage[$id] = $object;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function add(string $id, object $object): void
-	{
-		$this->storage[$id] = $object;
-	}
+    public function remove(string $id): void
+    {
+        if ($this->has($id)) {
+            unset($this->storage[$id]);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function remove(string $id): void
-	{
-		if ($this->has($id)) {
-			unset($this->storage[$id]);
-		}
-	}
+    public function filter(callable $callback): array
+    {
+        return array_values(array_filter($this->storage, $callback));
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function filter(callable $callback): array
-	{
-		return array_values(array_filter($this->storage, $callback));
-	}
+    public function filterOne(callable $callback): ?object
+    {
+        foreach ($this->storage as $item) {
+            if ($callback($item)) {
+                return $item;
+            }
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function filterOne(callable $callback): ?object
-	{
-		foreach ($this->storage as $item) {
-			if ($callback($item)) {
-				return $item;
-			}
-		}
+        return null;
+    }
 
-		return NULL;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function all(): array
-	{
-		return array_values($this->storage);
-	}
+    public function all(): array
+    {
+        return array_values($this->storage);
+    }
 }

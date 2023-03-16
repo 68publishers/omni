@@ -4,62 +4,54 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Application\Authentication;
 
+use SixtyEightPublishers\UserBundle\Application\Exception\AuthenticationException;
 use SixtyEightPublishers\UserBundle\Application\Exception\AuthenticatorResolvingException;
+use function explode;
+use function str_contains;
 
 final class AuthenticatorMount implements AuthenticatorInterface
 {
-	public const SEPARATOR = '://';
+    public const SEPARATOR = '://';
 
-	/** @var \SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface[]  */
-	private array $authenticators = [];
+    /** @var array<AuthenticatorInterface> */
+    private array $authenticators = [];
 
-	private ?AuthenticatorInterface $defaultAuthenticator;
+    /**
+     * @param array<AuthenticatorInterface> $authenticators
+     */
+    public function __construct(
+        array $authenticators,
+        private readonly ?AuthenticatorInterface $defaultAuthenticator = null,
+    ) {
+        foreach ($authenticators as $name => $authenticator) {
+            $this->addAuthenticator((string) $name, $authenticator);
+        }
+    }
 
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface[]    $authenticators
-	 * @param \SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface|NULL $defaultAuthenticator
-	 */
-	public function __construct(array $authenticators, ?AuthenticatorInterface $defaultAuthenticator = NULL)
-	{
-		foreach ($authenticators as $name => $authenticator) {
-			$this->addAuthenticator((string) $name, $authenticator);
-		}
+    /**
+     * @throws AuthenticatorResolvingException|AuthenticationException
+     */
+    public function authenticate(string $username, string $password): Identity
+    {
+        if (!str_contains($username, self::SEPARATOR)) {
+            if (null === $this->defaultAuthenticator) {
+                throw AuthenticatorResolvingException::missingDefault();
+            }
 
-		$this->defaultAuthenticator = $defaultAuthenticator;
-	}
+            return $this->defaultAuthenticator->authenticate($username, $password);
+        }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @throws \SixtyEightPublishers\UserBundle\Application\Exception\AuthenticatorResolvingException
-	 */
-	public function authenticate(string $username, string $password): Identity
-	{
-		if (FALSE === mb_strpos($username, self::SEPARATOR)) {
-			if (NULL === $this->defaultAuthenticator) {
-				throw AuthenticatorResolvingException::missingDefault();
-			}
+        [$authenticatorName, $username] = explode(self::SEPARATOR, $username, 2);
 
-			return $this->defaultAuthenticator->authenticate($username, $password);
-		}
+        if (!isset($this->authenticators[$authenticatorName])) {
+            throw AuthenticatorResolvingException::missingAuthenticator($authenticatorName);
+        }
 
-		[$authenticatorName, $username] = explode(self::SEPARATOR, $username, 2);
+        return $this->authenticators[$authenticatorName]->authenticate($username, $password);
+    }
 
-		if (!isset($this->authenticators[$authenticatorName])) {
-			throw AuthenticatorResolvingException::missingAuthenticator($authenticatorName);
-		}
-
-		return $this->authenticators[$authenticatorName]->authenticate($username, $password);
-	}
-
-	/**
-	 * @param string                                                                             $name
-	 * @param \SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface $authenticator
-	 *
-	 * @return void
-	 */
-	private function addAuthenticator(string $name, AuthenticatorInterface $authenticator): void
-	{
-		$this->authenticators[$name] = $authenticator;
-	}
+    private function addAuthenticator(string $name, AuthenticatorInterface $authenticator): void
+    {
+        $this->authenticators[$name] = $authenticator;
+    }
 }

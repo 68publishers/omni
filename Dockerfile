@@ -1,11 +1,19 @@
-FROM 68publishers/docker-images:php-nginx-unit-7.4 AS app
+FROM php:8.1.12-cli-alpine3.16 AS php81
 
-RUN set -ex && apk add --no-cache --update php7-xmlreader=~7.4 php7-pecl-amqp=~1.11
+CMD ["/bin/sh"]
+WORKDIR /var/www/html
 
-########################################################################################################################
-FROM postgis/postgis:13-3.0 AS db
+RUN apk add --no-cache --update git
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-########################################################################################################################
-FROM rabbitmq:3.9.8-alpine AS rabbitmq
+CMD tail -f /dev/null
 
-RUN rabbitmq-plugins enable rabbitmq_management
+FROM php:8.2.0RC6-cli-alpine3.16 AS php82
+
+CMD ["/bin/sh"]
+WORKDIR /var/www/html
+
+RUN apk add --no-cache --update git
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+CMD tail -f /dev/null

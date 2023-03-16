@@ -4,111 +4,124 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ProjectionBundle\Bridge\Nette\DI;
 
+use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\ServiceDefinition;
+use Nette\DI\Definitions\Statement;
+use Nette\DI\InvalidConfigurationException;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
-use Nette\DI\CompilerExtension;
-use Nette\DI\Definitions\Statement;
-use Nette\DI\Definitions\ServiceDefinition;
-use Nette\DI\InvalidConfigurationException;
-use Laminas\Code\Reflection\ClassReflection;
-use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionInterface;
-use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionClassnameResolver;
-use SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelInterface;
+use ReflectionClass;
+use ReflectionException;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger\MessageBusConfiguration;
-use SixtyEightPublishers\ProjectionBundle\Bridge\Symfony\Messenger\Transport\EventStoreReceiver;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger\MessageBusConfigurationsProviderInterface;
+use SixtyEightPublishers\ProjectionBundle\Bridge\Symfony\Messenger\Transport\EventStoreReceiver;
+use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionClassnameResolver;
+use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionInterface;
+use SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelInterface;
+use function array_is_list;
+use function assert;
+use function class_exists;
+use function is_a;
+use function is_array;
+use function is_string;
+use function is_subclass_of;
+use function sprintf;
 
 final class ProjectionBundleExtension extends CompilerExtension implements MessageBusConfigurationsProviderInterface
 {
-	use CompilerExtensionUtilsTrait;
+    use CompilerExtensionUtilsTrait;
 
-	public const PROJECTION_BUS_NAME = 'projection_bus';
+    public const PROJECTION_BUS_NAME = 'projection_bus';
 
-	public function getConfigSchema(): Schema
-	{
-		return Expect::listOf('string|' . Statement::class);
-	}
+    public function getConfigSchema(): Schema
+    {
+        return Expect::listOf('string|' . Statement::class);
+    }
 
-	public function loadConfiguration(): void
-	{
-		$this->requireCompilerExtension(InfrastructureExtensionInterface::class);
-		$this->loadConfigurationDir(__DIR__ . '/config/projection_bundle');
+    public function loadConfiguration(): void
+    {
+        $this->requireCompilerExtension(InfrastructureExtensionInterface::class);
+        $this->loadConfigurationDir(__DIR__ . '/definitions/projection_bundle');
 
-		$builder = $this->getContainerBuilder();
-		$projectionClassnames = [];
+        $builder = $this->getContainerBuilder();
+        $projectionClassnames = [];
+        $config = $this->getConfig();
+        assert(is_array($config) && array_is_list($config));
 
-		foreach ($this->getConfig() as $i => $projection) {
-			$classname = $projection;
+        foreach ($config as $i => $projection) {
+            $classname = $projection;
 
-			if ($classname instanceof Statement) {
-				$classname = $classname->getEntity();
-			}
+            if ($classname instanceof Statement) {
+                $classname = $classname->getEntity();
+            }
 
-			if (!is_a($classname, ProjectionInterface::class, TRUE)) {
-				throw new InvalidConfigurationException(sprintf(
-					'Projection "%s" not found or is not implementor of %s interface.',
-					$classname,
-					ProjectionInterface::class
-				));
-			}
+            if (!is_string($classname) || !is_a($classname, ProjectionInterface::class, true)) {
+                throw new InvalidConfigurationException(sprintf(
+                    'Projection "%s" not found or is not implementor of %s interface.',
+                    $classname,
+                    ProjectionInterface::class,
+                ));
+            }
 
-			$builder->addDefinition($this->prefix('projection.' . $i))
-				->setType($classname)
-				->setFactory($projection)
-				->setAutowired(FALSE)
-				->addTag('messenger.messageHandler', [
-					'bus' => self::PROJECTION_BUS_NAME,
-				]);
+            $builder->addDefinition($this->prefix('projection.' . $i))
+                ->setType($classname)
+                ->setFactory($projection)
+                ->setAutowired(false)
+                ->addTag('messenger.messageHandler', [
+                    'bus' => self::PROJECTION_BUS_NAME,
+                ]);
 
-			$builder->addDefinition($this->prefix('receiver.' . $i))
-				->setType(EventStoreReceiver::class)
-				->setArgument('projectionClassname', $classname)
-				->setAutowired(FALSE)
-				->addTag('messenger.receiver.alias', $classname::projectionName());
+            $builder->addDefinition($this->prefix('receiver.' . $i))
+                ->setType(EventStoreReceiver::class)
+                ->setArgument('projectionClassname', $classname)
+                ->setAutowired(false)
+                ->addTag('messenger.receiver.alias', $classname::getProjectionName());
 
-			$projectionClassnames[] = $classname;
-		}
+            $projectionClassnames[] = $classname;
+        }
 
-		$builder->addDefinition($this->prefix('projection_classname_resolver'))
-			->setType(ProjectionClassnameResolver::class)
-			->setArguments([$projectionClassnames]);
-	}
+        $builder->addDefinition($this->prefix('projection_classname_resolver'))
+            ->setType(ProjectionClassnameResolver::class)
+            ->setArguments([$projectionClassnames]);
+    }
 
-	/**
-	 * @throws \ReflectionException
-	 */
-	public function beforeCompile(): void
-	{
-		$builder = $this->getContainerBuilder();
-		$locatorDefinition = $builder->getDefinition($this->prefix('projection_model.locator.default'));
-		assert($locatorDefinition instanceof ServiceDefinition);
-		$serviceNamesByProjectionClassnames = [];
-		$serviceNamesByProjectionNames = [];
+    /**
+     * @throws ReflectionException
+     */
+    public function beforeCompile(): void
+    {
+        $builder = $this->getContainerBuilder();
+        $locatorDefinition = $builder->getDefinition($this->prefix('projection_model.locator.default'));
+        assert($locatorDefinition instanceof ServiceDefinition);
+        $serviceNamesByProjectionClassnames = [];
+        $serviceNamesByProjectionNames = [];
 
-		foreach ($builder->findByType(ProjectionModelInterface::class) as $serviceName => $projectionModelDefinition) {
-			$type = $projectionModelDefinition->getType();
+        foreach ($builder->findByType(ProjectionModelInterface::class) as $serviceName => $projectionModelDefinition) {
+            $type = $projectionModelDefinition->getType();
 
-			if (NULL === $type || !class_exists($type) || !(new ClassReflection($type))->isInstantiable()) {
-				throw new InvalidConfigurationException(sprintf(
-					'Can not resolve type for a projection model service with the name %s.',
-					$serviceName
-				));
-			}
+            if (null === $type || !class_exists($type) || !(new ReflectionClass($type))->isInstantiable()) {
+                throw new InvalidConfigurationException(sprintf(
+                    'Can not resolve type for a projection model service with the name %s.',
+                    $serviceName,
+                ));
+            }
 
-			$projectionClassname = call_user_func([$type, 'projectionClassname']);
-			$projectionName = call_user_func([$projectionClassname, 'projectionName']);
+            assert(is_subclass_of($type, ProjectionModelInterface::class, true));
 
-			$serviceNamesByProjectionClassnames[$projectionClassname] = $serviceName;
-			$serviceNamesByProjectionNames[$projectionName] = $serviceName;
-		}
+            $projectionClassname = $type::getProjectionClassname();
+            $projectionName = $projectionClassname::getProjectionName();
 
-		$locatorDefinition->setArgument('serviceNamesByProjectionClassnames', $serviceNamesByProjectionClassnames);
-		$locatorDefinition->setArgument('serviceNamesByProjectionNames', $serviceNamesByProjectionNames);
-	}
+            $serviceNamesByProjectionClassnames[$projectionClassname] = $serviceName;
+            $serviceNamesByProjectionNames[$projectionName] = $serviceName;
+        }
 
-	public function provideMessageBusConfigurations(): iterable
-	{
-		yield MessageBusConfiguration::fromFile(self::PROJECTION_BUS_NAME, __DIR__ . '/config/message_bus/projection_bus.neon');
-	}
+        $locatorDefinition->setArgument('serviceNamesByProjectionClassnames', $serviceNamesByProjectionClassnames);
+        $locatorDefinition->setArgument('serviceNamesByProjectionNames', $serviceNamesByProjectionNames);
+    }
+
+    public function provideMessageBusConfigurations(): iterable
+    {
+        yield MessageBusConfiguration::fromFile(self::PROJECTION_BUS_NAME, __DIR__ . '/definitions/message_bus/projection_bus.neon');
+    }
 }

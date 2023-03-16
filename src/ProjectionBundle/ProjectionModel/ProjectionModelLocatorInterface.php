@@ -6,12 +6,15 @@ namespace SixtyEightPublishers\ProjectionBundle\ProjectionModel;
 
 interface ProjectionModelLocatorInterface
 {
-	public function resolveForProjectionClassname(string $projectionClassname): ?ProjectionModelInterface;
+    /**
+     * @param class-string $projectionClassname
+     */
+    public function resolveForProjectionClassname(string $projectionClassname): ?ProjectionModelInterface;
 
-	public function resolveForProjectionName(string $projectionName): ?ProjectionModelInterface;
+    public function resolveForProjectionName(string $projectionName): ?ProjectionModelInterface;
 
-	/**
-	 * @return iterable<ProjectionModelInterface>
-	 */
-	public function all(): iterable;
+    /**
+     * @return iterable<ProjectionModelInterface>
+     */
+    public function all(): iterable;
 }

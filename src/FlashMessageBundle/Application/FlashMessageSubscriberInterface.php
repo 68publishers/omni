@@ -8,10 +8,5 @@ use SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessage;
 
 interface FlashMessageSubscriberInterface
 {
-	/**
-	 * @param \SixtyEightPublishers\FlashMessageBundle\Domain\FlashMessage $flashMessage
-	 *
-	 * @return void
-	 */
-	public function subscribe(FlashMessage $flashMessage): void;
+    public function subscribe(FlashMessage $flashMessage): void;
 }

@@ -5,61 +5,58 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ProjectionBundle\Bridge\Symfony\Console\Command;
 
 use InvalidArgumentException;
+use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionClassnameResolver;
+use SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException;
+use SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionClassnameResolver;
-use SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreInterface;
+use function sprintf;
 
 final class ResetProjectionCommand extends Command
 {
-	protected static $defaultName = 'omni:projection:reset';
+    protected static $defaultName = 'omni:projection:reset';
 
-	private ProjectionStoreInterface $projectionStore;
+    public function __construct(
+        private readonly ProjectionStoreInterface $projectionStore,
+        private readonly ProjectionClassnameResolver $projectionClassnameResolver,
+    ) {
+        parent::__construct();
+    }
 
-	private ProjectionClassnameResolver $projectionClassnameResolver;
+    protected function configure(): void
+    {
+        $this->setDescription('Resets data and positions for specific projection.')
+            ->addArgument('projection-name', InputArgument::REQUIRED, 'The name of a projection.');
+    }
 
-	public function __construct(ProjectionStoreInterface $projectionStore, ProjectionClassnameResolver $projectionClassnameResolver)
-	{
-		parent::__construct();
+    /**
+     * @throws ProjectionStoreException
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $projectionName = $input->getArgument('projection-name');
 
-		$this->projectionStore = $projectionStore;
-		$this->projectionClassnameResolver = $projectionClassnameResolver;
-	}
+        try {
+            $projectionClassname = $this->projectionClassnameResolver->resolve($projectionName);
+        } catch (InvalidArgumentException $e) {
+            $output->writeln($e->getMessage());
 
-	protected function configure(): void
-	{
-		$this->setDescription('Resets data and positions for specific projection.')
-			->addArgument('projection-name', InputArgument::REQUIRED, 'The name of a projection.');
-	}
+            return Command::INVALID;
+        }
 
-	/**
-	 * @throws \SixtyEightPublishers\ProjectionBundle\ProjectionStore\ProjectionStoreException
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int
-	{
-		$projectionName = $input->getArgument('projection-name');
+        $helper = $this->getHelper('question');
+        $question = new ConfirmationQuestion(sprintf('Do you really want to reset the "%s" projection? [y/n]: ', $projectionName), false);
 
-		try {
-			$projectionClassname = $this->projectionClassnameResolver->resolve($projectionName);
-		} catch (InvalidArgumentException $e) {
-			$output->writeln($e->getMessage());
+        if ($input->isInteractive() && !$helper->ask($input, $output, $question)) {
+            return Command::SUCCESS;
+        }
 
-			return Command::INVALID;
-		}
+        $this->projectionStore->resetProjection($projectionClassname);
+        $output->writeln('The projection has been successfully reset.');
 
-		$helper = $this->getHelper('question');
-		$question = new ConfirmationQuestion(sprintf('Do you really want to reset the "%s" projection? [y/n]: ', $projectionName), FALSE);
-
-		if ($input->isInteractive() && !$helper->ask($input, $output, $question)) {
-			return Command::SUCCESS;
-		}
-
-		$this->projectionStore->resetProjection($projectionClassname);
-		$output->writeln('The projection has been successfully reset.');
-
-		return Command::SUCCESS;
-	}
+        return Command::SUCCESS;
+    }
 }

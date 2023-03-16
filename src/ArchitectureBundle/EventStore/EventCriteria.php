@@ -9,262 +9,191 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
 final class EventCriteria
 {
-	public const SORTING_FROM_OLDEST = 'oldest';
-	public const SORTING_FROM_NEWEST = 'newest';
-	public const SORTING_FROM_LOWEST_POSITION= 'lowest_position';
-	public const SORTING_FROM_HIGHEST_POSITION= 'highest_position';
+    public const SORTING_FROM_OLDEST = 'oldest';
+    public const SORTING_FROM_NEWEST = 'newest';
+    public const SORTING_FROM_LOWEST_POSITION= 'lowest_position';
+    public const SORTING_FROM_HIGHEST_POSITION= 'highest_position';
 
-	private string $aggregateRootClassname;
+    /** @var class-string */
+    private string $aggregateRootClassname;
 
-	private ?AggregateId $aggregateId = NULL;
+    private ?AggregateId $aggregateId = null;
 
-	private ?DateTimeImmutable $createdBefore = NULL;
+    private ?DateTimeImmutable $createdBefore = null;
 
-	private ?DateTimeImmutable $createdAfter = NULL;
+    private ?DateTimeImmutable $createdAfter = null;
 
-	private ?string $positionGreaterThan = NULL;
+    private ?string $positionGreaterThan = null;
 
-	private ?string $positionLessThan = NULL;
+    private ?string $positionLessThan = null;
 
-	private array $eventNames = [];
+    /** @var array<class-string> */
+    private array $eventNames = [];
 
-	private string $sorting = self::SORTING_FROM_NEWEST;
+    private string $sorting = self::SORTING_FROM_NEWEST;
 
-	private ?int $limit = NULL;
+    private ?int $limit = null;
 
-	private ?int $offset = NULL;
+    private ?int $offset = null;
 
-	private function __construct()
-	{
-	}
+    private function __construct() {}
 
-	/**
-	 * @param string $aggregateRootClassname
-	 *
-	 * @return static
-	 */
-	public static function create(string $aggregateRootClassname): self
-	{
-		$criteria = new self();
-		$criteria->aggregateRootClassname = $aggregateRootClassname;
+    /**
+     * @param class-string $aggregateRootClassname
+     */
+    public static function create(string $aggregateRootClassname): self
+    {
+        $criteria = new self();
+        $criteria->aggregateRootClassname = $aggregateRootClassname;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId $aggregateId
-	 *
-	 * @return $this
-	 */
-	public function withAggregateId(AggregateId $aggregateId): self
-	{
-		$criteria = clone $this;
-		$criteria->aggregateId = $aggregateId;
+    public function withAggregateId(AggregateId $aggregateId): self
+    {
+        $criteria = clone $this;
+        $criteria->aggregateId = $aggregateId;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @param \DateTimeImmutable $createdBefore
-	 *
-	 * @return $this
-	 */
-	public function withCreatedBefore(DateTimeImmutable $createdBefore): self
-	{
-		$criteria = clone $this;
-		$criteria->createdBefore = $createdBefore;
+    public function withCreatedBefore(DateTimeImmutable $createdBefore): self
+    {
+        $criteria = clone $this;
+        $criteria->createdBefore = $createdBefore;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @param \DateTimeImmutable $createdAfter
-	 *
-	 * @return $this
-	 */
-	public function withCreatedAfter(DateTimeImmutable $createdAfter): self
-	{
-		$criteria = clone $this;
-		$criteria->createdAfter = $createdAfter;
+    public function withCreatedAfter(DateTimeImmutable $createdAfter): self
+    {
+        $criteria = clone $this;
+        $criteria->createdAfter = $createdAfter;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @param string $position
-	 *
-	 * @return $this
-	 */
-	public function withPositionGreaterThan(string $position): self
-	{
-		$criteria = clone $this;
-		$criteria->positionGreaterThan = $position;
+    public function withPositionGreaterThan(string $position): self
+    {
+        $criteria = clone $this;
+        $criteria->positionGreaterThan = $position;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @param string $position
-	 *
-	 * @return $this
-	 */
-	public function withPositionLessThan(string $position): self
-	{
-		$criteria = clone $this;
-		$criteria->positionLessThan = $position;
+    public function withPositionLessThan(string $position): self
+    {
+        $criteria = clone $this;
+        $criteria->positionLessThan = $position;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @param array<string> $eventNames
-	 *
-	 * @return $this
-	 */
-	public function withEventNames(array $eventNames): self
-	{
-		$criteria = clone $this;
-		$criteria->eventNames = $eventNames;
+    /**
+     * @param array<class-string> $eventNames
+     */
+    public function withEventNames(array $eventNames): self
+    {
+        $criteria = clone $this;
+        $criteria->eventNames = $eventNames;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @return $this
-	 */
-	public function withNewestSorting(): self
-	{
-		$criteria = clone $this;
-		$criteria->sorting = self::SORTING_FROM_NEWEST;
+    public function withNewestSorting(): self
+    {
+        $criteria = clone $this;
+        $criteria->sorting = self::SORTING_FROM_NEWEST;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @return $this
-	 */
-	public function withOldestSorting(): self
-	{
-		$criteria = clone $this;
-		$criteria->sorting = self::SORTING_FROM_OLDEST;
+    public function withOldestSorting(): self
+    {
+        $criteria = clone $this;
+        $criteria->sorting = self::SORTING_FROM_OLDEST;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @return $this
-	 */
-	public function withLowestPositionSorting(): self
-	{
-		$criteria = clone $this;
-		$criteria->sorting = self::SORTING_FROM_LOWEST_POSITION;
+    public function withLowestPositionSorting(): self
+    {
+        $criteria = clone $this;
+        $criteria->sorting = self::SORTING_FROM_LOWEST_POSITION;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @return $this
-	 */
-	public function withHighestPositionSorting(): self
-	{
-		$criteria = clone $this;
-		$criteria->sorting = self::SORTING_FROM_HIGHEST_POSITION;
+    public function withHighestPositionSorting(): self
+    {
+        $criteria = clone $this;
+        $criteria->sorting = self::SORTING_FROM_HIGHEST_POSITION;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @param int|NULL $limit
-	 * @param int|NULL $offset
-	 *
-	 * @return $this
-	 */
-	public function withSize(?int $limit, ?int $offset): self
-	{
-		$criteria = clone $this;
-		$criteria->limit = $limit;
-		$criteria->offset = $offset;
+    public function withSize(?int $limit, ?int $offset): self
+    {
+        $criteria = clone $this;
+        $criteria->limit = $limit;
+        $criteria->offset = $offset;
 
-		return $criteria;
-	}
+        return $criteria;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function aggregateRootClassname(): string
-	{
-		return $this->aggregateRootClassname;
-	}
+    /**
+     * @return class-string
+     */
+    public function getAggregateRootClassname(): string
+    {
+        return $this->aggregateRootClassname;
+    }
 
-	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId|NULL
-	 */
-	public function aggregateId(): ?AggregateId
-	{
-		return $this->aggregateId;
-	}
+    public function getAggregateId(): ?AggregateId
+    {
+        return $this->aggregateId;
+    }
 
-	/**
-	 * @return \DateTimeImmutable|NULL
-	 */
-	public function createdBefore(): ?DateTimeImmutable
-	{
-		return $this->createdBefore;
-	}
+    public function getCreatedBefore(): ?DateTimeImmutable
+    {
+        return $this->createdBefore;
+    }
 
-	/**
-	 * @return \DateTimeImmutable|NULL
-	 */
-	public function createdAfter(): ?DateTimeImmutable
-	{
-		return $this->createdAfter;
-	}
+    public function getCreatedAfter(): ?DateTimeImmutable
+    {
+        return $this->createdAfter;
+    }
 
-	/**
-	 * @return string|NULL
-	 */
-	public function positionGreaterThan(): ?string
-	{
-		return $this->positionGreaterThan;
-	}
+    public function getPositionGreaterThan(): ?string
+    {
+        return $this->positionGreaterThan;
+    }
 
-	/**
-	 * @return string|NULL
-	 */
-	public function positionLessThan(): ?string
-	{
-		return $this->positionLessThan;
-	}
+    public function getPositionLessThan(): ?string
+    {
+        return $this->positionLessThan;
+    }
 
-	/**
-	 * @return array<string>
-	 */
-	public function eventNames(): array
-	{
-		return $this->eventNames;
-	}
+    /**
+     * @return array<class-string>
+     */
+    public function getEventNames(): array
+    {
+        return $this->eventNames;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function sorting(): string
-	{
-		return $this->sorting;
-	}
+    public function getSorting(): string
+    {
+        return $this->sorting;
+    }
 
-	/**
-	 * @return int|NULL
-	 */
-	public function limit(): ?int
-	{
-		return $this->limit;
-	}
+    public function getLimit(): ?int
+    {
+        return $this->limit;
+    }
 
-	/**
-	 * @return int|NULL
-	 */
-	public function offset(): ?int
-	{
-		return $this->offset;
-	}
+    public function getOffset(): ?int
+    {
+        return $this->offset;
+    }
 }

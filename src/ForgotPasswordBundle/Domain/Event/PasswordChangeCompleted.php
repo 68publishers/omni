@@ -5,94 +5,55 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\Event;
 
 use BadMethodCallException;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\IpAddress;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\UserAgent;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddress;
-use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\Attributes;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo;
+use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\EmailAddress;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface;
 
 final class PasswordChangeCompleted extends AbstractDomainEvent
 {
-	private PasswordRequestId $passwordRequestId;
+    private ?string $password = null;
 
-	private DeviceInfo $finishedDeviceInfo;
+    public static function create(
+        PasswordRequestId $passwordRequestId,
+        DeviceInfo $finishedDeviceInfo,
+        EmailAddress $emailAddress,
+        Attributes $attributes,
+        string $password,
+    ): self {
+        $event = self::occur($passwordRequestId->toNative(), [
+            'finished_device_info' => $finishedDeviceInfo,
+            'email_address' => $emailAddress,
+            'attributes' => $attributes,
+        ]);
 
-	private EmailAddressInterface $emailAddress;
+        $event->password = $password;
 
-	private ?string $password = NULL;
+        return $event;
+    }
 
-	/**
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId   $passwordRequestId
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo          $finishedDeviceInfo
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface $emailAddress
-	 * @param string                                                                            $password
-	 *
-	 * @return static
-	 */
-	public static function create(PasswordRequestId $passwordRequestId, DeviceInfo $finishedDeviceInfo, EmailAddressInterface $emailAddress, string $password): self
-	{
-		$event = self::occur($passwordRequestId->toString(), [
-			'finished_ip_address' => $finishedDeviceInfo->ipAddress()->value(),
-			'finished_user_agent' => $finishedDeviceInfo->userAgent()->value(),
-			'email_address' => $emailAddress->value(),
-		]);
+    public function getFinishedDeviceInfo(): DeviceInfo
+    {
+        return DeviceInfo::fromNative($this->parameters['finished_device_info']);
+    }
 
-		$event->passwordRequestId = $passwordRequestId;
-		$event->finishedDeviceInfo = $finishedDeviceInfo;
-		$event->emailAddress = $emailAddress;
-		$event->password = $password;
+    public function getEmailAddress(): EmailAddress
+    {
+        return EmailAddress::fromNative($this->parameters['email_address']);
+    }
 
-		return $event;
-	}
+    public function getAttributes(): Attributes
+    {
+        return Attributes::fromNative($this->parameters['attributes']);
+    }
 
-	/**
-	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId
-	 */
-	public function passwordRequestId(): PasswordRequestId
-	{
-		return $this->passwordRequestId;
-	}
+    public function getPassword(): string
+    {
+        if (null === $this->password) {
+            throw new BadMethodCallException('Password unavailable due to security reasons.');
+        }
 
-	/**
-	 * @return \SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\DeviceInfo
-	 */
-	public function finishedDeviceInfo(): DeviceInfo
-	{
-		return $this->finishedDeviceInfo;
-	}
-
-	/**
-	 * @return \SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EmailAddressInterface
-	 */
-	public function emailAddress(): EmailAddressInterface
-	{
-		return $this->emailAddress;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function password(): string
-	{
-		if (NULL === $this->password) {
-			throw new BadMethodCallException('Password is missing because raw passwords can not be stored in the event stream.');
-		}
-
-		return $this->password;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function reconstituteState(array $parameters): void
-	{
-		$this->passwordRequestId = PasswordRequestId::fromUuid($this->aggregateId()->id());
-		$this->finishedDeviceInfo = DeviceInfo::create(
-			IpAddress::fromValue($parameters['finished_ip_address']),
-			UserAgent::fromValue($parameters['finished_user_agent'])
-		);
-		$this->emailAddress = EmailAddress::fromValue($parameters['email_address']);
-	}
+        return $this->password;
+    }
 }

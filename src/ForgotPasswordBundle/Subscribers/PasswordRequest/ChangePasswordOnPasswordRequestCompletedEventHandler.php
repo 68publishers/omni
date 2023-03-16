@@ -4,47 +4,35 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Subscribers\PasswordRequest;
 
-use SixtyEightPublishers\UserBundle\ReadModel\View\UserView;
-use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use SixtyEightPublishers\ArchitectureBundle\Bus\CommandBusInterface;
-use SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand;
+use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use SixtyEightPublishers\ArchitectureBundle\Event\EventHandlerInterface;
-use SixtyEightPublishers\UserBundle\ReadModel\Query\GetUserByEmailAddressQuery;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeCompleted;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception\EmailAddressNotFoundException;
+use SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
+use SixtyEightPublishers\UserBundle\ReadModel\Query\GetUserIdByEmailAddressQuery;
 
 final class ChangePasswordOnPasswordRequestCompletedEventHandler implements EventHandlerInterface
 {
-	private QueryBusInterface $queryBus;
+    public function __construct(
+        private readonly QueryBusInterface $queryBus,
+        private readonly CommandBusInterface $commandBus,
+    ) {}
 
-	private CommandBusInterface $commandBus;
+    public function __invoke(PasswordChangeCompleted $event): void
+    {
+        $userId = $this->queryBus->dispatch(new GetUserIdByEmailAddressQuery($event->getEmailAddress()->toNative()));
 
-	/**
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface   $queryBus
-	 * @param \SixtyEightPublishers\ArchitectureBundle\Bus\CommandBusInterface $commandBus
-	 */
-	public function __construct(QueryBusInterface $queryBus, CommandBusInterface $commandBus)
-	{
-		$this->queryBus = $queryBus;
-		$this->commandBus = $commandBus;
-	}
+        if (!$userId instanceof UserId) {
+            throw EmailAddressNotFoundException::create($event->getEmailAddress()->toNative());
+        }
 
-	/**
-	 * @param \SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeCompleted $event
-	 *
-	 * @return void
-	 */
-	public function __invoke(PasswordChangeCompleted $event): void
-	{
-		$userView = $this->queryBus->dispatch(GetUserByEmailAddressQuery::create($event->emailAddress()->value()));
+        $command = new UpdateUserCommand(
+            userId: $userId->toNative(),
+            password: $event->getPassword(),
+        );
 
-		if (!$userView instanceof UserView) {
-			throw EmailAddressNotFoundException::create($event->emailAddress()->value());
-		}
-
-		$command = UpdateUserCommand::create($userView->id->toString())
-			->withPassword($event->password());
-
-		$this->commandBus->dispatch($command);
-	}
+        $this->commandBus->dispatch($command);
+    }
 }

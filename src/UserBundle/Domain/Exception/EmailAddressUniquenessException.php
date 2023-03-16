@@ -5,40 +5,22 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Domain\Exception;
 
 use DomainException;
+use function sprintf;
 
 final class EmailAddressUniquenessException extends DomainException
 {
-	private string $emailAddress;
+    public function __construct(
+        string $message,
+        public readonly string $emailAddress,
+    ) {
+        parent::__construct($message);
+    }
 
-	/**
-	 * @param string $message
-	 * @param string $emailAddress
-	 */
-	private function __construct(string $message, string $emailAddress)
-	{
-		parent::__construct($message);
-
-		$this->emailAddress = $emailAddress;
-	}
-
-	/**
-	 * @param string $emailAddress
-	 *
-	 * @return static
-	 */
-	public static function create(string $emailAddress): self
-	{
-		return new self(sprintf(
-			'User with an email "%s" already exists.',
-			$emailAddress
-		), $emailAddress);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function emailAddress(): string
-	{
-		return $this->emailAddress;
-	}
+    public static function create(string $emailAddress): self
+    {
+        return new self(sprintf(
+            'User with the email "%s" already exists.',
+            $emailAddress,
+        ), $emailAddress);
+    }
 }

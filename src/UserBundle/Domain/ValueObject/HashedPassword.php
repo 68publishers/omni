@@ -4,42 +4,18 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\ValueObject;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\StringValueObjectInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\NullableStringValueTrait;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
 
-final class HashedPassword implements StringValueObjectInterface
+final class HashedPassword implements ValueObjectInterface
 {
-	private string $hash;
+    use NullableStringValueTrait;
 
-	private function __construct()
-	{
-	}
+    public function verify(Password $password): bool
+    {
+        $nativePassword = $password->toNative();
+        $nativeHash = $password->toNative();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public static function fromValue(string $value): self
-	{
-		$hashedPassword = new self();
-		$hashedPassword->hash = $value;
-
-		return $hashedPassword;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function value(): string
-	{
-		return $this->hash;
-	}
-
-	/**
-	 * @param \SixtyEightPublishers\UserBundle\Domain\ValueObject\Password $password
-	 *
-	 * @return bool
-	 */
-	public function verify(Password $password): bool
-	{
-		return password_verify($password->value(), $this->value());
-	}
+        return null !== $nativePassword && null !== $nativeHash && password_verify($nativePassword, $nativeHash);
+    }
 }

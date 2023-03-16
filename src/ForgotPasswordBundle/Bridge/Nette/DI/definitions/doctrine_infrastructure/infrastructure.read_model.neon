@@ -1,0 +1,8 @@
+services:
+	infrastructure.read_model.query_handler.find_ids_of_requested_password_changes:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\ReadModel\FindIdsOfRequestedPasswordChangesQueryHandler
+
+	infrastructure.read_model.query_handler.is_possible_to_complete_password_change_request:
+		autowired: no
+		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\ReadModel\IsPossibleToCompletePasswordChangeRequestQueryHandler

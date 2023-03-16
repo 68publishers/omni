@@ -8,17 +8,11 @@ use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAda
 
 final class InMemoryPersistenceAdapter extends AbstractNonTransactionalPersistenceAdapter
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function pingConnection(): void
-	{
-	}
+    public function pingConnection(): void
+    {
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function closeConnection(): void
-	{
-	}
+    public function closeConnection(): void
+    {
+    }
 }

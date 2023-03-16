@@ -6,16 +6,13 @@ namespace SixtyEightPublishers\ProjectionBundle\Projection;
 
 final class EventDefinition
 {
-	public string $aggregateRootClassname;
-
-	public string $eventClassname;
-
-	public ?string $methodName;
-
-	public function __construct(string $aggregateRootClassname, string $eventClassname, ?string $methodName = NULL)
-	{
-		$this->aggregateRootClassname = $aggregateRootClassname;
-		$this->eventClassname = $eventClassname;
-		$this->methodName = $methodName;
-	}
+    /**
+     * @param class-string $aggregateRootClassname
+     * @param class-string $eventClassname
+     */
+    public function __construct(
+        public readonly string $aggregateRootClassname,
+        public readonly string $eventClassname,
+        public readonly ?string $methodName = null,
+    ) {}
 }
