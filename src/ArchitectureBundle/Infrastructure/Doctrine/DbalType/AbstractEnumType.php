@@ -46,6 +46,11 @@ abstract class AbstractEnumType extends Type
         return $enumClassname::tryFrom($value);
     }
 
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+    {
+        return true;
+    }
+
     /**
      * @return class-string<BackedEnum>
      */

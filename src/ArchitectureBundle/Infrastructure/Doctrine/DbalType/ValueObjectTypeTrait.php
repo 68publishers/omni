@@ -59,6 +59,11 @@ trait ValueObjectTypeTrait
         return parent::convertToDatabaseValue($value, $platform);
     }
 
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+    {
+        return true;
+    }
+
     /**
      * @return class-string<ValueObjectInterface>
      */

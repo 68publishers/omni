@@ -10,6 +10,7 @@ use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\ExtendedAggregatesResolverTrait;
+use SixtyEightPublishers\ForgotPasswordBundle\Bridge\Nette\DI\Config\AggregateClassnameConfig;
 use SixtyEightPublishers\ForgotPasswordBundle\Bridge\Nette\DI\Config\ForgotPasswordBundleConfig;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\PasswordRequest;
 use SixtyEightPublishers\UserBundle\Bridge\Nette\DI\UserBundleExtension;
@@ -37,8 +38,8 @@ final class ForgotPasswordBundleExtension extends CompilerExtension
 
                         return true;
                     }),
-            ]),
-        ]);
+            ])->castTo(AggregateClassnameConfig::class),
+        ])->castTo(ForgotPasswordBundleConfig::class);
     }
 
     public function loadConfiguration(): void
