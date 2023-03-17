@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\Http;
 
 use Nette\Http\Session;
+use SixtyEightPublishers\UserBundle\Application\Csrf\AbstractCsrfTokenFactory;
 
 final class CsrfTokenFactory extends AbstractCsrfTokenFactory
 {

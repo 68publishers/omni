@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\UserBundle\Bridge\Nette\Http;
+namespace SixtyEightPublishers\UserBundle\Application\Csrf;
 
 use Nette\Utils\Random;
-use SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface;
 use function base64_encode;
 use function hash_hmac;
 use function mb_substr;
