@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\FlashMessageBundle\Domain;
 
 use Stringable;
+use function count;
 
 final class FlashMessage
 {
@@ -21,24 +22,60 @@ final class FlashMessage
         private Phrase $message,
     ) {}
 
-    public static function success(Phrase|Stringable $message): self
+    /**
+     * @param mixed... $args
+     */
+    public static function success(Phrase|Stringable|string $message, ...$args): self
     {
-        return new self(FlashMessageId::new(), Type::SUCCESS, $message instanceof Phrase ? $message : new Phrase((string) $message));
+        $message = $message instanceof Phrase ? $message : new Phrase((string) $message);
+
+        if (0 < count($args)) {
+            $message = $message->withArgs($args);
+        }
+
+        return new self(FlashMessageId::new(), Type::SUCCESS, $message);
     }
 
-    public static function info(Phrase|Stringable $message): self
+    /**
+     * @param mixed... $args
+     */
+    public static function info(Phrase|Stringable|string $message, ...$args): self
     {
-        return new self(FlashMessageId::new(), Type::INFO, $message instanceof Phrase ? $message : new Phrase((string) $message));
+        $message = $message instanceof Phrase ? $message : new Phrase((string) $message);
+
+        if (0 < count($args)) {
+            $message = $message->withArgs($args);
+        }
+
+        return new self(FlashMessageId::new(), Type::INFO, $message);
     }
 
-    public static function error(Phrase|Stringable $message): self
+    /**
+     * @param mixed... $args
+     */
+    public static function error(Phrase|Stringable|string $message, ...$args): self
     {
-        return new self(FlashMessageId::new(), Type::ERROR, $message instanceof Phrase ? $message : new Phrase((string) $message));
+        $message = $message instanceof Phrase ? $message : new Phrase((string) $message);
+
+        if (0 < count($args)) {
+            $message = $message->withArgs($args);
+        }
+
+        return new self(FlashMessageId::new(), Type::ERROR, $message);
     }
 
-    public static function warning(Phrase|Stringable $message): self
+    /**
+     * @param mixed... $args
+     */
+    public static function warning(Phrase|Stringable|string $message, ...$args): self
     {
-        return new self(FlashMessageId::new(), Type::WARNING, $message instanceof Phrase ? $message : new Phrase((string) $message));
+        $message = $message instanceof Phrase ? $message : new Phrase((string) $message);
+
+        if (0 < count($args)) {
+            $message = $message->withArgs($args);
+        }
+
+        return new self(FlashMessageId::new(), Type::WARNING, $message);
     }
 
     public function getId(): FlashMessageId
