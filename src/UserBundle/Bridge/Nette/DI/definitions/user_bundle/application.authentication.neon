@@ -1,16 +1,16 @@
 services:
-	application.authentication.authenticator:
-		autowired: SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface
-		type: SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface
-		factory: @extension.application.authentication.authenticator.mount
+    application.authentication.authenticator:
+        autowired: SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface
+        type: SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorInterface
+        factory: @extension.application.authentication.authenticator.mount
 
-	application.authentication.authenticator.mount:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorMount
-		arguments:
-			defaultAuthenticator: @extension.application.authentication.authenticator.default
-			authenticators: []
+    application.authentication.authenticator.mount:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Application\Authentication\AuthenticatorMount
+        arguments:
+            defaultAuthenticator: @extension.application.authentication.authenticator.default
+            authenticators: []
 
-	application.authentication.authenticator.default:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Application\Authentication\Authenticator
+    application.authentication.authenticator.default:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Application\Authentication\Authenticator

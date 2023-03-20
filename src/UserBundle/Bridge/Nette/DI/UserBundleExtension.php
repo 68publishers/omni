@@ -12,10 +12,11 @@ use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\ArchitectureBundleExtension;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
-use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\ExtendedAggregatesResolverTrait;
-use SixtyEightPublishers\UserBundle\Bridge\Nette\DI\Config\AggregateClassnameConfig;
+use SixtyEightPublishers\UserBundle\Bridge\Nette\DI\Config\AggregateConfig;
+use SixtyEightPublishers\UserBundle\Bridge\Nette\DI\Config\AggregateTypeConfig;
 use SixtyEightPublishers\UserBundle\Bridge\Nette\DI\Config\UserBundleConfig;
 use SixtyEightPublishers\UserBundle\Domain\User;
+use function array_unique;
 use function assert;
 use function is_a;
 use function sprintf;
@@ -23,24 +24,26 @@ use function sprintf;
 final class UserBundleExtension extends CompilerExtension
 {
     use CompilerExtensionUtilsTrait;
-    use ExtendedAggregatesResolverTrait;
 
     public function getConfigSchema(): Schema
     {
         return Expect::structure([
-            'aggregate_classname' => Expect::structure([
-                'user' => Expect::string(User::class)
-                    ->assert(static function (string $classname) {
-                        if (!is_a($classname, User::class, true)) {
-                            throw new InvalidArgumentException(sprintf(
-                                'Classname must be %s or it\'s inheritor.',
-                                User::class,
-                            ));
-                        }
+            'aggregate' => Expect::structure([
+                'user' => Expect::structure([
+                    'classname' => Expect::string(User::class)
+                        ->assert(static function (string $classname) {
+                            if (!is_a($classname, User::class, true)) {
+                                throw new InvalidArgumentException(sprintf(
+                                    'Classname must be %s or it\'s inheritor.',
+                                    User::class,
+                                ));
+                            }
 
-                        return true;
-                    }),
-            ])->castTo(AggregateClassnameConfig::class),
+                            return true;
+                        }),
+                    'event_store_name' => Expect::string(),
+                ])->castTo(AggregateTypeConfig::class),
+            ])->castTo(AggregateConfig::class),
         ])->castTo(UserBundleConfig::class);
     }
 
@@ -55,22 +58,26 @@ final class UserBundleExtension extends CompilerExtension
         assert($config instanceof UserBundleConfig);
 
         $this->setBundleParameter('aggregate_classname', [
-            'user' => $config->aggregate_classname->user,
+            'user' => $config->aggregate->user->classname,
         ]);
 
         $this->loadConfigurationDir(__DIR__ . '/definitions/user_bundle');
     }
 
-    /**
-     * @return array<class-string, class-string>
-     */
-    public function resolveExtendedAggregates(): array
+    public function beforeCompile(): void
     {
         $config = $this->getConfig();
         assert($config instanceof UserBundleConfig);
 
-        return [
-            User::class => $config->aggregate_classname->user,
-        ];
+        if (null === $config->aggregate->user->event_store_name) {
+            return;
+        }
+
+        $architectureBundle = $this->requireCompilerExtension(ArchitectureBundleExtension::class);
+        assert($architectureBundle instanceof ArchitectureBundleExtension);
+
+        foreach (array_unique([User::class, $config->aggregate->user->classname]) as $aggregateClassname) {
+            $architectureBundle->resolveEventStoreForAggregateClassname($aggregateClassname, $config->aggregate->user->event_store_name);
+        }
     }
 }

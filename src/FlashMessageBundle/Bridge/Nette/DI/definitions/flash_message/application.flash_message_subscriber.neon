@@ -1,9 +1,9 @@
 services:
-	application.flash_message_subscriber:
-		autowired: SixtyEightPublishers\FlashMessageBundle\Application\FlashMessageSubscriberInterface
-		type: SixtyEightPublishers\FlashMessageBundle\Application\FlashMessageSubscriberInterface
-		factory: @extension.application.flash_message_subscriber.default
+    application.flash_message_subscriber:
+        autowired: SixtyEightPublishers\FlashMessageBundle\Application\FlashMessageSubscriberInterface
+        type: SixtyEightPublishers\FlashMessageBundle\Application\FlashMessageSubscriberInterface
+        factory: @extension.application.flash_message_subscriber.default
 
-	application.flash_message_subscriber.default:
-		autowired: no
-		factory: SixtyEightPublishers\FlashMessageBundle\Application\FlashMessageSubscriber
+    application.flash_message_subscriber.default:
+        autowired: no
+        factory: SixtyEightPublishers\FlashMessageBundle\Application\FlashMessageSubscriber

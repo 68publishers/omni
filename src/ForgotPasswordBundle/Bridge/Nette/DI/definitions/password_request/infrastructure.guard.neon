@@ -1,5 +1,5 @@
 services:
-	infrastructure.guard.email_address:
-		autowired: SixtyEightPublishers\ForgotPasswordBundle\Domain\EmailAddressGuardInterface
-		type: SixtyEightPublishers\ForgotPasswordBundle\Domain\EmailAddressGuardInterface
-		factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\ExistingEmailAddressGuard
+    infrastructure.guard.email_address:
+        autowired: SixtyEightPublishers\ForgotPasswordBundle\Domain\EmailAddressGuardInterface
+        type: SixtyEightPublishers\ForgotPasswordBundle\Domain\EmailAddressGuardInterface
+        factory: SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\ExistingEmailAddressGuard

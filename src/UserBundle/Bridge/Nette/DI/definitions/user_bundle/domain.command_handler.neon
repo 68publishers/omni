@@ -1,12 +1,12 @@
 services:
-	domain.command_handler.create_user:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Domain\CommandHandler\CreateUserCommandHandler
+    domain.command_handler.create_user:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Domain\CommandHandler\CreateUserCommandHandler
 
-	domain.command_handler.updated_user:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Domain\CommandHandler\UpdateUserCommandHandler
+    domain.command_handler.updated_user:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Domain\CommandHandler\UpdateUserCommandHandler
 
-	domain.command_handler.delete_user:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Domain\CommandHandler\DeleteUserCommandHandler
+    domain.command_handler.delete_user:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Domain\CommandHandler\DeleteUserCommandHandler

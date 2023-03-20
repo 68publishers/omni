@@ -1,4 +1,4 @@
 services:
-	command_bus:
-		type: SixtyEightPublishers\ArchitectureBundle\Bus\CommandBusInterface
-		factory: SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Bus\CommandBus(@%68publishers.architecture_bundle.extension_name%.messenger.command_bus.bus)
+    command_bus:
+        type: SixtyEightPublishers\ArchitectureBundle\Bus\CommandBusInterface
+        factory: SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Bus\CommandBus(@%68publishers.architecture_bundle.extension_name%.messenger.command_bus.bus)

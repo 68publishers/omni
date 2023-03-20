@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure;
+namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine;
 
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository\DoctrineAggregateRootRepositoryInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception\PasswordRequestNotFoundException;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\PasswordRequest;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\PasswordRequestRepositoryInterface;
@@ -14,7 +14,7 @@ use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequest
 final class PasswordRequestRepository implements PasswordRequestRepositoryInterface
 {
     public function __construct(
-        private readonly AggregateRootRepositoryInterface $aggregateRootRepository,
+        private readonly DoctrineAggregateRootRepositoryInterface $aggregateRootRepository,
     ) {}
 
     public function save(PasswordRequest $passwordRequest): void

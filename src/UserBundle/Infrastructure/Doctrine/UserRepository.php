@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\UserBundle\Infrastructure;
+namespace SixtyEightPublishers\UserBundle\Infrastructure\Doctrine;
 
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository\DoctrineAggregateRootRepositoryInterface;
 use SixtyEightPublishers\UserBundle\Domain\Exception\UserNotFoundException;
 use SixtyEightPublishers\UserBundle\Domain\User;
 use SixtyEightPublishers\UserBundle\Domain\UserRepositoryInterface;
@@ -14,7 +14,7 @@ use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 final class UserRepository implements UserRepositoryInterface
 {
     public function __construct(
-        private readonly AggregateRootRepositoryInterface $aggregateRootRepository,
+        private readonly DoctrineAggregateRootRepositoryInterface $aggregateRootRepository,
     ) {}
 
     public function save(User $user): void

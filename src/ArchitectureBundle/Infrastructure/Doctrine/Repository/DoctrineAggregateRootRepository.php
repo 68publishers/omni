@@ -10,10 +10,9 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreException;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface;
 use function get_class;
 
-final class DoctrineAggregateRootRepository implements AggregateRootRepositoryInterface
+final class DoctrineAggregateRootRepository implements DoctrineAggregateRootRepositoryInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,

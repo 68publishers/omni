@@ -1,0 +1,11 @@
+services:
+    infrastructure.persistence_adapter:
+        autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface
+        type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface
+        factory: @extension.infrastructure.persistence_adapter.stack
+
+    infrastructure.persistence_adapter.stack:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterStack
+        arguments:
+            persistenceAdapters: []

@@ -1,16 +1,16 @@
 services:
-	infrastructure.read_model.query_handler.get_credentials:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetCredentialsQueryHandler
+    infrastructure.read_model.query_handler.get_credentials:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetCredentialsQueryHandler
 
-	infrastructure.read_model.query_handler.get_identity_data:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetIdentityDataQueryHandler
+    infrastructure.read_model.query_handler.get_identity_data:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetIdentityDataQueryHandler
 
-	infrastructure.read_model.query_handler.get_user_id_by_email_address:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetUserIdByEmailAddressQueryHandler
+    infrastructure.read_model.query_handler.get_user_id_by_email_address:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetUserIdByEmailAddressQueryHandler
 
-	infrastructure.read_model.query_handler.get_user_id_by_username:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetUserIdByUsernameQueryHandler
+    infrastructure.read_model.query_handler.get_user_id_by_username:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel\GetUserIdByUsernameQueryHandler

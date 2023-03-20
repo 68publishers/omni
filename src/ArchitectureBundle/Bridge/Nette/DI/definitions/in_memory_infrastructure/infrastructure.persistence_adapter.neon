@@ -1,9 +1,0 @@
-services:
-	infrastructure.store_adapter:
-		autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface
-		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface
-		factory: @extension.infrastructure.store_adapter.in_memory
-
-	infrastructure.store_adapter.in_memory:
-		autowired: no
-		factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\PersistenceAdapter\InMemoryPersistenceAdapter

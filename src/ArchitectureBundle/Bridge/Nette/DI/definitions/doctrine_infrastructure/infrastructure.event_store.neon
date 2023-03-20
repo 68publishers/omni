@@ -1,28 +1,9 @@
 services:
-	# event store
-	infrastructure.event_store:
-		autowired: SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface
-		type: SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface
-		factory: @extension.infrastructure.event_store.decorator
+    # event store
+    infrastructure.event_store.doctrine:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\EventStore\DoctrineEventStore
 
-	infrastructure.event_store.decorator:
-		autowired: no
-		factory: SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreDecorator
-		arguments:
-			eventStore: @extension.infrastructure.event_store.doctrine
-			eventMetadataExtender: @extension.infrastructure.event_store.metadata_extender.registry
-
-	infrastructure.event_store.doctrine:
-		autowired: no
-		factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\EventStore\DoctrineEventStore
-
-	# metadata extender
-	infrastructure.event_store.metadata_extender.registry:
-		autowired: no
-		type: SixtyEightPublishers\ArchitectureBundle\EventStore\EventMetadataExtenderRegistry
-		arguments:
-			eventMetadataExtenders: typed(SixtyEightPublishers\ArchitectureBundle\EventStore\EventMetadataExtenderInterface)
-
-	# doctrine event subscriber
-	infrastructure.event_store.event_subscriber.create_event_stream:
-		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\EventSubscriber\CreateEventStreamSubscriber
+    # doctrine event subscriber
+    infrastructure.event_store.event_subscriber.create_event_stream:
+        type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\EventSubscriber\CreateEventStreamSubscriber

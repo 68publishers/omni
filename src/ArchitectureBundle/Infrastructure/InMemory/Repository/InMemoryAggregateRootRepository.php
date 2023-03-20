@@ -7,11 +7,10 @@ namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\Reposi
 use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface;
-use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\MemoryStorageInterface;
 use function get_class;
 
-final class InMemoryAggregateRootRepository implements AggregateRootRepositoryInterface
+final class InMemoryAggregateRootRepository implements InMemoryAggregateRootRepositoryInterface
 {
     public function __construct(
         private readonly MemoryStorageInterface $memoryStorage,

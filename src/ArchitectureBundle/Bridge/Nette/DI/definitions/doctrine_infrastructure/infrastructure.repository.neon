@@ -1,9 +1,9 @@
 services:
-	infrastructure.repository:
-		autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface
-		type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository\AggregateRootRepositoryInterface
-		factory: @extension.infrastructure.repository.doctrine
+    infrastructure.repository:
+        autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository\DoctrineAggregateRootRepositoryInterface
+        type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository\DoctrineAggregateRootRepositoryInterface
+        factory: @extension.infrastructure.repository.doctrine
 
-	infrastructure.repository.doctrine:
-		autowired: no
-		factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository\DoctrineAggregateRootRepository
+    infrastructure.repository.doctrine:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository\DoctrineAggregateRootRepository

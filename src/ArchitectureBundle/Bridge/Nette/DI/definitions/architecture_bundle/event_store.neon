@@ -1,0 +1,37 @@
+services:
+    # event store
+    event_store:
+        autowired: SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface
+        type: SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface
+        factory: @extension.event_store.extendable
+
+    event_store.extendable:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\EventStore\MetadataExtendableEventStore
+        arguments:
+            eventStore: @extension.event_store.resolvable
+            eventMetadataExtender: @extension.event_store.metadata_extender.registry
+
+    event_store.resolvable:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\EventStore\ResolvableEventStore
+        arguments:
+            eventStores:
+                'null': @extension.event_store.null
+
+    event_store.null:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\EventStore\NullEventStore
+
+    # metadata extender
+    event_store.metadata_extender.registry:
+        autowired: no
+        type: SixtyEightPublishers\ArchitectureBundle\EventStore\EventMetadataExtenderRegistry
+        arguments:
+            eventMetadataExtenders: typed(SixtyEightPublishers\ArchitectureBundle\EventStore\EventMetadataExtenderInterface)
+
+    # event store name resolver
+    event_store.name_resolver:
+        type: SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreNameResolver
+        arguments:
+            defaultEventStoreName: %68publishers.architecture_bundle.default_event_store_name%

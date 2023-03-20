@@ -1,3 +1,3 @@
 services:
-	ui.control.flash_message:
-		implement: SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageControlFactoryInterface
+    ui.control.flash_message:
+        implement: SixtyEightPublishers\FlashMessageBundle\Bridge\Nette\Ui\FlashMessageControl\FlashMessageControlFactoryInterface

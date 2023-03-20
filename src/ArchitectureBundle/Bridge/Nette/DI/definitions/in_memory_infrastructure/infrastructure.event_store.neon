@@ -1,0 +1,5 @@
+services:
+    # event store
+    infrastructure.event_store.in_memory:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\EventStore\InMemoryEventStore

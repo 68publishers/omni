@@ -8,7 +8,7 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
 use function array_map;
 
-final class EventStoreDecorator implements EventStoreInterface
+final class MetadataExtendableEventStore implements EventStoreInterface
 {
     public function __construct(
         private readonly EventStoreInterface $eventStore,

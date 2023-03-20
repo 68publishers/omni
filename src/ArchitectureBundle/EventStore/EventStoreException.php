@@ -12,7 +12,7 @@ use function sprintf;
 
 final class EventStoreException extends Exception
 {
-    private function __construct(
+    public function __construct(
         string $message,
         public readonly bool $retryable,
         ?Throwable $previous = null,
@@ -66,6 +66,15 @@ final class EventStoreException extends Exception
             'Unable to count events for an aggregate of type %s',
             $aggregateRootClassname,
         ), $retryable, $previous);
+    }
+
+    public static function unableToResolveEventStore(string $aggregateRootClassname, string $eventStoreName): self
+    {
+        return new self(sprintf(
+            'Unable to resolve a event store with the name %s for an aggregate of the type %s',
+            $eventStoreName,
+            $aggregateRootClassname,
+        ), false);
     }
 
     public static function of(Throwable $error, bool $retryable): self

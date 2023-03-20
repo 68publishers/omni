@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\Repository;
+namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\InMemory\Repository;
 
 use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 
-interface AggregateRootRepositoryInterface
+interface InMemoryAggregateRootRepositoryInterface
 {
     /**
      * @param class-string $classname

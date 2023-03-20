@@ -24,6 +24,8 @@ use function trim;
 
 final class DoctrineEventStore implements EventStoreInterface
 {
+    public const NAME = 'doctrine';
+
     public function __construct(
         private readonly EntityManagerInterface $em,
     ) {}

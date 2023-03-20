@@ -1,0 +1,9 @@
+services:
+    infrastructure.event_publiher:
+        autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface
+        type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface
+        factory: @extension.infrastructure.event_publiher.event_bus
+
+    infrastructure.event_publiher.event_bus:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventBusPublisher

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\DI\Config;
 
-final class AggregateClassnameConfig
+final class AggregateConfig
 {
-    /** @var class-string */
-    public string $user;
+    public AggregateTypeConfig $user;
 }

@@ -11,10 +11,16 @@ use Doctrine\ORM\Tools\ToolEvents;
 use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
+use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreNameResolver;
+use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\EventStore\DoctrineEventStore;
 use function is_subclass_of;
 
 final class CreateEventStreamSubscriber implements EventSubscriber
 {
+    public function __construct(
+        private readonly EventStoreNameResolver $eventStoreNameResolver,
+    ) {}
+
     public function getSubscribedEvents(): array
     {
         return [
@@ -28,6 +34,10 @@ final class CreateEventStreamSubscriber implements EventSubscriber
     public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $args): void
     {
         if (!is_subclass_of($args->getClassMetadata()->getName(), AggregateRootInterface::class, true)) {
+            return;
+        }
+
+        if (DoctrineEventStore::NAME !== $this->eventStoreNameResolver->resolve($args->getClassMetadata()->getName())) {
             return;
         }
 

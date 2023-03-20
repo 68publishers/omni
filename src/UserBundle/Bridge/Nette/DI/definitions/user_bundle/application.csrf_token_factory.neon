@@ -1,9 +1,9 @@
 services:
-	application.csrf_token_factory:
-		autowired: SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface
-		type: SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface
-		factory: @extension.application.csrf_token_factory.default
+    application.csrf_token_factory:
+        autowired: SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface
+        type: SixtyEightPublishers\UserBundle\Application\Csrf\CsrfTokenFactoryInterface
+        factory: @extension.application.csrf_token_factory.default
 
-	application.csrf_token_factory.default:
-		autowired: no
-		factory: SixtyEightPublishers\UserBundle\Bridge\Nette\Http\CsrfTokenFactory
+    application.csrf_token_factory.default:
+        autowired: no
+        factory: SixtyEightPublishers\UserBundle\Bridge\Nette\Http\CsrfTokenFactory

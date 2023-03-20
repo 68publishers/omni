@@ -1,9 +1,9 @@
 services:
-	# doctrine event subscribers
-	infrastructure.projection_store.event_subscriber.create_projection_schema:
-		type: SixtyEightPublishers\ProjectionBundle\Infrastructure\Doctrine\EventSubscriber\CreateProjectionSchemaSubscriber
-		arguments:
-			tableName: %68publishers.projection_bundle_doctrine.projection_table_name%
+    # doctrine event subscribers
+    infrastructure.projection_store.event_subscriber.create_projection_schema:
+        type: SixtyEightPublishers\ProjectionBundle\Infrastructure\Doctrine\EventSubscriber\CreateProjectionSchemaSubscriber
+        arguments:
+            tableName: %68publishers.projection_bundle_doctrine.projection_table_name%
 
-	infrastructure.projection_store.event_subscriber.create_projection_model_schemas:
-		type: SixtyEightPublishers\ProjectionBundle\Infrastructure\Doctrine\EventSubscriber\CreateProjectionModelSchemasSubscriber
+    infrastructure.projection_store.event_subscriber.create_projection_model_schemas:
+        type: SixtyEightPublishers\ProjectionBundle\Infrastructure\Doctrine\EventSubscriber\CreateProjectionModelSchemasSubscriber
