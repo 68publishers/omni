@@ -25,6 +25,20 @@ final class FlashMessage
     /**
      * @param mixed... $args
      */
+    public static function ofType(Type $type, Phrase|Stringable|string $message, ...$args): self
+    {
+        $message = $message instanceof Phrase ? $message : new Phrase((string) $message);
+
+        if (0 < count($args)) {
+            $message = $message->withArgs($args);
+        }
+
+        return new self(FlashMessageId::new(), $type, $message);
+    }
+
+    /**
+     * @param mixed... $args
+     */
     public static function success(Phrase|Stringable|string $message, ...$args): self
     {
         $message = $message instanceof Phrase ? $message : new Phrase((string) $message);

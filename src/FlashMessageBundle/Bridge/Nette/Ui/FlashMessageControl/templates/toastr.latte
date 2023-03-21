@@ -22,7 +22,11 @@
         {/foreach}
 
         {define messageText, $phrase}
-            {if null !== $phrase && empty($phrase->args)}
+            {varType SixtyEightPublishers\FlashMessageBundle\Domain\Phrase|null $phrase}
+
+            {if null !== $phrase && !$phrase->isTranslatable()}
+                {$phrase->text}
+            {elseif null !== $phrase && empty($phrase->args)}
                 {_$phrase->text}
             {elseif null !== $phrase}
                 {_$phrase->text, ...$phrase->args}

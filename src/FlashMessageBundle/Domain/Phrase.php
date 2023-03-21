@@ -9,6 +9,8 @@ final class Phrase
     /** @var array<int|string, mixed> */
     public readonly array $args;
 
+    private bool $translatable = true;
+
     /**
      * @param mixed... $args
      */
@@ -17,6 +19,19 @@ final class Phrase
         ...$args,
     ) {
         $this->args = $args;
+    }
+
+    public static function nonTranslatable(string $text): self
+    {
+        $phrase = new self($text);
+        $phrase->translatable = false;
+
+        return $phrase;
+    }
+
+    public function isTranslatable(): bool
+    {
+        return $this->translatable;
     }
 
     /**
@@ -29,6 +44,10 @@ final class Phrase
 
     public function withPrefix(PhrasePrefix $prefix): self
     {
+        if (!$this->isTranslatable()) {
+            return $this;
+        }
+
         return new self(
             $prefix->value . $this->text,
             ...$this->args,
