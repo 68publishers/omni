@@ -14,7 +14,7 @@ final class HashedPassword implements ValueObjectInterface
     public function verify(Password $password): bool
     {
         $nativePassword = $password->toNative();
-        $nativeHash = $password->toNative();
+        $nativeHash = $this->toNative();
 
         return null !== $nativePassword && null !== $nativeHash && password_verify($nativePassword, $nativeHash);
     }
