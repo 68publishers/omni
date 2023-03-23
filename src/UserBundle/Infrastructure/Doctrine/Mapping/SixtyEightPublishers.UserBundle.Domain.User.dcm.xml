@@ -46,6 +46,10 @@
             </options>
         </field>
 
+        <field name="locale" column="locale" type="SixtyEightPublishers\UserBundle\Domain\ValueObject\Locale" />
+
+        <field name="timezone" column="timezone" type="datetime_zone" />
+
         <field name="attributes" column="attributes" type="SixtyEightPublishers\UserBundle\Domain\ValueObject\Attributes">
             <options>
                 <option name="jsonb">true</option>

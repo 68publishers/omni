@@ -30,7 +30,7 @@ final class GetIdentityDataQueryHandler implements QueryHandlerInterface
         }
 
         $data = $this->em->createQueryBuilder()
-            ->select('u.id, u.createdAt, u.username, u.emailAddress, u.active, u.name.firstname, u.name.surname, u.roles, u.attributes')
+            ->select('u.id, u.createdAt, u.username, u.emailAddress, u.active, u.name.firstname, u.name.surname, u.roles, u.locale, u.timezone, u.attributes')
             ->from(User::class, 'u')
             ->where('u.id = :id')
             ->andWhere('u.deletedAt IS NULL')
@@ -47,6 +47,8 @@ final class GetIdentityDataQueryHandler implements QueryHandlerInterface
                 active: $data['active'],
                 name: new Name($data['name.firstname'], $data['name.surname']),
                 roles: $data['roles'],
+                locale: $data['locale'],
+                timezone: $data['timezone'],
                 attributes: $data['attributes'],
             )
             : null;

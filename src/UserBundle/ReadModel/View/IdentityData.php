@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\ReadModel\View;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Active;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Attributes;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\EmailAddress;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Locale;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
@@ -23,6 +25,8 @@ class IdentityData
         public readonly Active $active,
         public readonly Name $name,
         public readonly Roles $roles,
+        public readonly Locale $locale,
+        public readonly DateTimeZone $timezone,
         public readonly Attributes $attributes,
     ) {}
 }

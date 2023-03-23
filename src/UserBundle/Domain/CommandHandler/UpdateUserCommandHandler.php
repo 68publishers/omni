@@ -53,6 +53,14 @@ final class UpdateUserCommandHandler implements CommandHandlerInterface
             $user->changeRoles($command->roles);
         }
 
+        if (null !== $command->locale) {
+            $user->changeLocale($command->locale);
+        }
+
+        if (null !== $command->timezone) {
+            $user->changeTimezone($command->timezone);
+        }
+
         if (null !== $command->attributes) {
             $user->addAttributes($command->attributes, $this->attributesGuard);
         }

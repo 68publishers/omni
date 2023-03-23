@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\Event;
 
+use DateTimeZone;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Active;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Attributes;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\EmailAddress;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\HashedPassword;
+use SixtyEightPublishers\UserBundle\Domain\ValueObject\Locale;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Name;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Roles;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
@@ -24,6 +26,8 @@ final class UserCreated extends AbstractDomainEvent
         Active $active,
         Name $name,
         Roles $roles,
+        Locale $locale,
+        DateTimeZone $timezone,
         Attributes $attributes,
     ): self {
         return self::occur($userId->toNative(), [
@@ -33,6 +37,8 @@ final class UserCreated extends AbstractDomainEvent
             'active' => $active,
             'name' => $name,
             'roles' => $roles,
+            'locale' => $locale,
+            'timezone' => $timezone,
             'attributes' => $attributes,
         ]);
     }
@@ -65,6 +71,16 @@ final class UserCreated extends AbstractDomainEvent
     public function getRoles(): Roles
     {
         return Roles::fromNative($this->parameters['roles']);
+    }
+
+    public function getLocale(): Locale
+    {
+        return Locale::fromNative($this->parameters['locale']);
+    }
+
+    public function getTimezone(): DateTimeZone
+    {
+        return new DateTimeZone($this->parameters['timezone']);
     }
 
     public function getAttributes(): Attributes

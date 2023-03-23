@@ -21,6 +21,8 @@ final class UpdateUserCommand implements CommandInterface
         public readonly ?string $firstname = null,
         public readonly ?string $surname = null,
         public readonly ?array $roles = null,
+        public readonly ?string $locale = null,
+        public readonly ?string $timezone = null,
         public readonly ?array $attributes = null,
     ) {}
 }

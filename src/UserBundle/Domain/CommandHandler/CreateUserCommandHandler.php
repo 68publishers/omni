@@ -8,6 +8,7 @@ use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
 use SixtyEightPublishers\UserBundle\Domain\AttributesGuardInterface;
 use SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand;
 use SixtyEightPublishers\UserBundle\Domain\EmailAddressGuardInterface;
+use SixtyEightPublishers\UserBundle\Domain\LocaleGuardInterface;
 use SixtyEightPublishers\UserBundle\Domain\PasswordGuardInterface;
 use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
 use SixtyEightPublishers\UserBundle\Domain\User;
@@ -22,12 +23,13 @@ final class CreateUserCommandHandler implements CommandHandlerInterface
         private readonly ?PasswordGuardInterface $passwordGuard = null,
         private readonly ?UsernameGuardInterface $usernameGuard = null,
         private readonly ?EmailAddressGuardInterface $emailAddressGuard = null,
+        private readonly ?LocaleGuardInterface $localeGuard = null,
         private readonly ?AttributesGuardInterface $attributesGuard = null,
     ) {}
 
     public function __invoke(CreateUserCommand $command): void
     {
-        $user = User::create($command, $this->algorithm, $this->passwordGuard, $this->usernameGuard, $this->emailAddressGuard, $this->attributesGuard);
+        $user = User::create($command, $this->algorithm, $this->passwordGuard, $this->usernameGuard, $this->emailAddressGuard, $this->localeGuard, $this->attributesGuard);
 
         $this->userRepository->save($user);
     }

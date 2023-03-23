@@ -20,6 +20,8 @@ final class CreateUserCommand implements CommandInterface
         public readonly string $firstname,
         public readonly string $surname,
         public readonly array $roles,
+        public readonly string $locale,
+        public readonly string $timezone,
         public readonly array $attributes,
         public readonly ?string $userId = null,
     ) {}
