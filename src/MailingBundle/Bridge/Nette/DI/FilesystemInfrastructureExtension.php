@@ -12,7 +12,6 @@ use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUti
 use SixtyEightPublishers\MailingBundle\Bridge\Nette\DI\Config\DirectoryConfig;
 use SixtyEightPublishers\MailingBundle\Bridge\Nette\DI\Config\FilesystemInfrastructureConfig;
 use function assert;
-use function is_string;
 
 final class FilesystemInfrastructureExtension extends CompilerExtension implements InfrastructureExtensionInterface
 {
@@ -20,29 +19,14 @@ final class FilesystemInfrastructureExtension extends CompilerExtension implemen
 
     public function getConfigSchema(): Schema
     {
-        $normalizeDirectories = static function (array $list): array {
-            foreach ($list as $index => $item) {
-                if (is_string($item)) {
-                    $list[$index] = (object) [
-                        'path' => $item,
-                        'priority' => 0,
-                    ];
-                }
-            }
-
-            return $list;
-        };
-
         return Expect::structure([
             'directories' => Expect::listOf(
-                Expect::anyOf(
-                    Expect::string(),
-                    Expect::structure([
-                        'path' => Expect::string()->required(),
-                        'priority' => Expect::int(0),
-                    ])->castTo(DirectoryConfig::class),
-                ),
-            )->before($normalizeDirectories),
+                Expect::structure([
+                    'path' => Expect::string()->required(),
+                    'extension' => Expect::string('latte'),
+                    'priority' => Expect::int(0),
+                ])->castTo(DirectoryConfig::class),
+            ),
         ])->castTo(FilesystemInfrastructureConfig::class);
     }
 
@@ -56,11 +40,11 @@ final class FilesystemInfrastructureExtension extends CompilerExtension implemen
         assert($config instanceof FilesystemInfrastructureConfig);
 
         foreach ($config->directories as $directory) {
-            $this->registerDirectory($directory->path, $directory->priority);
+            $this->registerDirectory($directory->path, $directory->extension, $directory->priority);
         }
     }
 
-    public function registerDirectory(string $directory, int $priority = 0): void
+    public function registerDirectory(string $directory, string $extension, int $priority = 0): void
     {
         $builder = $this->getContainerBuilder();
         $mailSourceLocatorDefinition = $builder->getDefinition($this->prefix('infrastructure.locator.default'));
@@ -68,6 +52,7 @@ final class FilesystemInfrastructureExtension extends CompilerExtension implemen
 
         $mailSourceLocatorDefinition->addSetup('registerDirectory', [
             'directory' => $directory,
+            'extension' => $extension,
             'priority' => $priority,
         ]);
     }

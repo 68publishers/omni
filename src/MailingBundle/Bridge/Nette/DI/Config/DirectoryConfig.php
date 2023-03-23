@@ -8,5 +8,7 @@ final class DirectoryConfig
 {
     public string $path;
 
+    public string $extension;
+
     public int $priority;
 }
