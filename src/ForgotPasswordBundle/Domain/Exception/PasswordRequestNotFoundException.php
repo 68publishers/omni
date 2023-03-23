@@ -14,7 +14,7 @@ final class PasswordRequestNotFoundException extends DomainException
     {
         return new self(sprintf(
             'Password request with ID %s not found.',
-            $id,
+            $id->toNative(),
         ));
     }
 }

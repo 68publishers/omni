@@ -1,0 +1,12 @@
+services:
+    domain.command_handler.create_mail:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Domain\CommandHandler\CreateMailCommandHandler
+
+    domain.command_handler.update_mail:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Domain\CommandHandler\UpdateMailCommandHandler
+
+    domain.command_handler.update_mail_translation:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Domain\CommandHandler\UpdateMailTranslationCommandHandler

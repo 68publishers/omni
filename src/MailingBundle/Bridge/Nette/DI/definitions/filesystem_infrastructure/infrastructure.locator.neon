@@ -1,0 +1,9 @@
+services:
+    infrastructure.locator:
+        autowired: no
+        type: SixtyEightPublishers\MailingBundle\Infrastructure\Filesystem\Locator\MailSourceLocatorInterface
+        factory: @extension.infrastructure.locator.default
+
+    infrastructure.locator.default:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Infrastructure\Filesystem\Locator\MailSourceLocator

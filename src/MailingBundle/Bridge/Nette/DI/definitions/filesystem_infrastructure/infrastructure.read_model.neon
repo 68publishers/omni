@@ -1,0 +1,6 @@
+services:
+    infrastructure.read_model.query_handler.get_mail_source_by_code:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Infrastructure\Filesystem\ReadModel\GetMailSourceByCodeQueryHandler(
+            mailSourceLocator: @extension.infrastructure.locator
+        )

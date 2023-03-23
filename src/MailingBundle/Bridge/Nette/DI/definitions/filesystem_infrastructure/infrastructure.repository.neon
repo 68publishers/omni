@@ -1,0 +1,9 @@
+services:
+    infrastructure.repository.mail:
+        autowired: SixtyEightPublishers\MailingBundle\Domain\MailRepositoryInterface
+        type: SixtyEightPublishers\MailingBundle\Domain\MailRepositoryInterface
+        factory: @extension.infrastructure.repository.mail.default
+
+    infrastructure.repository.mail.default:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Infrastructure\Filesystem\MailRepository

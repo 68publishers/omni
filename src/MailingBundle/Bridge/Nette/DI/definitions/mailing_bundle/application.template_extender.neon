@@ -1,0 +1,10 @@
+services:
+    application.template_extender:
+        autowired: no
+        factory: @extension.application.template_extender.registry
+
+    application.template_extender.registry:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Application\Template\TemplateExtenderRegistry(
+            templateExtenders: typed(SixtyEightPublishers\MailingBundle\Application\Template\TemplateExtenderInterface)
+        )

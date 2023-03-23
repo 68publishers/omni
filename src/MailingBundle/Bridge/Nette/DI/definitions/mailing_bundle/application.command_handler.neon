@@ -1,0 +1,8 @@
+services:
+    application.command_handler.send_mail:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Application\CommandHandler\SendMailCommandHandler(
+            mailSender: @extension.application.mail_sender
+            templateFactory: @extension.application.template_factory
+            templateExtender: @extension.application.template_extender
+        )

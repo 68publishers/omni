@@ -1,0 +1,9 @@
+services:
+    application.mail_sender:
+        autowired: no
+        type: SixtyEightPublishers\MailingBundle\Application\MailSender\MailSenderInterface
+        factory: @extension.application.mail_sender.default
+
+    application.mail_sender.default:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Bridge\Nette\MailSender

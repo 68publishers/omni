@@ -1,0 +1,9 @@
+services:
+    application.template_factory:
+        autowired: no
+        type: SixtyEightPublishers\MailingBundle\Application\Template\TemplateFactoryInterface
+        factory: @extension.application.template_factory.default
+
+    application.template_factory.default:
+        autowired: no
+        factory: SixtyEightPublishers\MailingBundle\Bridge\Nette\Template\TemplateFactory

@@ -14,7 +14,7 @@ final class UserNotFoundException extends DomainException
     {
         return new self(sprintf(
             'User with the ID %s not found.',
-            $id,
+            $id->toUuid(),
         ));
     }
 }
