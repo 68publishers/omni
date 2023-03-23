@@ -8,3 +8,10 @@ services:
         factory: SixtyEightPublishers\MailingBundle\Application\Template\TemplateExtenderRegistry(
             templateExtenders: typed(SixtyEightPublishers\MailingBundle\Application\Template\TemplateExtenderInterface)
         )
+
+    application.template_extender.provide_variables:
+        autowired: self
+        type: SixtyEightPublishers\MailingBundle\Application\Template\ProvideArgumentsTemplateExtender
+        factory: SixtyEightPublishers\MailingBundle\Application\Template\ProvideArgumentsTemplateExtender(
+            arguments: []
+        )

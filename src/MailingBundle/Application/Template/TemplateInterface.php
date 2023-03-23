@@ -14,5 +14,10 @@ interface TemplateInterface
     /**
      * @param array<string, mixed> $arguments
      */
+    public function withArguments(array $arguments): self;
+
+    /**
+     * @param array<string, mixed> $arguments
+     */
     public function render(array $arguments): string;
 }

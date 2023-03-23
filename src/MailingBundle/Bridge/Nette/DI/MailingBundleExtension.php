@@ -50,6 +50,8 @@ final class MailingBundleExtension extends CompilerExtension
                 'email_address' => Expect::string()->dynamic()->nullable(),
                 'name' => Expect::string()->dynamic()->nullable(),
             ])->castTo(SenderConfig::class),
+
+            'default_template_arguments' => Expect::arrayOf(Expect::mixed(), Expect::string()),
         ])->castTo(MailingBundleConfig::class);
     }
 
@@ -75,6 +77,7 @@ final class MailingBundleExtension extends CompilerExtension
         $config = $this->getConfig();
         assert($config instanceof MailingBundleConfig);
 
+        # default sender
         if (null !== $config->default_sender->email_address) {
             $sendMailCommandDefinition = $builder->getDefinition($this->prefix('application.command_handler.send_mail'));
             assert($sendMailCommandDefinition instanceof ServiceDefinition);
@@ -85,6 +88,12 @@ final class MailingBundleExtension extends CompilerExtension
             ]));
         }
 
+        $provideArgumentsTemplateExtender = $builder->getDefinition($this->prefix('application.template_extender.provide_variables'));
+        assert($provideArgumentsTemplateExtender instanceof ServiceDefinition);
+
+        $provideArgumentsTemplateExtender->getCreator()->arguments['arguments'] = $config->default_template_arguments;
+
+        # Mail aggregate event store
         if (null === $config->aggregate->mail->event_store_name) {
             return;
         }
