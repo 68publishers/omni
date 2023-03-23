@@ -1,0 +1,9 @@
+services:
+    application.http_link.link_factory:
+        autowired: SixtyEightPublishers\ArchitectureBundle\Application\HttpLink\LinkFactoryInterface
+        type: SixtyEightPublishers\ArchitectureBundle\Application\HttpLink\LinkFactoryInterface
+        factory: @extension.application.http_link.link_factory.default
+
+    application.http_link.link_factory.default:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\HttpLink\LinkFactory

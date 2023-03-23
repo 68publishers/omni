@@ -97,4 +97,19 @@ final class ArchitectureBundleExtension extends CompilerExtension implements Mes
             $eventStoreName,
         ]);
     }
+
+    /**
+     * @param array<string, mixed> $staticParameters
+     */
+    public function registerHttpLink(string $name, string $destination, array $staticParameters = []): void
+    {
+        $linkFactoryDefinition = $this->getContainerBuilder()->getDefinition($this->prefix('application.http_link.link_factory.default'));
+        assert($linkFactoryDefinition instanceof ServiceDefinition);
+
+        $linkFactoryDefinition->addSetup('registerLink', [
+            $name,
+            $destination,
+            $staticParameters,
+        ]);
+    }
 }
