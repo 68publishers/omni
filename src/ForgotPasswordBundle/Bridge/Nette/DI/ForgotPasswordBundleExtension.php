@@ -14,6 +14,7 @@ use SixtyEightPublishers\ForgotPasswordBundle\Bridge\Nette\DI\Config\AggregateCo
 use SixtyEightPublishers\ForgotPasswordBundle\Bridge\Nette\DI\Config\AggregateTypeConfig;
 use SixtyEightPublishers\ForgotPasswordBundle\Bridge\Nette\DI\Config\ForgotPasswordBundleConfig;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\PasswordRequest;
+use SixtyEightPublishers\MailingBundle\Bridge\Nette\DI\MailingBundleExtension;
 use SixtyEightPublishers\UserBundle\Bridge\Nette\DI\UserBundleExtension;
 use function array_unique;
 use function assert;
@@ -49,6 +50,7 @@ final class ForgotPasswordBundleExtension extends CompilerExtension
     public function loadConfiguration(): void
     {
         $this->requireCompilerExtension(UserBundleExtension::class);
+        $this->requireCompilerExtension(MailingBundleExtension::class);
         $this->requireCompilerExtension(InfrastructureExtensionInterface::class);
 
         $config = $this->getConfig();
