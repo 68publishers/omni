@@ -34,7 +34,7 @@ final class IsPossibleToCompletePasswordChangeRequestQueryHandler implements Que
             ->from(PasswordRequest::class, 'pr')
             ->where('pr.id = :id')
             ->andWhere('pr.status = :status')
-            ->andWhere('pr.expiredAt < :now')
+            ->andWhere('pr.expiredAt > :now')
             ->setParameters([
                 'id' => $query->passwordRequestId,
                 'status' => Status::REQUESTED->value,
