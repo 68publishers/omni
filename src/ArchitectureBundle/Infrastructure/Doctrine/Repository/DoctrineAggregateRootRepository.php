@@ -22,7 +22,7 @@ final class DoctrineAggregateRootRepository implements DoctrineAggregateRootRepo
 
     public function loadAggregateRoot(string $classname, AggregateId $aggregateId): ?object
     {
-        return $this->em->find($classname, $aggregateId->toUuid());
+        return $this->em->find($classname, $aggregateId);
     }
 
     /**
