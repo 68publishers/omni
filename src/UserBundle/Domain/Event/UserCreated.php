@@ -21,7 +21,7 @@ final class UserCreated extends AbstractDomainEvent
     public static function create(
         UserId $userId,
         Username $username,
-        HashedPassword $password,
+        ?HashedPassword $password,
         EmailAddress $emailAddress,
         Active $active,
         Name $name,
@@ -48,9 +48,9 @@ final class UserCreated extends AbstractDomainEvent
         return Username::fromNative($this->parameters['username']);
     }
 
-    public function getPassword(): HashedPassword
+    public function getPassword(): ?HashedPassword
     {
-        return HashedPassword::fromNative($this->parameters['password']);
+        return null !== $this->parameters['password'] ? HashedPassword::fromNative($this->parameters['password']) : null;
     }
 
     public function getEmailAddress(): EmailAddress

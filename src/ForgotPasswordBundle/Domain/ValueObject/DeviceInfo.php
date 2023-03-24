@@ -12,24 +12,24 @@ final class DeviceInfo implements ValueObjectInterface
     use CompositeValueObjectTrait;
 
     public function __construct(
-        private readonly IpAddress $ipAddress,
-        private readonly UserAgent $userAgent,
+        private readonly ?IpAddress $ipAddress,
+        private readonly ?UserAgent $userAgent,
     ) {}
 
     protected static function fromNativeFactory(callable $factory): static
     {
         return new self(
-            $factory(IpAddress::class, 'ipAddress'),
-            $factory(UserAgent::class, 'userAgent'),
+            $factory(IpAddress::class, 'ipAddress', true),
+            $factory(UserAgent::class, 'userAgent', true),
         );
     }
 
-    public function getIpAddress(): IpAddress
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    public function getUserAgent(): UserAgent
+    public function getUserAgent(): ?UserAgent
     {
         return $this->userAgent;
     }

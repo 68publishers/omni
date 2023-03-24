@@ -44,7 +44,7 @@ class User implements AggregateRootInterface
 
     protected Username $username;
 
-    protected HashedPassword $password;
+    protected ?HashedPassword $password;
 
     protected EmailAddress $emailAddress;
 
@@ -72,7 +72,7 @@ class User implements AggregateRootInterface
         $user = new static(); // @phpstan-ignore-line
 
         $userId = null !== $command->userId ? UserId::fromNative($command->userId) : UserId::new();
-        $password = Password::fromNative($command->password);
+        $password = null !== $command->password ? Password::fromNative($command->password) : null;
         $username = Username::fromNative($command->username);
         $emailAddress = EmailAddress::fromNative($command->emailAddress);
         $active = Active::fromNative($command->active);
@@ -82,16 +82,20 @@ class User implements AggregateRootInterface
         $timezone = new DateTimeZone($command->timezone);
         $attributes = Attributes::fromNative($command->attributes);
 
-        $passwordGuard && $passwordGuard($userId, $password);
         $usernameGuard && $usernameGuard($userId, $username);
         $emailAddressGuard && $emailAddressGuard($userId, $emailAddress);
         $localeGuard && $localeGuard($userId, $locale);
         $attributesGuard && $attributesGuard($userId, $attributes);
 
+        if (null !== $password) {
+            $passwordGuard && $passwordGuard($userId, $password);
+            $password = $password->createHashedPassword($algorithm);
+        }
+
         $user->recordThat(UserCreated::create(
             $userId,
             $username,
-            $password->createHashedPassword($algorithm),
+            $password,
             $emailAddress,
             $active,
             $name,

@@ -35,8 +35,8 @@ final class CancelPreviousPasswordRequestsEventHandler implements EventHandlerIn
 
             $this->commandBus->dispatch(new CancelPasswordRequestCommand(
                 $passwordRequestId->toNative(),
-                $deviceInfo->getIpAddress()->toNative(),
-                $deviceInfo->getUserAgent()->toNative(),
+                $deviceInfo->getIpAddress()?->toNative(),
+                $deviceInfo->getUserAgent()?->toNative(),
             ));
         }
     }

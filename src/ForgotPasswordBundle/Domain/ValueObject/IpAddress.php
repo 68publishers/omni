@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\NullableStringValueTrait;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\StringValueTrait;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception\IpAddressException;
 
 final class IpAddress implements ValueObjectInterface
 {
-    use NullableStringValueTrait {
+    use StringValueTrait {
         __construct as private __stringConstructor;
     }
 
-    protected function __construct(?string $value)
+    protected function __construct(string $value)
     {
-        if (null !== $value && !filter_var($value, FILTER_VALIDATE_IP)) {
+        if (!filter_var($value, FILTER_VALIDATE_IP)) {
             throw IpAddressException::invalidValue($value);
         }
 

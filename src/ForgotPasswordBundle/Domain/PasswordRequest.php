@@ -60,7 +60,10 @@ class PasswordRequest implements AggregateRootInterface
 
         $passwordRequestId = null !== $command->passwordRequestId ? PasswordRequestId::fromNative($command->passwordRequestId) : PasswordRequestId::new();
         $emailAddress = EmailAddress::fromNative($command->emailAddress);
-        $deviceInfo = new DeviceInfo(IpAddress::fromNative($command->ipAddress), UserAgent::fromNative($command->userAgent));
+        $deviceInfo = new DeviceInfo(
+            null !== $command->ipAddress ? IpAddress::fromNative($command->ipAddress) : null,
+            null !== $command->userAgent ? UserAgent::fromNative($command->userAgent) : null,
+        );
         $attributes = Attributes::fromNative($command->attributes);
 
         $emailAddressGuard && $emailAddressGuard($passwordRequestId, $emailAddress);
@@ -91,7 +94,10 @@ class PasswordRequest implements AggregateRootInterface
 
         $this->recordThat(PasswordChangeCompleted::create(
             $this->id,
-            new DeviceInfo(IpAddress::fromNative($command->ipAddress), UserAgent::fromNative($command->userAgent)),
+            new DeviceInfo(
+                null !== $command->ipAddress ? IpAddress::fromNative($command->ipAddress) : null,
+                null !== $command->userAgent ? UserAgent::fromNative($command->userAgent) : null,
+            ),
             $this->emailAddress,
             Attributes::fromNative($command->attributes),
             $command->password,
@@ -106,7 +112,10 @@ class PasswordRequest implements AggregateRootInterface
 
         $this->recordThat(PasswordChangeCanceled::create(
             $this->id,
-            new DeviceInfo(IpAddress::fromNative($command->ipAddress), UserAgent::fromNative($command->userAgent)),
+            new DeviceInfo(
+                null !== $command->ipAddress ? IpAddress::fromNative($command->ipAddress) : null,
+                null !== $command->userAgent ? UserAgent::fromNative($command->userAgent) : null,
+            ),
             $this->emailAddress,
             Attributes::fromNative($command->attributes),
         ));
@@ -137,7 +146,7 @@ class PasswordRequest implements AggregateRootInterface
         $this->requestedAt = $event->getCreatedAt();
         $this->expiredAt = $event->getExpiredAt();
         $this->requestDeviceInfo = $event->getRequestDeviceInfo();
-        $this->finishedDeviceInfo = new DeviceInfo(IpAddress::null(), UserAgent::null());
+        $this->finishedDeviceInfo = new DeviceInfo(null, null);
         $this->attributes = $event->getAttributes();
     }
 

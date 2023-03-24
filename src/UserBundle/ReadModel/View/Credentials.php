@@ -13,6 +13,6 @@ class Credentials
     public function __construct(
         public readonly UserId $userId,
         public readonly Username $username,
-        public readonly HashedPassword $password,
+        public readonly ?HashedPassword $password,
     ) {}
 }

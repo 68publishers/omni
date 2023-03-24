@@ -25,13 +25,18 @@ trait ValueObjectTypeTrait
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
         $value = parent::convertToPHPValue($value, $platform);
+
+        if (null === $value) {
+            return null;
+        }
+
         $classname = $this->getValueObjectClassname();
 
         try {
             return $classname::fromNative($value);
         } catch (DomainException $e) {
             throw ConversionException::conversionFailed(
-                is_scalar($value) ? (string) $value : var_export($value, true),
+                is_scalar($value) ? (string) $value : var_export($value, true), // @phpstan-ignore-line
                 $classname,
                 $e,
             );
@@ -43,6 +48,10 @@ trait ValueObjectTypeTrait
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
+        if (null === $value) {
+            return parent::convertToDatabaseValue($value, $platform);
+        }
+
         if (!$value instanceof ValueObjectInterface) {
             throw ConversionException::conversionFailedSerialization($value, 'native', sprintf(
                 'Value is not instance of %s',

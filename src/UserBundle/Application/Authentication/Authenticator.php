@@ -24,7 +24,7 @@ final class Authenticator implements AuthenticatorInterface
             throw AuthenticationException::userNotFound($username);
         }
 
-        if (!$credentials->password->verify(Password::fromNative($password))) {
+        if (null === $credentials->password || !$credentials->password->verify(Password::fromNative($password))) {
             throw AuthenticationException::invalidPassword($username);
         }
 

@@ -17,11 +17,7 @@ final class RegexPasswordGuard implements PasswordGuardInterface
 
     public function __invoke(UserId $userId, Password $password): void
     {
-        if ($password->isNull()) {
-            return;
-        }
-
-        $passwordString = (string) $password->toNative();
+        $passwordString = $password->toNative();
 
         if (!preg_match('/' . $this->regex . '/', $passwordString)) {
             throw PasswordException::passwordDoesNotMeetConditions([
