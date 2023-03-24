@@ -19,8 +19,8 @@ final class DeviceInfo implements ValueObjectInterface
     protected static function fromNativeFactory(callable $factory): static
     {
         return new self(
-            $factory(IpAddress::class, 'ip_address'),
-            $factory(UserAgent::class, 'user_agent'),
+            $factory(IpAddress::class, 'ipAddress'),
+            $factory(UserAgent::class, 'userAgent'),
         );
     }
 
