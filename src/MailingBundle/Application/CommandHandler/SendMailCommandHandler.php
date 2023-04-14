@@ -48,12 +48,17 @@ final class SendMailCommandHandler implements CommandHandlerInterface
             throw UnableToFindMailSourceException::create($message->code, $locale);
         }
 
-        $messageBodyTemplate = $this->templateFactory->create($mailSource->type, $mailSource->messageBody->toNative(), $mailSource->locale->toNative());
+        $messageBodyTemplate = $this->templateFactory->create(
+            $mailSource->type,
+            $mailSource->messageBody->toNative(),
+            $mailSource->layoutBody?->toNative(),
+            $mailSource->locale->toNative(),
+        );
         $messageBodyTemplate = $this->templateExtender->extend($messageBodyTemplate);
         $messageBody = $messageBodyTemplate->render($message->arguments);
 
         if (null !== $mailSource->subject) {
-            $subjectTemplate = $this->templateFactory->create($mailSource->type, $mailSource->subject->toNative(), $mailSource->locale->toNative());
+            $subjectTemplate = $this->templateFactory->create($mailSource->type, $mailSource->subject->toNative(), null, $mailSource->locale->toNative());
             $subjectTemplate = $this->templateExtender->extend($subjectTemplate);
             $subject = $subjectTemplate->render($message->arguments);
         }

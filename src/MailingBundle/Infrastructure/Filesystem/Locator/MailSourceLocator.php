@@ -6,7 +6,6 @@ namespace SixtyEightPublishers\MailingBundle\Infrastructure\Filesystem\Locator;
 
 use function array_merge;
 use function is_file;
-use function ksort;
 use function ltrim;
 use function rtrim;
 
@@ -58,7 +57,7 @@ final class MailSourceLocator implements MailSourceLocatorInterface
         $directoriesByPriority = $this->directories;
         $sortedDirectories = [];
 
-        ksort($directoriesByPriority);
+        krsort($directoriesByPriority);
 
         foreach ($directoriesByPriority as $directories) {
             $sortedDirectories[] = $directories;

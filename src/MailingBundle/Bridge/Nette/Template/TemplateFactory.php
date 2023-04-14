@@ -24,12 +24,12 @@ final class TemplateFactory implements TemplateFactoryInterface
         private readonly TranslatorLocalizerInterface $translatorLocalizer,
     ) {}
 
-    public function create(SourceType $sourceType, string $content, string $locale): TemplateInterface
+    public function create(SourceType $sourceType, string $content, ?string $layout, string $locale): TemplateInterface
     {
         $template = $this->templateFactory->createTemplate();
         assert($template instanceof NetteTemplate);
 
-        $file = $this->prepareSource($sourceType, $content, $template);
+        $file = $this->prepareSource($sourceType, $content, $layout, $template);
 
         $template->setTranslator($this->translator);
         $template->getLatte()->addProvider('uiControl', $this->linkGenerator);
@@ -37,15 +37,33 @@ final class TemplateFactory implements TemplateFactoryInterface
         return new Template($template, $this->translatorLocalizer, $file, $locale);
     }
 
-    private function prepareSource(SourceType $sourceType, string $content, NetteTemplate $template): string
+    private function prepareSource(SourceType $sourceType, string $content, ?string $layout, NetteTemplate $template): string
     {
+        $latte = $template->getLatte();
+
         if (SourceType::FILE_PATH === $sourceType) {
+            $loader = $latte->getLoader();
+
+            if (null !== $layout) {
+                $loader = new AliasedLatteLoader($loader, [
+                    '@layout' => $layout,
+                ]);
+            }
+
+            $template->getLatte()->setLoader($loader);
+
             return $content;
         }
 
-        $template->getLatte()->setLoader(new StringLoader([
+        $templates = [
             'content' => $content,
-        ]));
+        ];
+
+        if (null !== $layout) {
+            $templates['@layout'] = $layout;
+        }
+
+        $template->getLatte()->setLoader(new StringLoader($templates));
 
         return 'content';
     }

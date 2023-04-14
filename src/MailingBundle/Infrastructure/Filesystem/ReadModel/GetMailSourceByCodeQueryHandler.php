@@ -28,11 +28,13 @@ final class GetMailSourceByCodeQueryHandler implements QueryHandlerInterface
         }
 
         $subjectFile = $this->mailSourceLocator->locale($query->code, $query->locale, '.subject');
+        $layoutFile = $this->mailSourceLocator->locale('@layout', $query->locale);
 
         return new MailSource(
             SourceType::FILE_PATH,
             null !== $subjectFile ? Subject::fromNative($subjectFile) : null,
             MessageBody::fromNative($messageBodyFile),
+            null !== $layoutFile ? MessageBody::fromNative($layoutFile) : null,
             Locale::fromNative($query->locale),
         );
     }

@@ -8,5 +8,5 @@ use SixtyEightPublishers\MailingBundle\ReadModel\View\SourceType;
 
 interface TemplateFactoryInterface
 {
-    public function create(SourceType $sourceType, string $content, string $locale): TemplateInterface;
+    public function create(SourceType $sourceType, string $content, ?string $layout, string $locale): TemplateInterface;
 }

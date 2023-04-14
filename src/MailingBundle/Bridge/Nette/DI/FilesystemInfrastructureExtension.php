@@ -39,6 +39,8 @@ final class FilesystemInfrastructureExtension extends CompilerExtension implemen
         $config = $this->getConfig();
         assert($config instanceof FilesystemInfrastructureConfig);
 
+        $this->registerDirectory(__DIR__ . '/../../../Resources/templates', 'latte', -1);
+
         foreach ($config->directories as $directory) {
             $this->registerDirectory($directory->path, $directory->extension, $directory->priority);
         }

@@ -14,6 +14,7 @@ final class MailSource
         public readonly SourceType $type,
         public readonly ?Subject $subject,
         public readonly MessageBody $messageBody,
+        public readonly ?MessageBody $layoutBody,
         public readonly Locale $locale,
     ) {}
 }
