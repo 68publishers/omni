@@ -48,7 +48,7 @@ trait ValueObjectTypeTrait
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
-        if (null === $value) {
+        if (!is_object($value)) {
             return parent::convertToDatabaseValue($value, $platform);
         }
 
