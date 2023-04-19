@@ -10,16 +10,14 @@ use SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception\IpAddressExceptio
 
 final class IpAddress implements ValueObjectInterface
 {
-    use StringValueTrait {
-        __construct as private __stringConstructor;
-    }
+    use StringValueTrait;
 
-    protected function __construct(string $value)
+    protected function validate(): void
     {
+        $value = $this->toNative();
+
         if (!filter_var($value, FILTER_VALIDATE_IP)) {
             throw IpAddressException::invalidValue($value);
         }
-
-        $this->__stringConstructor($value);
     }
 }

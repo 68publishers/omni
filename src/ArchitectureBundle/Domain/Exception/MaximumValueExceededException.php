@@ -7,14 +7,15 @@ namespace SixtyEightPublishers\ArchitectureBundle\Domain\Exception;
 use DomainException;
 use function sprintf;
 
-final class InvalidEmailAddressException extends DomainException
+final class MaximumValueExceededException extends DomainException
 {
     /**
      * @param class-string $valueObjectClassname
      */
     public function __construct(
         string $message,
-        public readonly string $emailAddress,
+        public readonly int|float $value,
+        public readonly int|float $maximum,
         public readonly string $valueObjectClassname,
     ) {
         parent::__construct($message);
@@ -23,12 +24,13 @@ final class InvalidEmailAddressException extends DomainException
     /**
      * @param class-string $valueObjectClassname
      */
-    public static function create(string $emailAddress, string $valueObjectClassname): self
+    public static function create(int|float $maximum, int|float $value, string $valueObjectClassname): self
     {
         return new self(sprintf(
-            'Value "%s" is not valid email for a value object of the type %s.',
-            $emailAddress,
+            'Maximum value for a value object of the type %s is %s. Value %d passed.',
             $valueObjectClassname,
-        ), $emailAddress, $valueObjectClassname);
+            $maximum,
+            $value,
+        ), $value, $maximum, $valueObjectClassname);
     }
 }

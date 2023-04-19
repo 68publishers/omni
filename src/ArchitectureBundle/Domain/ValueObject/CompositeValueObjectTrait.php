@@ -15,23 +15,12 @@ trait CompositeValueObjectTrait
 {
     public static function fromNative(mixed $native): static
     {
-        if (!is_array($native)) {
-            throw InvalidNativeValueTypeException::fromNativeValue($native, 'array', static::class);
-        }
+        return static::doCreateFromNative($native, false);
+    }
 
-        $factory = static function (string $classname, string $key, bool $canBeNull = false) use ($native): ?ValueObjectInterface {
-            if (!array_key_exists($key, $native)) {
-                /** @var class-string $classname */
-                throw InvalidNativeValueTypeException::fromNativeValue(null, 'missing', $classname);
-            }
-
-            assert(is_subclass_of($classname, ValueObjectInterface::class, true));
-            $native = $native[$key];
-
-            return null === $native && $canBeNull ? null : $classname::fromNative($native);
-        };
-
-        return self::fromNativeFactory($factory);
+    public static function fromSafeNative(mixed $native): static
+    {
+        return static::doCreateFromNative($native, true);
     }
 
     /**
@@ -56,4 +45,25 @@ trait CompositeValueObjectTrait
     }
 
     abstract protected static function fromNativeFactory(callable $factory): static;
+
+    private static function doCreateFromNative(mixed $native, bool $safe): static
+    {
+        if (!is_array($native)) {
+            throw InvalidNativeValueTypeException::fromNativeValue($native, 'array', static::class);
+        }
+
+        $factory = static function (string $classname, string $key, bool $canBeNull = false) use ($native, $safe): ?ValueObjectInterface {
+            if (!array_key_exists($key, $native)) {
+                /** @var class-string $classname */
+                throw InvalidNativeValueTypeException::fromNativeValue(null, 'missing', $classname);
+            }
+
+            assert(is_subclass_of($classname, ValueObjectInterface::class, true));
+            $native = $native[$key];
+
+            return null === $native && $canBeNull ? null : ($safe ? $classname::fromSafeNative($native) : $classname::fromNative($native));
+        };
+
+        return self::fromNativeFactory($factory);
+    }
 }

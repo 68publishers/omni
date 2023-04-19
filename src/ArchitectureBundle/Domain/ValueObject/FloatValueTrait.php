@@ -9,12 +9,14 @@ use function is_float;
 
 trait FloatValueTrait
 {
+    use NativeFactoryMethodTrait;
+
     protected function __construct(
         protected readonly float $value,
     ) {
     }
 
-    public static function fromNative(mixed $native): static
+    public static function fromSafeNative(mixed $native): static
     {
         if (!is_float($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'float', static::class);

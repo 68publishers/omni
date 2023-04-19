@@ -30,6 +30,12 @@ trait UuidValueTrait
 
     public static function fromNative(mixed $native): static
     {
+        # always validated
+        return static::fromSafeNative($native);
+    }
+
+    public static function fromSafeNative(mixed $native): static
+    {
         if (!is_string($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'string', static::class);
         }

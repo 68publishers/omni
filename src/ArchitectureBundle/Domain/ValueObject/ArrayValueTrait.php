@@ -15,6 +15,8 @@ use function sprintf;
 
 trait ArrayValueTrait
 {
+    use NativeFactoryMethodTrait;
+
     /**
      * @param array<mixed> $values
      */
@@ -23,7 +25,7 @@ trait ArrayValueTrait
     ) {
     }
 
-    public static function fromNative(mixed $native): static
+    public static function fromSafeNative(mixed $native): static
     {
         if (!is_array($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'array', static::class);

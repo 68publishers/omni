@@ -9,12 +9,14 @@ use function is_int;
 
 trait IntegerValueTrait
 {
+    use NativeFactoryMethodTrait;
+
     protected function __construct(
         protected readonly int $value,
     ) {
     }
 
-    public static function fromNative(mixed $native): static
+    public static function fromSafeNative(mixed $native): static
     {
         if (!is_int($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'int', static::class);

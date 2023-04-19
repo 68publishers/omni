@@ -9,12 +9,14 @@ use function is_string;
 
 trait StringValueTrait
 {
+    use NativeFactoryMethodTrait;
+
     protected function __construct(
         protected readonly string $value,
     ) {
     }
 
-    public static function fromNative(mixed $native): static
+    public static function fromSafeNative(mixed $native): static
     {
         if (!is_string($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'string', static::class);

@@ -32,10 +32,10 @@ final class GetMailSourceByCodeQueryHandler implements QueryHandlerInterface
 
         return new MailSource(
             SourceType::FILE_PATH,
-            null !== $subjectFile ? Subject::fromNative($subjectFile) : null,
-            MessageBody::fromNative($messageBodyFile),
-            null !== $layoutFile ? MessageBody::fromNative($layoutFile) : null,
-            Locale::fromNative($query->locale),
+            null !== $subjectFile ? Subject::fromSafeNative($subjectFile) : null,
+            MessageBody::fromSafeNative($messageBodyFile),
+            null !== $layoutFile ? MessageBody::fromSafeNative($layoutFile) : null,
+            Locale::fromSafeNative($query->locale),
         );
     }
 }

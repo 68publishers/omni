@@ -33,7 +33,7 @@ trait ValueObjectSetTrait
         if (!is_array($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue(
                 $native,
-                empty($itemClassname) ? 'array' : sprintf('array<%s>', $itemClassname),
+                sprintf('array<%s>', $itemClassname),
                 static::class,
             );
         }
@@ -42,6 +42,27 @@ trait ValueObjectSetTrait
 
         foreach ($native as $item) {
             $items[] = ([$itemClassname, 'fromNative'])($item);
+        }
+
+        return new static($items);
+    }
+
+    public static function fromSafeNative(mixed $native): static
+    {
+        $itemClassname = self::getValidItemClassname();
+
+        if (!is_array($native)) {
+            throw InvalidNativeValueTypeException::fromNativeValue(
+                $native,
+                sprintf('array<%s>', $itemClassname),
+                static::class,
+            );
+        }
+
+        $items = [];
+
+        foreach ($native as $item) {
+            $items[] = ([$itemClassname, 'fromSafeNative'])($item);
         }
 
         return new static($items);

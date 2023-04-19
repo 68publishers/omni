@@ -9,16 +9,14 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidEmailAddress
 
 trait EmailAddressValueTrait
 {
-    use StringValueTrait {
-        __construct as private __stringConstructor;
-    }
+    use StringValueTrait;
 
-    protected function __construct(string $value)
+    protected function validate(): void
     {
-        if (!Validators::isEmail($value)) {
-            throw InvalidEmailAddressException::create($value, static::class);
-        }
+        $native = $this->toNative();
 
-        $this->__stringConstructor($value);
+        if (!Validators::isEmail($native)) {
+            throw InvalidEmailAddressException::create($native, static::class);
+        }
     }
 }

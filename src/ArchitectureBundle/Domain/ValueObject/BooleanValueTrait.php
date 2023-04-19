@@ -8,6 +8,8 @@ use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidNativeValueT
 
 trait BooleanValueTrait
 {
+    use NativeFactoryMethodTrait;
+
     protected function __construct(
         protected readonly bool $value,
     ) {
@@ -23,7 +25,7 @@ trait BooleanValueTrait
         return new static(false);
     }
 
-    public static function fromNative(mixed $native): static
+    public static function fromSafeNative(mixed $native): static
     {
         if (!is_bool($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'bool', static::class);
