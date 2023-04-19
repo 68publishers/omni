@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository\DoctrineAggregateRootRepositoryInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception\PasswordRequestNotFoundException;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\PasswordRequest;
@@ -24,7 +23,7 @@ final class PasswordRequestRepository implements PasswordRequestRepositoryInterf
 
     public function get(PasswordRequestId $id): PasswordRequest
     {
-        $passwordRequest = $this->aggregateRootRepository->loadAggregateRoot(PasswordRequest::class, AggregateId::fromUuid($id->toUuid()));
+        $passwordRequest = $this->aggregateRootRepository->loadAggregateRoot(PasswordRequest::class, $id->toAggregateId());
 
         if (!$passwordRequest instanceof PasswordRequest) {
             throw PasswordRequestNotFoundException::withId($id);

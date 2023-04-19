@@ -123,7 +123,7 @@ class PasswordRequest implements AggregateRootInterface
 
     public function getAggregateId(): AggregateId
     {
-        return AggregateId::fromUuid($this->id->toUuid());
+        return $this->id->toAggregateId();
     }
 
     public function isExpired(): bool
@@ -140,7 +140,7 @@ class PasswordRequest implements AggregateRootInterface
      */
     protected function whenPasswordChangeRequested(PasswordChangeRequested $event): void
     {
-        $this->id = PasswordRequestId::fromUuid($event->getAggregateId()->toUuid());
+        $this->id = PasswordRequestId::fromAggregateId($event->getAggregateId());
         $this->emailAddress = $event->getEmailAddress();
         $this->status = Status::REQUESTED;
         $this->requestedAt = $event->getCreatedAt();

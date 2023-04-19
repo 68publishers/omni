@@ -110,7 +110,7 @@ class User implements AggregateRootInterface
 
     public function getAggregateId(): AggregateId
     {
-        return AggregateId::fromUuid($this->id->toUuid());
+        return $this->id->toAggregateId();
     }
 
     public function changeUsername(string $username, ?UsernameGuardInterface $usernameGuard = null): void
@@ -227,7 +227,7 @@ class User implements AggregateRootInterface
 
     protected function whenUserCreated(UserCreated $event): void
     {
-        $this->id = UserId::fromUuid($event->getAggregateId()->toUuid());
+        $this->id = UserId::fromAggregateId($event->getAggregateId());
         $this->createdAt = $event->getCreatedAt();
         $this->username = $event->getUsername();
         $this->password = $event->getPassword();

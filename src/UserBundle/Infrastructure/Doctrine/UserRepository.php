@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Infrastructure\Doctrine;
 
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Repository\DoctrineAggregateRootRepositoryInterface;
 use SixtyEightPublishers\UserBundle\Domain\Exception\UserNotFoundException;
 use SixtyEightPublishers\UserBundle\Domain\User;
@@ -24,7 +23,7 @@ final class UserRepository implements UserRepositoryInterface
 
     public function get(UserId $id): User
     {
-        $user = $this->aggregateRootRepository->loadAggregateRoot(User::class, AggregateId::fromUuid($id->toUuid()));
+        $user = $this->aggregateRootRepository->loadAggregateRoot(User::class, $id->toAggregateId());
 
         if (!$user instanceof User) {
             throw UserNotFoundException::withId($id);

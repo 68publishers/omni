@@ -57,7 +57,7 @@ class Mail implements AggregateRootInterface
 
     public function getAggregateId(): AggregateId
     {
-        return AggregateId::fromUuid($this->id->toUuid());
+        return $this->id->toAggregateId();
     }
 
     public function changeCode(string $code, ?CodeGuardInterface $codeGuard = null): void
@@ -94,7 +94,7 @@ class Mail implements AggregateRootInterface
 
     protected function whenMailCreated(MailCreated $event): void
     {
-        $this->id = MailId::fromUuid($event->getAggregateId()->toUuid());
+        $this->id = MailId::fromAggregateId($event->getAggregateId());
         $this->code = $event->getCode();
         $this->translations = new ArrayCollection();
 
