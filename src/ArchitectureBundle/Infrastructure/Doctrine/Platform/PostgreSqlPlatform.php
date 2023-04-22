@@ -6,21 +6,26 @@ namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Platfo
 
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Table;
 use function array_combine;
 use function array_filter;
 use function explode;
 use function implode;
 use function in_array;
 use function is_array;
+use function sprintf;
 
 final class PostgreSqlPlatform extends PostgreSQL100Platform
 {
     private const INDEX_OPTION_CASE_INSENSITIVE = 'case-insensitive';
     private const INDEX_OPTION_INCLUDE = 'include';
     private const INDEX_OPTION_DESC = 'desc';
+    private const INDEX_OPTION_JSONB_PATH_OPS = 'jsonb_path_ops';
+
+    private const INDEX_FLAG_GIN = 'gin';
 
     /**
-     * Adds options 'case-insensitive' and 'desc' for indexes
+     * Adds options 'case-insensitive', 'desc' and 'jsonb_path_ops' for indexes
      *
      * {@inheritDoc}
      */
@@ -30,6 +35,7 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
 
         $ciColumns = $index->hasOption(self::INDEX_OPTION_CASE_INSENSITIVE) ? $index->getOption(self::INDEX_OPTION_CASE_INSENSITIVE) : [];
         $descColumns = $index->hasOption(self::INDEX_OPTION_DESC) ? $index->getOption(self::INDEX_OPTION_DESC) : [];
+        $jsonbPathsOpsColumns = $index->hasOption(self::INDEX_OPTION_JSONB_PATH_OPS) ? $index->getOption(self::INDEX_OPTION_JSONB_PATH_OPS) : [];
 
         if (!is_array($ciColumns)) {
             $ciColumns = explode(',', (string) $ciColumns);
@@ -39,19 +45,44 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
             $descColumns = explode(',', (string) $descColumns);
         }
 
+        if (!is_array($jsonbPathsOpsColumns)) {
+            $jsonbPathsOpsColumns = explode(',', (string) $jsonbPathsOpsColumns);
+        }
+
         $columns = array_combine($index->getUnquotedColumns(), $quotedColumns);
 
         foreach ($columns as $name => $quoted) {
             if (in_array($name, $ciColumns, true)) {
-                $columns[$name] = 'lower(' . $quoted . ')';
+                $quoted = 'lower(' . $quoted . ')';
             }
 
             if (in_array($name, $descColumns, true)) {
-                $columns[$name] = $quoted . ' DESC';
+                $quoted = $quoted . ' DESC';
             }
+
+            if (in_array($name, $jsonbPathsOpsColumns, true)) {
+                $quoted = $quoted . ' jsonb_path_ops';
+            }
+
+            $columns[$name] = $quoted;
         }
 
         return implode(', ', $columns);
+    }
+
+    /**
+     * Support for GIN indexes
+     */
+    public function getCreateIndexSQL(Index $index, $table): string
+    {
+        if ($index->hasFlag(self::INDEX_FLAG_GIN)) {
+            $table = sprintf(
+                '%s USING gin',
+                $table instanceof Table ? $table->getQuotedName($this) : $table,
+            );
+        }
+
+        return parent::getCreateIndexSQL($index, $table);
     }
 
     /**
