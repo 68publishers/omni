@@ -9,7 +9,8 @@ use Fmasa\Messenger\Exceptions\InvalidHandlerService;
 use Fmasa\Messenger\Exceptions\MultipleHandlersFound;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
-use Nette\DI\Extensions\DecoratorExtension;
+use Nette\DI\Definitions\Definition;
+use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Extensions\ParametersExtension;
 use Nette\DI\Helpers;
 use Nette\DI\InvalidConfigurationException;
@@ -20,7 +21,11 @@ use Nette\Schema\Processor;
 use Nette\Schema\Schema;
 use Nette\Schema\ValidationException;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use function array_filter;
 use function assert;
+use function is_a;
+use function is_array;
 use function is_string;
 use function trigger_error;
 
@@ -77,16 +82,9 @@ final class MessengerExtensionDecorator extends CompilerExtension
      */
     public function beforeCompile(): void
     {
-        $decoratorExtension = $this->requireCompilerExtension(DecoratorExtension::class);
-        assert($decoratorExtension instanceof DecoratorExtension);
-
         foreach ($this->getMessageBusConfigurations() as $messageBusConfiguration) {
             foreach ($messageBusConfiguration->messageHandlerTypes as $messageHandlerType) {
-                $decoratorExtension->addTags($messageHandlerType, [
-                    'messenger.messageHandler' => [
-                        'bus' => $messageBusConfiguration->busName,
-                    ],
-                ]);
+                $this->setupMessageHandlerTag($messageHandlerType, $messageBusConfiguration->busName);
             }
         }
 
@@ -140,5 +138,47 @@ final class MessengerExtensionDecorator extends CompilerExtension
         }
 
         return $res;
+    }
+
+    /**
+     * @param class-string<MessageHandlerInterface> $messageHandlerType
+     */
+    private function setupMessageHandlerTag(string $messageHandlerType, string $busName): void
+    {
+        foreach ($this->findByType($messageHandlerType) as $definition) {
+            $tag = $definition->getTag('messenger.messageHandler') ?? [];
+
+            if (!is_array($tag)) {
+                $tag = [];
+            }
+
+            if (!isset($tag['bus'])) {
+                $tag['bus'] = $busName;
+            }
+
+            $definition->addTag('messenger.messageHandler', $tag);
+        }
+    }
+
+    /**
+     * @return array<Definition>
+     */
+    private function findByType(string $type): array
+    {
+        return array_filter($this->getContainerBuilder()->getDefinitions(), static function (Definition $definition) use ($type): bool {
+            return null !== $definition->getType()
+                && (
+                    is_a($definition->getType(), $type, true)
+                    || (
+                        $definition instanceof FactoryDefinition
+                        && null !== $definition->getResultType()
+                        && is_a(
+                            $definition->getResultType(),
+                            $type,
+                            true,
+                        )
+                    )
+                );
+        });
     }
 }
