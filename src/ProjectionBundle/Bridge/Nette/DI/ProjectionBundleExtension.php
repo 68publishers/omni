@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ProjectionBundle\Bridge\Nette\DI;
 
+use ReflectionClass;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\Statement;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\InvalidConfigurationException;
-use Laminas\Code\Reflection\ClassReflection;
 use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionInterface;
 use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionClassnameResolver;
 use SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelInterface;
@@ -89,7 +89,7 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 		foreach ($builder->findByType(ProjectionModelInterface::class) as $serviceName => $projectionModelDefinition) {
 			$type = $projectionModelDefinition->getType();
 
-			if (NULL === $type || !class_exists($type) || !(new ClassReflection($type))->isInstantiable()) {
+			if (NULL === $type || !class_exists($type) || !(new ReflectionClass($type))->isInstantiable()) {
 				throw new InvalidConfigurationException(sprintf(
 					'Can not resolve type for a projection model service with the name %s.',
 					$serviceName

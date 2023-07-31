@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\DI;
 
 use Nette\DI\CompilerExtension;
-use SixtyEightPublishers\DoctrineBridge\DI\DatabaseTypeProviderInterface;
-use SixtyEightPublishers\DoctrineBridge\DI\TargetEntityProviderInterface;
-use SixtyEightPublishers\DoctrineBridge\DI\EntityMappingProviderInterface;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\DatabaseTypeProviderInterface;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\TargetEntityProviderInterface;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\EntityMappingProviderInterface;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\AutoRegisterDoctrineTypesTrait;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\AutoRegisterDoctrineXmlMappingTrait;

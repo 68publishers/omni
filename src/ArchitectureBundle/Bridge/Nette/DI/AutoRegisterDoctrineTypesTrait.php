@@ -7,14 +7,14 @@ namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI;
 use ReflectionClass;
 use Nette\Utils\Finder;
 use Doctrine\DBAL\Types\Type;
-use SixtyEightPublishers\DoctrineBridge\DI\DatabaseType;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\DatabaseType;
 
 trait AutoRegisterDoctrineTypesTrait
 {
 	protected ?string $doctrineTypesDirectory = NULL;
 
 	/**
-	 * @return \SixtyEightPublishers\DoctrineBridge\DI\DatabaseType[]
+	 * @return DatabaseType[]
 	 * @throws \ReflectionException
 	 */
 	public function getDatabaseTypes(): array
@@ -72,7 +72,7 @@ trait AutoRegisterDoctrineTypesTrait
 
 			assert($type instanceof Type);
 
-			$databaseTypes[] = new DatabaseType($type->getName(), $classname, NULL, TRUE);
+			$databaseTypes[] = new DatabaseType($type->getName(), $classname);
 		}
 
 		return $databaseTypes;

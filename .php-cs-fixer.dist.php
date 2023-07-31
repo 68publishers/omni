@@ -20,7 +20,10 @@ return (new PhpCsFixer\Config)
 			'statements' => ['break', 'continue', 'declare', 'return'],
 		],
 		'blank_line_after_namespace' => TRUE,
-		'single_blank_line_before_namespace' => TRUE,
+		'blank_lines_before_namespace' => [
+            'min_line_breaks' => 2,
+            'max_line_breaks' => 2,
+        ],
 		'return_type_declaration' => [
 			'space_before' => 'none',
 		],

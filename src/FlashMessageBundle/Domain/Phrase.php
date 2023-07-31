@@ -16,7 +16,7 @@ final class Phrase
 
 	/**
 	 * @param string $text
-	 * @param ...$args
+	 * @param        ...$args
 	 *
 	 * @return $this
 	 */

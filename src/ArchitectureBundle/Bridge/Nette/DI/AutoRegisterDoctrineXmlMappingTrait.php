@@ -6,7 +6,7 @@ namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI;
 
 use ReflectionClass;
 use Nette\Utils\Finder;
-use SixtyEightPublishers\DoctrineBridge\DI\EntityMapping;
+use SixtyEightPublishers\DoctrineBridge\Bridge\Nette\DI\EntityMapping;
 
 trait AutoRegisterDoctrineXmlMappingTrait
 {
@@ -15,7 +15,7 @@ trait AutoRegisterDoctrineXmlMappingTrait
 	protected ?string $xmlMappingDirectory = NULL;
 
 	/**
-	 * @return \SixtyEightPublishers\DoctrineBridge\DI\EntityMapping[]
+	 * @return EntityMapping[]
 	 */
 	public function getEntityMappings(): array
 	{

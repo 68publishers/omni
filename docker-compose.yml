@@ -1,62 +1,11 @@
 version: "3.7"
 
 services:
-    app:
+    php81:
         build:
             context: .
             dockerfile: Dockerfile
-            target: app
-        container_name: omni-app
-        command: ["run-nginx-unit"]
-        ports:
-            - 8888:8080
-        dns:
-            - 8.8.8.8
-            - 8.8.4.4
+            target: php81
+        container_name: 68publishers.omni.81
         volumes:
-            - nfsmount:/var/www/html:cached
-        depends_on:
-            - db
-    db:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            target: db
-        container_name: omni-db
-        restart: always
-        ports:
-            - 5432:5432
-        volumes:
-            - ./docker/postgres/postgres.conf:/var/lib/postgresql/data/postgresql.conf:delegated
-            - ./var/postgres-data:/var/lib/postgresql/data:cached
-        environment:
-            - PGDATA=/var/lib/postgresql/data/pgdata
-            - POSTGRES_USER=root
-            - POSTGRES_PASSWORD=root
-            - POSTGRES_DB=omni
-        command:
-            - postgres
-            - -c
-            - config_file=/var/lib/postgresql/data/postgresql.conf
-
-    rabbitmq:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            target: rabbitmq
-        container_name: omni-rabbitmq
-        ports:
-            - 5672:5672
-            - 15672:15672
-        environment:
-            - RABBITMQ_DEFAULT_USER=omni
-            - RABBITMQ_DEFAULT_PASS=omni
-            - RABBITMQ_DEFAULT_VHOST=omni-app
-
-volumes:
-    nfsmount:
-        driver: local
-        driver_opts:
-            type: nfs
-            o: addr=host.docker.internal,rw,nolock,hard,nointr,nfsvers=3
-            device: ":${PWD}"
+            - .:/var/www/html:cached

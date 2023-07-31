@@ -122,7 +122,7 @@ abstract class AbstractDomainEvent implements EventInterface
 
 	/**
 	 * @param string $name
-	 * @param $value
+	 * @param        $value
 	 *
 	 * @return $this
 	 */
