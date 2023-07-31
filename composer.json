@@ -10,7 +10,7 @@
 		}
 	],
 	"require": {
-		"php": "^7.4",
+		"php": "^7.4 || ^8.1",
 		"ext-json": "*",
 		"fmasa/messenger": "dev-feature/handler-options as 2.0.0",
 		"nette/di": "^3.0.3",
