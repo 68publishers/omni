@@ -6,33 +6,31 @@
             {var $type = $message->type()}
             {var $messagePhrase = $message->message()}
             {var $titlePhrase = $message->title()}
-            {var $messageText = ''}
-            {var $messageTitle = ''}
-
-            {if empty($messagePhrase->args())}
-                {do $messageText = ($messagePhrase->text()|translate)}
-            {else}
-                {do $messageText = ($messagePhrase->text(), ...$messagePhrase->args()|translate)}
-            {/if}
-
-            {if NULL !== $titlePhrase && empty($titlePhrase->args())}
-                {do $messageTitle = ($titlePhrase->text()|translate)}
-            {elseif NULL !== $titlePhrase}
-                {do $messageTitle = ($titlePhrase->text(), ...$titlePhrase->args()|translate)}
-            {/if}
 
             {switch TRUE}
-                {case $type->is($type::INFO)}
-                    toastr.info({$messageText}, {$messageTitle});
-                {case $type->is($type::WARNING)}
-                    toastr.warning({$messageText}, {$messageTitle});
-                {case $type->is($type::SUCCESS)}
-                    toastr.success({$messageText}, {$messageTitle});
-                {case $type->is($type::ERROR)}
-                    toastr.error({$messageText}, {$messageTitle});
+                {case $type->is(SixtyEightPublishers\FlashMessageBundle\Domain\Type::INFO)}
+                    toastr.info({include messageText, $messagePhrase|spaceless}, {include messageText, $titlePhrase|spaceless});
+                {case $type->is(SixtyEightPublishers\FlashMessageBundle\Domain\Type::WARNING)}
+                    toastr.warning({include messageText, $messagePhrase|spaceless}, {include messageText, $titlePhrase|spaceless});
+                {case $type->is(SixtyEightPublishers\FlashMessageBundle\Domain\Type::SUCCESS)}
+                    toastr.success({include messageText, $messagePhrase|spaceless}, {include messageText, $titlePhrase|spaceless});
+                {case $type->is(SixtyEightPublishers\FlashMessageBundle\Domain\Type::ERROR)}
+                    toastr.error({include messageText, $messagePhrase|spaceless}, {include messageText, $titlePhrase|spaceless});
             {/switch}
 
             {do $expireFlashMessage($message)}
         {/foreach}
+
+        {define messageText, $phrase}
+            {varType SixtyEightPublishers\FlashMessageBundle\Domain\Phrase|null $phrase}
+
+            {if null !== $phrase && empty($phrase->args())}
+                {_$phrase->text()}
+            {elseif null !== $phrase}
+                {_$phrase->text(), ...$phrase->args()}
+            {else}
+                {=''}
+            {/if}
+        {/define}
     </script>
 {/snippet}
