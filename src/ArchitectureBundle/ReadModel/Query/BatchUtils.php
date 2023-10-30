@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\ReadModel\Query;
 
+use Closure;
 use function array_fill;
 use function array_map;
 use function ceil;
@@ -37,12 +38,12 @@ final class BatchUtils
     }
 
     /**
-     * @param callable $callback function(int $limit, int $offset) {}
+     * @param Closure(int $limit, int $offset): void $callback
      */
-    public static function apply(int $total, int $batch, callable $callback): void
+    public static function apply(int $total, int $batch, Closure $callback): void
     {
         foreach (self::from($total, $batch) as $offsets) {
-            $callback(...$offsets);
+            $callback($offsets[0], $offsets[1]);
         }
     }
 }

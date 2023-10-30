@@ -10,8 +10,9 @@ use function assert;
 use function count;
 use function is_array;
 use function is_subclass_of;
+use function sprintf;
 
-trait ValueObjectSetTrait
+trait AppendOnlyValueObjectSetTrait
 {
     /**
      * @param array<ValueObjectInterface> $items
@@ -33,7 +34,7 @@ trait ValueObjectSetTrait
         if (!is_array($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue(
                 $native,
-                'array<mixed>',
+                sprintf('array<%s>', $itemClassname),
                 static::class,
             );
         }
@@ -97,8 +98,8 @@ trait ValueObjectSetTrait
             return false;
         }
 
-        foreach ($object->all() as $item) {
-            if (!$this->has($item)) {
+        foreach ($object->all() as $index => $item) {
+            if (!isset($this->items[$index]) || !$this->items[$index]->equals($item)) {
                 return false;
             }
         }
@@ -106,41 +107,12 @@ trait ValueObjectSetTrait
         return true;
     }
 
-    public function with(ValueObjectInterface $item): static
+    public function append(ValueObjectInterface $item): static
     {
         $items = $this->all();
-
-        if (!$this->has($item)) {
-            $items[] = $item;
-        }
+        $items[] = $item;
 
         return self::fromItems($items);
-    }
-
-    public function without(ValueObjectInterface $item): static
-    {
-        $items = $this->all();
-
-        foreach ($items as $index => $i) {
-            if ($i->equals($item)) {
-                unset($items[$index]);
-
-                break;
-            }
-        }
-
-        return new static($items);
-    }
-
-    public function has(ValueObjectInterface $item): bool
-    {
-        foreach ($this->all() as $i) {
-            if ($i->equals($item)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

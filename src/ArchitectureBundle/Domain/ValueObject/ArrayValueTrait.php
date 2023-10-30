@@ -8,6 +8,7 @@ use RuntimeException;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidNativeValueTypeException;
 use function array_key_exists;
 use function array_merge;
+use function assert;
 use function count;
 use function get_class;
 use function is_array;
@@ -15,8 +16,6 @@ use function sprintf;
 
 trait ArrayValueTrait
 {
-    use NativeFactoryMethodTrait;
-
     /**
      * @param array<mixed> $values
      */
@@ -25,11 +24,22 @@ trait ArrayValueTrait
     ) {
     }
 
-    public static function fromSafeNative(mixed $native): static
+    public static function fromNative(mixed $native): static
     {
         if (!is_array($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'array', static::class);
         }
+
+        $valueObject = new static($native);
+
+        $valueObject->validate();
+
+        return $valueObject;
+    }
+
+    public static function fromSafeNative(mixed $native): static
+    {
+        assert(is_array($native));
 
         return new static($native);
     }
@@ -104,5 +114,9 @@ trait ArrayValueTrait
     public function count(): int
     {
         return count($this->all());
+    }
+
+    protected function validate(): void
+    {
     }
 }

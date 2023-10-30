@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject;
 
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidNativeValueTypeException;
+use function assert;
 
 trait BooleanValueTrait
 {
-    use NativeFactoryMethodTrait;
-
     protected function __construct(
         protected readonly bool $value,
     ) {
@@ -25,11 +24,22 @@ trait BooleanValueTrait
         return new static(false);
     }
 
-    public static function fromSafeNative(mixed $native): static
+    public static function fromNative(mixed $native): static
     {
         if (!is_bool($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'bool', static::class);
         }
+
+        $valueObject = new static($native);
+
+        $valueObject->validate();
+
+        return $valueObject;
+    }
+
+    public static function fromSafeNative(mixed $native): static
+    {
+        assert(\is_bool($native));
 
         return new static($native);
     }
@@ -52,5 +62,9 @@ trait BooleanValueTrait
     public function isFalse(): bool
     {
         return !$this->toNative();
+    }
+
+    protected function validate(): void
+    {
     }
 }

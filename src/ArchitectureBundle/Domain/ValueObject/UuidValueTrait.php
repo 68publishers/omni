@@ -9,6 +9,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidNativeValueTypeException;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidUuidValueException;
+use function assert;
 use function is_string;
 
 trait UuidValueTrait
@@ -30,16 +31,22 @@ trait UuidValueTrait
 
     public static function fromNative(mixed $native): static
     {
-        # always validated
-        return static::fromSafeNative($native);
-    }
-
-    public static function fromSafeNative(mixed $native): static
-    {
         if (!is_string($native)) {
             throw InvalidNativeValueTypeException::fromNativeValue($native, 'string', static::class);
         }
 
+        try {
+            return new static(Uuid::fromString($native));
+        } catch (UuidExceptionInterface $e) {
+            throw InvalidUuidValueException::create($native, static::class);
+        }
+    }
+
+    public static function fromSafeNative(mixed $native): static
+    {
+        assert(is_string($native));
+
+        # always validated
         try {
             return new static(Uuid::fromString($native));
         } catch (UuidExceptionInterface $e) {
