@@ -6,6 +6,7 @@ namespace SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject;
 
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidNativeValueTypeException;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\ValueObjectSetException;
+use function array_merge;
 use function assert;
 use function count;
 use function is_array;
@@ -14,6 +15,9 @@ use function sprintf;
 
 trait AppendOnlyValueObjectSetTrait
 {
+    /** @var class-string<ValueObjectInterface>|null */
+    private static ?string $validItemClassname = null;
+
     /**
      * @param array<ValueObjectInterface> $items
      */
@@ -67,12 +71,8 @@ trait AppendOnlyValueObjectSetTrait
      */
     public static function fromItems(array $items): static
     {
-        $itemClassname = self::getValidItemClassname();
-
         foreach ($items as $item) {
-            if (!$item instanceof $itemClassname) {
-                throw ValueObjectSetException::invalidItemPassed(static::class, $itemClassname, $item);
-            }
+            self::validateItem($item);
         }
 
         return new static($items);
@@ -109,10 +109,36 @@ trait AppendOnlyValueObjectSetTrait
 
     public function append(ValueObjectInterface $item): static
     {
+        self::validateItem($item);
+
         $items = $this->all();
         $items[] = $item;
 
-        return self::fromItems($items);
+        return new static($items);
+    }
+
+    /**
+     * @param array<int, ValueObjectInterface> $items
+     */
+    public function appendAll(array $items): static
+    {
+        $allItems = $this->all();
+
+        foreach ($items as $item) {
+            self::validateItem($item);
+
+            $allItems[] = $item;
+        }
+
+        return new static($allItems);
+    }
+
+    public function merge(self $valueObject): static
+    {
+        return new static(array_merge(
+            $this->all(),
+            $valueObject->all(),
+        ));
     }
 
     /**
@@ -138,6 +164,10 @@ trait AppendOnlyValueObjectSetTrait
      */
     private static function getValidItemClassname(): string
     {
+        if (null !== self::$validItemClassname) {
+            return self::$validItemClassname;
+        }
+
         /** @var class-string $itemClassname */
         $itemClassname = static::getItemClassname();
 
@@ -149,6 +179,15 @@ trait AppendOnlyValueObjectSetTrait
             throw ValueObjectSetException::declaredItemTypeMustBeValueObjectImplementor(static::class, $itemClassname);
         }
 
-        return $itemClassname;
+        return self::$validItemClassname = $itemClassname;
+    }
+
+    private static function validateItem(ValueObjectInterface $item): void
+    {
+        $itemClassname = self::getValidItemClassname();
+
+        if (!$item instanceof $itemClassname) {
+            throw ValueObjectSetException::invalidItemPassed(static::class, $itemClassname, $item);
+        }
     }
 }

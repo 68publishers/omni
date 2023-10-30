@@ -13,6 +13,9 @@ use function is_subclass_of;
 
 trait ValueObjectSetTrait
 {
+    /** @var class-string<ValueObjectInterface>|null */
+    private static ?string $validItemClassname = null;
+
     /**
      * @param array<ValueObjectInterface> $items
      */
@@ -66,12 +69,8 @@ trait ValueObjectSetTrait
      */
     public static function fromItems(array $items): static
     {
-        $itemClassname = self::getValidItemClassname();
-
         foreach ($items as $item) {
-            if (!$item instanceof $itemClassname) {
-                throw ValueObjectSetException::invalidItemPassed(static::class, $itemClassname, $item);
-            }
+            self::validateItem($item);
         }
 
         return new static($items);
@@ -111,10 +110,12 @@ trait ValueObjectSetTrait
         $items = $this->all();
 
         if (!$this->has($item)) {
+            self::validateItem($item);
+
             $items[] = $item;
         }
 
-        return self::fromItems($items);
+        return new static($items);
     }
 
     public function without(ValueObjectInterface $item): static
@@ -166,6 +167,10 @@ trait ValueObjectSetTrait
      */
     private static function getValidItemClassname(): string
     {
+        if (null !== self::$validItemClassname) {
+            return self::$validItemClassname;
+        }
+
         /** @var class-string $itemClassname */
         $itemClassname = static::getItemClassname();
 
@@ -177,6 +182,15 @@ trait ValueObjectSetTrait
             throw ValueObjectSetException::declaredItemTypeMustBeValueObjectImplementor(static::class, $itemClassname);
         }
 
-        return $itemClassname;
+        return self::$validItemClassname = $itemClassname;
+    }
+
+    private static function validateItem(ValueObjectInterface $item): void
+    {
+        $itemClassname = self::getValidItemClassname();
+
+        if (!$item instanceof $itemClassname) {
+            throw ValueObjectSetException::invalidItemPassed(static::class, $itemClassname, $item);
+        }
     }
 }
