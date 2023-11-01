@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware;
 
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Stamp\NoTransactionStamp;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\PersistenceAdapter\PersistenceAdapterInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -23,20 +24,22 @@ final class StoreTransactionMiddleware implements MiddlewareInterface
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if ($this->persistenceAdapter->supportsTransactions()) {
+        $transactionsEnabled = null === $envelope->last(NoTransactionStamp::class);
+
+        if ($transactionsEnabled && $this->persistenceAdapter->supportsTransactions()) {
             $this->persistenceAdapter->beginTransaction();
         }
 
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
 
-            if ($this->persistenceAdapter->supportsTransactions()) {
+            if ($transactionsEnabled && $this->persistenceAdapter->supportsTransactions()) {
                 $this->persistenceAdapter->commitTransaction();
             }
 
             return $envelope;
         } catch (Throwable $exception) {
-            if ($this->persistenceAdapter->supportsTransactions()) {
+            if ($transactionsEnabled && $this->persistenceAdapter->supportsTransactions()) {
                 $this->persistenceAdapter->rollbackTransaction();
             }
 
