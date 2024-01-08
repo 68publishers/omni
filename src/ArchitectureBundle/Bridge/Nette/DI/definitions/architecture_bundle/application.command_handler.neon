@@ -1,0 +1,4 @@
+services:
+    -
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Application\CommandHandler\TransactionalCommandHandler
