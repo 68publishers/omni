@@ -17,13 +17,13 @@ trait DeletableAggregateRootTrait
 
     protected ?DateTimeImmutable $deletedAt = null;
 
-    protected function recordThat(AbstractDomainEvent $event): void
+    protected function recordThat(AbstractDomainEvent $event, bool $apply = true): void
     {
         if ($this->isDeleted()) {
             throw UnableToRecordEventOnDeletedAggregateException::create(static::class, $this->getAggregateId());
         }
 
-        $this->_recordThat($event);
+        $this->_recordThat($event, $apply);
     }
 
     public function isDeleted(): bool

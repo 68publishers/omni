@@ -53,12 +53,14 @@ trait AggregateRootTrait
         $this->{$handler}($event);
     }
 
-    protected function recordThat(AbstractDomainEvent $event): void
+    protected function recordThat(AbstractDomainEvent $event, bool $apply = true): void
     {
         ++$this->version;
         $this->recordedEvents[] = $event->withVersion($this->version);
 
-        $this->apply($event);
+        if ($apply) {
+            $this->apply($event);
+        }
     }
 
     protected function determineEventHandlerMethodFor(AbstractDomainEvent $event): string
