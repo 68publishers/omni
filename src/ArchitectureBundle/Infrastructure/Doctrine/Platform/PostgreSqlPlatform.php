@@ -21,6 +21,7 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
     private const INDEX_OPTION_INCLUDE = 'include';
     private const INDEX_OPTION_DESC = 'desc';
     private const INDEX_OPTION_JSONB_PATH_OPS = 'jsonb_path_ops';
+    private const INDEX_OPTION_GIN_TRGM_OPS = 'gin_trgm_ops';
 
     private const INDEX_FLAG_GIN = 'gin';
 
@@ -36,6 +37,7 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
         $ciColumns = $index->hasOption(self::INDEX_OPTION_CASE_INSENSITIVE) ? $index->getOption(self::INDEX_OPTION_CASE_INSENSITIVE) : [];
         $descColumns = $index->hasOption(self::INDEX_OPTION_DESC) ? $index->getOption(self::INDEX_OPTION_DESC) : [];
         $jsonbPathsOpsColumns = $index->hasOption(self::INDEX_OPTION_JSONB_PATH_OPS) ? $index->getOption(self::INDEX_OPTION_JSONB_PATH_OPS) : [];
+        $ginTrgmOpsColumns = $index->hasOption(self::INDEX_OPTION_GIN_TRGM_OPS) ? $index->getOption(self::INDEX_OPTION_GIN_TRGM_OPS) : [];
 
         if (!is_array($ciColumns)) {
             $ciColumns = explode(',', (string) $ciColumns);
@@ -47,6 +49,10 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
 
         if (!is_array($jsonbPathsOpsColumns)) {
             $jsonbPathsOpsColumns = explode(',', (string) $jsonbPathsOpsColumns);
+        }
+
+        if (!is_array($ginTrgmOpsColumns)) {
+            $ginTrgmOpsColumns = explode(',', (string) $ginTrgmOpsColumns);
         }
 
         $columns = array_combine($index->getUnquotedColumns(), $quotedColumns);
@@ -62,6 +68,10 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
 
             if (in_array($name, $jsonbPathsOpsColumns, true)) {
                 $quoted = $quoted . ' jsonb_path_ops';
+            }
+
+            if (in_array($name, $ginTrgmOpsColumns, true)) {
+                $quoted = $quoted . ' gin_trgm_ops';
             }
 
             $columns[$name] = $quoted;
