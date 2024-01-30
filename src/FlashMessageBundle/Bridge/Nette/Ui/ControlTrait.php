@@ -17,7 +17,7 @@ trait ControlTrait
         subscribeFlashMessage as private doSubscribeFlashMessage;
     }
 
-    protected function subscribeFlashMessage(FlashMessage $flashMessage): void
+    public function subscribeFlashMessage(FlashMessage $flashMessage): void
     {
         $this->doSubscribeFlashMessage($flashMessage);
 

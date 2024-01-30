@@ -70,7 +70,7 @@ trait FlashMessageTrait
         return $this->flashMessagePhrasePrefix;
     }
 
-    protected function subscribeFlashMessage(FlashMessage $flashMessage): void
+    public function subscribeFlashMessage(FlashMessage $flashMessage): void
     {
         $this->flashMessageSubscriber->subscribe(
             $flashMessage->withPhrasePrefix($this->getFlashMessagePhrasePrefix()),
