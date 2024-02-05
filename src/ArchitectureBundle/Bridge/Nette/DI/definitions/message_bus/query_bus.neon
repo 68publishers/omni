@@ -4,4 +4,5 @@ middleware:
     - Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware(query_bus)
     - Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware
     - SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\OriginalExceptionMiddleware
+    - SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\QueryCacheMiddleware
 panel: %debugMode%

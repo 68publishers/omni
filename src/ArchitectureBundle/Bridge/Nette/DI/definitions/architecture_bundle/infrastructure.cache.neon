@@ -1,0 +1,9 @@
+services:
+    infrastructure.cache:
+        autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Cache\CacheInterface
+        type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Cache\CacheInterface
+        factory: @extension.infrastructure.cache.nette
+
+    infrastructure.cache.nette:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\NetteCache\NetteCache

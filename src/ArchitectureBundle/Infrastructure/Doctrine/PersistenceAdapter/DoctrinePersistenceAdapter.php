@@ -69,7 +69,7 @@ final class DoctrinePersistenceAdapter implements PersistenceAdapterInterface
 
         try {
             $connection->executeQuery($connection->getDatabasePlatform()->getDummySelectSQL());
-        } catch (DBALException $e) {
+        } catch (DbalException $e) {
             $connection->close();
             $connection->connect();
         }

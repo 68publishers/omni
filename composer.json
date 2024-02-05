@@ -27,6 +27,7 @@
 		"kubawerlos/php-cs-fixer-custom-fixers": "^3.13",
 		"latte/latte": "^3.0",
 		"nette/application": "^3.1",
+		"nette/caching": "^3.2",
 		"nette/mail": "^3.1",
 		"nette/security": "^3.1",
 		"nette/tester": "^2.5",
