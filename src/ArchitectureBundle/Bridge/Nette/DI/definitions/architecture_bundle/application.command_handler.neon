@@ -2,3 +2,6 @@ services:
     -
         autowired: no
         factory: SixtyEightPublishers\ArchitectureBundle\Application\CommandHandler\TransactionalCommandHandler
+    -
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Application\CommandHandler\InvalidateCacheCommandHandler
