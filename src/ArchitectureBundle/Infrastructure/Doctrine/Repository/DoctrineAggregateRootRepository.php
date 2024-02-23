@@ -36,6 +36,9 @@ final class DoctrineAggregateRootRepository implements DoctrineAggregateRootRepo
         $this->em->persist($aggregateRoot);
 
         $this->eventStore->store($aggregateRootClassname, $events);
+
+        $this->em->flush();
+
         $this->eventPublisher->publish($aggregateRootClassname, $aggregateRoot->getAggregateId(), $events);
     }
 }
