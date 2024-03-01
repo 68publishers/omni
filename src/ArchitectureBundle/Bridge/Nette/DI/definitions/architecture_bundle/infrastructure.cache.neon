@@ -1,9 +1,28 @@
 services:
+    infrastructure.cache_registry:
+        autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Cache\CacheRegistryInterface
+        type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Cache\CacheRegistryInterface
+        factory: @extension.infrastructure.cache_registry.default
+
+    infrastructure.cache_registry.default:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Cache\CacheRegistry(
+            cacheServices: [
+                memory: @extension.infrastructure.cache.memory
+            ]
+        )
+
     infrastructure.cache:
         autowired: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Cache\CacheInterface
         type: SixtyEightPublishers\ArchitectureBundle\Infrastructure\Cache\CacheInterface
-        factory: @extension.infrastructure.cache.nette
+        factory: @extension.infrastructure.cache.default
 
-    infrastructure.cache.nette:
+    infrastructure.cache.default:
         autowired: no
         factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\NetteCache\NetteCache
+
+    infrastructure.cache.memory:
+        autowired: no
+        factory: SixtyEightPublishers\ArchitectureBundle\Infrastructure\NetteCache\NetteCache(
+            storage: Nette\Caching\Storages\MemoryStorage(),
+        )

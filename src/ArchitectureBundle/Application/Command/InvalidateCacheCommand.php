@@ -15,5 +15,6 @@ final class InvalidateCacheCommand implements CommandInterface
     public function __construct(
         public readonly array $keys = [],
         public readonly array $tags = [],
+        public readonly ?string $cacheName = null,
     ) {}
 }

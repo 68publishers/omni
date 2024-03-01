@@ -15,5 +15,6 @@ final class CacheMetadata
         public readonly string $key,
         public readonly int|DateTimeImmutable|null $expiration,
         public readonly array $tags = [],
+        public readonly ?string $cacheName = null,
     ) {}
 }
