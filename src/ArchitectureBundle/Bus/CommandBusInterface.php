@@ -10,7 +10,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 interface CommandBusInterface
 {
     /**
-     * @param StampInterface[] $stamps
+     * @param array<int, StampInterface> $stamps
      */
     public function dispatch(CommandInterface $message, array $stamps = []): void;
 }
