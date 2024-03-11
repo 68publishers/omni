@@ -14,19 +14,26 @@ use function implode;
 use function in_array;
 use function is_array;
 use function sprintf;
+use function str_starts_with;
+use function strlen;
+use function substr;
 
 final class PostgreSqlPlatform extends PostgreSQL100Platform
 {
-    private const INDEX_OPTION_CASE_INSENSITIVE = 'case-insensitive';
-    private const INDEX_OPTION_INCLUDE = 'include';
-    private const INDEX_OPTION_DESC = 'desc';
-    private const INDEX_OPTION_JSONB_PATH_OPS = 'jsonb_path_ops';
-    private const INDEX_OPTION_GIN_TRGM_OPS = 'gin_trgm_ops';
-
-    private const INDEX_FLAG_GIN = 'gin';
+    private const IndexOptCustomDeclaration = 'customDeclaration:';
+    private const IndexOptInclude = 'include';
+    private const IndexFlagGin = 'gin';
 
     /**
-     * Adds options 'case-insensitive', 'desc' and 'jsonb_path_ops' for indexes
+     * The following options are @deprecated and can be replaced with `customDeclaration:`
+     */
+    private const IndexOptCaseInsensitive = 'case-insensitive';
+    private const IndexOptDesc = 'desc';
+    private const IndexOptJsonbPathOps = 'jsonb_path_ops';
+    private const IndexOptGinTrgmOps = 'gin_trgm_ops';
+
+    /**
+     * Support for custom custom index columns declarations
      *
      * {@inheritDoc}
      */
@@ -34,10 +41,23 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
     {
         $quotedColumns = $index->getQuotedColumns($this);
 
-        $ciColumns = $index->hasOption(self::INDEX_OPTION_CASE_INSENSITIVE) ? $index->getOption(self::INDEX_OPTION_CASE_INSENSITIVE) : [];
-        $descColumns = $index->hasOption(self::INDEX_OPTION_DESC) ? $index->getOption(self::INDEX_OPTION_DESC) : [];
-        $jsonbPathsOpsColumns = $index->hasOption(self::INDEX_OPTION_JSONB_PATH_OPS) ? $index->getOption(self::INDEX_OPTION_JSONB_PATH_OPS) : [];
-        $ginTrgmOpsColumns = $index->hasOption(self::INDEX_OPTION_GIN_TRGM_OPS) ? $index->getOption(self::INDEX_OPTION_GIN_TRGM_OPS) : [];
+        $customDeclarations = [];
+
+        foreach ($index->getOptions() as $key => $value) {
+            if (str_starts_with($key, self::IndexOptCustomDeclaration)) {
+                $columnName = substr(
+                    string: $key,
+                    offset: strlen(self::IndexOptCustomDeclaration),
+                );
+
+                $customDeclarations[$columnName] = $value;
+            }
+        }
+
+        $ciColumns = $index->hasOption(self::IndexOptCaseInsensitive) ? $index->getOption(self::IndexOptCaseInsensitive) : [];
+        $descColumns = $index->hasOption(self::IndexOptDesc) ? $index->getOption(self::IndexOptDesc) : [];
+        $jsonbPathsOpsColumns = $index->hasOption(self::IndexOptJsonbPathOps) ? $index->getOption(self::IndexOptJsonbPathOps) : [];
+        $ginTrgmOpsColumns = $index->hasOption(self::IndexOptGinTrgmOps) ? $index->getOption(self::IndexOptGinTrgmOps) : [];
 
         if (!is_array($ciColumns)) {
             $ciColumns = explode(',', (string) $ciColumns);
@@ -58,6 +78,16 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
         $columns = array_combine($index->getUnquotedColumns(), $quotedColumns);
 
         foreach ($columns as $name => $quoted) {
+            # custom declaration has top priority
+            if (isset($customDeclarations[$name])) {
+                $columns[$name] = sprintf(
+                    $customDeclarations[$name],
+                    $quoted,
+                );
+
+                continue;
+            }
+
             if (in_array($name, $ciColumns, true)) {
                 $quoted = 'lower(' . $quoted . ')';
             }
@@ -85,7 +115,7 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
      */
     public function getCreateIndexSQL(Index $index, $table): string
     {
-        if ($index->hasFlag(self::INDEX_FLAG_GIN)) {
+        if ($index->hasFlag(self::IndexFlagGin)) {
             $table = sprintf(
                 '%s USING gin',
                 $table instanceof Table ? $table->getQuotedName($this) : $table,
@@ -102,8 +132,8 @@ final class PostgreSqlPlatform extends PostgreSQL100Platform
     {
         $parts = [];
 
-        if ($index->hasOption(self::INDEX_OPTION_INCLUDE)) {
-            $includeColumns = $index->getOption(self::INDEX_OPTION_INCLUDE);
+        if ($index->hasOption(self::IndexOptInclude)) {
+            $includeColumns = $index->getOption(self::IndexOptInclude);
 
             if (!is_array($includeColumns)) {
                 $includeColumns = explode(',', (string) $includeColumns);
