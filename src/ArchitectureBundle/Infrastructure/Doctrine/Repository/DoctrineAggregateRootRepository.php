@@ -6,7 +6,8 @@ namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\Reposi
 
 use Doctrine\ORM\EntityManagerInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateIdInterface;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\CompositeAggregateIdInterface;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreException;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher\EventPublisherInterface;
@@ -20,9 +21,12 @@ final class DoctrineAggregateRootRepository implements DoctrineAggregateRootRepo
         private readonly EventStoreInterface $eventStore,
     ) {}
 
-    public function loadAggregateRoot(string $classname, AggregateId $aggregateId): ?object
+    public function loadAggregateRoot(string $classname, AggregateIdInterface $aggregateId): ?object
     {
-        return $this->em->find($classname, $aggregateId);
+        return $this->em->find(
+            className: $classname,
+            id: $aggregateId instanceof CompositeAggregateIdInterface ? $aggregateId->getValues() : $aggregateId,
+        );
     }
 
     /**

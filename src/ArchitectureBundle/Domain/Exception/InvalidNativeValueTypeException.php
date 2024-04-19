@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Exception;
 
 use DomainException;
-use function get_class;
-use function gettype;
-use function is_object;
+use Throwable;
 use function sprintf;
 
 final class InvalidNativeValueTypeException extends DomainException
@@ -18,25 +16,39 @@ final class InvalidNativeValueTypeException extends DomainException
     public function __construct(
         string $message,
         public readonly string $expectedType,
-        public readonly string $passedType,
+        public readonly Typehint $passedType,
         public readonly string $valueObjectClassname,
+        ?Throwable $previous = null,
     ) {
-        parent::__construct($message);
+        parent::__construct(
+            message: $message,
+            previous: $previous,
+        );
     }
 
     /**
      * @param class-string $valueObjectClassname
      */
-    public static function fromNativeValue(mixed $passedNativeValue, string $expectedType, string $valueObjectClassname): self
-    {
-        $passedType = is_object($passedNativeValue) ? ('instance of ' . get_class($passedNativeValue)) : gettype($passedNativeValue);
-        $passedType = ['boolean' => 'bool', 'integer' => 'int', 'double' => 'float', 'NULL' => 'null'][$passedType] ?? $passedType;
+    public static function fromNativeValue(
+        mixed $passedNativeValue,
+        string|Typehint $expectedType,
+        string $valueObjectClassname,
+        ?Throwable $previous = null,
+    ): self {
+        $passedType = $passedNativeValue instanceof Typehint ? $passedNativeValue : Typehint::fromVariable($passedNativeValue);
+        $expectedType = (string) $expectedType;
 
-        return new self(sprintf(
-            'Cannot instantiate an value object of the type %s. Expected native value type is %s, %s passed.',
-            $valueObjectClassname,
-            $expectedType,
-            $passedType,
-        ), $expectedType, $passedType, $valueObjectClassname);
+        return new self(
+            message: sprintf(
+                'Cannot instantiate an value object of the type %s. Expected native value type is %s, %s passed.',
+                $valueObjectClassname,
+                $expectedType,
+                $passedType->isInstance ? ('instance of ' . $passedType) : $passedType,
+            ),
+            expectedType: $expectedType,
+            passedType: $passedType,
+            valueObjectClassname: $valueObjectClassname,
+            previous: $previous,
+        );
     }
 }

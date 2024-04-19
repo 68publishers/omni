@@ -12,9 +12,14 @@ final class UserActiveStateChanged extends AbstractDomainEvent
 {
     public static function create(UserId $userId, Active $active): self
     {
-        return self::occur($userId->toNative(), [
+        return self::occur($userId, [
             'active' => $active,
         ]);
+    }
+
+    public function getAggregateId(): UserId
+    {
+        return UserId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getActive(): Active

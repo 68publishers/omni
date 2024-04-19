@@ -54,6 +54,9 @@ trait UuidValueTrait
         }
     }
 
+    /**
+     * @deprecated
+     */
     public static function fromAggregateId(AggregateId $aggregateId): static
     {
         return self::fromUuid($aggregateId->toUuid());
@@ -74,6 +77,9 @@ trait UuidValueTrait
         return $this->value->toString();
     }
 
+    /**
+     * @deprecated
+     */
     public function toAggregateId(): AggregateId
     {
         return AggregateId::fromUuid($this->toUuid());
@@ -84,8 +90,13 @@ trait UuidValueTrait
         return $object instanceof static && $object->toUuid()->equals($this->toUuid());
     }
 
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->toNative();
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString();
     }
 }

@@ -12,9 +12,14 @@ final class UserLocaleChanged extends AbstractDomainEvent
 {
     public static function create(UserId $userId, Locale $locale): self
     {
-        return self::occur($userId->toNative(), [
+        return self::occur($userId, [
             'locale' => $locale,
         ]);
+    }
+
+    public function getAggregateId(): UserId
+    {
+        return UserId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getLocale(): Locale

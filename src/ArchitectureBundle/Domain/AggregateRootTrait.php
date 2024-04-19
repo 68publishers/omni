@@ -6,7 +6,7 @@ namespace SixtyEightPublishers\ArchitectureBundle\Domain;
 
 use RuntimeException;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateIdInterface;
 use function array_slice;
 use function explode;
 use function implode;
@@ -20,7 +20,7 @@ trait AggregateRootTrait
     /** @var array<AbstractDomainEvent> */
     protected array $recordedEvents = [];
 
-    abstract public function getAggregateId(): AggregateId;
+    abstract public function getAggregateId(): AggregateIdInterface;
 
     public function getVersion(): int
     {

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Domain;
 
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateIdInterface;
 
 interface AggregateRootInterface
 {
-    public function getAggregateId(): AggregateId;
+    public function getAggregateId(): AggregateIdInterface;
 
     public function getVersion(): int;
 

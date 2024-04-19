@@ -22,12 +22,17 @@ final class PasswordChangeRequested extends AbstractDomainEvent
         DateTimeImmutable $expiredAt,
         Attributes $attributes,
     ): self {
-        return self::occur($passwordRequestId->toNative(), [
+        return self::occur($passwordRequestId, [
             'email_address' => $emailAddress,
             'request_device_info' => $requestDeviceInfo,
             'expired_at' => $expiredAt->format(DateTimeInterface::ATOM),
             'attributes' => $attributes,
         ]);
+    }
+
+    public function getAggregateId(): PasswordRequestId
+    {
+        return PasswordRequestId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getEmailAddress(): EmailAddress

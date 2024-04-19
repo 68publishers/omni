@@ -12,9 +12,14 @@ final class UserEmailAddressChanged extends AbstractDomainEvent
 {
     public static function create(UserId $userId, EmailAddress $emailAddress): self
     {
-        return self::occur($userId->toNative(), [
+        return self::occur($userId, [
             'email_address' => $emailAddress,
         ]);
+    }
+
+    public function getAggregateId(): UserId
+    {
+        return UserId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getEmailAddress(): EmailAddress

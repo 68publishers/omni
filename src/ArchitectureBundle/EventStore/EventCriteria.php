@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\EventStore;
 
 use DateTimeImmutable;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateIdInterface;
 
 final class EventCriteria
 {
@@ -17,7 +17,7 @@ final class EventCriteria
     /** @var class-string */
     private string $aggregateRootClassname;
 
-    private ?AggregateId $aggregateId = null;
+    private ?AggregateIdInterface $aggregateId = null;
 
     private ?DateTimeImmutable $createdBefore = null;
 
@@ -49,7 +49,7 @@ final class EventCriteria
         return $criteria;
     }
 
-    public function withAggregateId(AggregateId $aggregateId): self
+    public function withAggregateId(AggregateIdInterface $aggregateId): self
     {
         $criteria = clone $this;
         $criteria->aggregateId = $aggregateId;
@@ -149,7 +149,7 @@ final class EventCriteria
         return $this->aggregateRootClassname;
     }
 
-    public function getAggregateId(): ?AggregateId
+    public function getAggregateId(): ?AggregateIdInterface
     {
         return $this->aggregateId;
     }

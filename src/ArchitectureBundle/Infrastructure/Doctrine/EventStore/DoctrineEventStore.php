@@ -11,12 +11,18 @@ use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\MappingException;
+use LogicException;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\CompositeAggregateIdInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventCriteria;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreException;
 use SixtyEightPublishers\ArchitectureBundle\EventStore\EventStoreInterface;
+use function array_combine;
 use function assert;
+use function count;
+use function get_class;
 use function is_string;
 use function is_subclass_of;
 use function sprintf;
@@ -30,28 +36,73 @@ final class DoctrineEventStore implements EventStoreInterface
         private readonly EntityManagerInterface $em,
     ) {}
 
+    /**
+     * @throws EventStoreException
+     * @throws MappingException
+     */
     public function store(string $aggregateRootClassname, array $events): void
     {
         $connection = $this->em->getConnection();
         $tableName = $this->getTableName($aggregateRootClassname);
 
         foreach ($events as $event) {
+            $data = [
+                'event_id' => $event->getEventId()->toNative(),
+                'event_name' => $event->getEventName(),
+                'created_at' => $event->getCreatedAt(),
+                'parameters' => $event->getParameters(),
+                'metadata' => $event->getMetadata(),
+            ];
+            $types = [
+                Types::GUID,
+                Types::STRING,
+                Types::DATETIME_IMMUTABLE,
+                Types::JSON,
+                Types::JSON,
+            ];
+
+            $classMetadata = $this->em->getClassMetadata($aggregateRootClassname);
+            $aggregatedId = $event->getAggregateId();
+
+            $identifierColumns = array_combine(
+                keys: $classMetadata->getIdentifierFieldNames(),
+                values: $classMetadata->getIdentifierColumnNames(),
+            );
+
+            if (0 >= count($identifierColumns)) {
+                throw new LogicException(
+                    message: sprintf(
+                        'Entity of type %s has no identifier defined.',
+                        $classMetadata->getName(),
+                    ),
+                );
+            }
+
+            $aggregateIdValues = $aggregatedId instanceof CompositeAggregateIdInterface
+                ? $aggregatedId->getValues()
+                : [$classMetadata->getSingleIdentifierFieldName() => $aggregatedId];
+
+            foreach ($identifierColumns as $fieldName => $columnName) {
+                if (!isset($aggregateIdValues[$fieldName])) {
+                    throw new LogicException(
+                        message: sprintf(
+                            'Missing field "%s" in aggregate id of type %s',
+                            $fieldName,
+                            get_class($aggregatedId),
+                        ),
+                    );
+                }
+
+                $data['aggregate_' . $columnName] = $aggregateIdValues[$fieldName];
+                $types['aggregate_' . $columnName] = $classMetadata->getTypeOfField($fieldName);
+            }
+
             try {
-                $connection->insert($tableName, [
-                    'event_id' => $event->getEventId()->toNative(),
-                    'aggregate_id' => $event->getAggregateId()->toNative(),
-                    'event_name' => $event->getEventName(),
-                    'created_at' => $event->getCreatedAt(),
-                    'parameters' => $event->getParameters(),
-                    'metadata' => $event->getMetadata(),
-                ], [
-                    Types::GUID,
-                    Types::GUID,
-                    Types::STRING,
-                    Types::DATETIME_IMMUTABLE,
-                    Types::JSON,
-                    Types::JSON,
-                ]);
+                $connection->insert(
+                    table: $tableName,
+                    data: $data,
+                    types: $types,
+                );
             } catch (DbalException $e) {
                 throw EventStoreException::unableToStoreEvent($aggregateRootClassname, $event, $e instanceof RetryableException, $e);
             }
@@ -82,6 +133,10 @@ final class DoctrineEventStore implements EventStoreInterface
         }
     }
 
+    /**
+     * @throws EventStoreException
+     * @throws MappingException
+     */
     public function find(EventCriteria $criteria): array
     {
         $connection = $this->em->getConnection();
@@ -136,6 +191,10 @@ final class DoctrineEventStore implements EventStoreInterface
         return $events;
     }
 
+    /**
+     * @throws EventStoreException
+     * @throws MappingException
+     */
     public function count(EventCriteria $criteria): int
     {
         $connection = $this->em->getConnection();
@@ -155,11 +214,50 @@ final class DoctrineEventStore implements EventStoreInterface
         }
     }
 
+    /**
+     * @throws MappingException
+     */
     private function buildConditions(QueryBuilder $qb, EventCriteria $criteria): QueryBuilder
     {
         if (null !== $criteria->getAggregateId()) {
-            $qb->andWhere('aggregate_id = :aggregateId')
-                ->setParameter('aggregateId', $criteria->getAggregateId()->toNative());
+            $classMetadata = $this->em->getClassMetadata($criteria->getAggregateRootClassname());
+            $aggregatedId = $criteria->getAggregateId();
+
+            $identifierColumns = array_combine(
+                keys: $classMetadata->getIdentifierFieldNames(),
+                values: $classMetadata->getIdentifierColumnNames(),
+            );
+
+            if (0 >= count($identifierColumns)) {
+                throw new LogicException(
+                    message: sprintf(
+                        'Entity of type %s has no identifier defined.',
+                        $classMetadata->getName(),
+                    ),
+                );
+            }
+
+            $aggregateIdValues = $aggregatedId instanceof CompositeAggregateIdInterface
+                ? $aggregatedId->getValues()
+                : [$classMetadata->getSingleIdentifierFieldName() => $aggregatedId];
+
+            foreach ($identifierColumns as $fieldName => $columnName) {
+                $param = 'aggregate_' . $fieldName;
+                $column = 'aggregate_' . $columnName;
+
+                if (!isset($aggregateIdValues[$fieldName])) {
+                    throw new LogicException(
+                        message: sprintf(
+                            'Missing field "%s" in aggregate id of type %s',
+                            $fieldName,
+                            get_class($aggregatedId),
+                        ),
+                    );
+                }
+
+                $qb->andWhere($column . ' = :' . $param)
+                    ->setParameter($param, $aggregateIdValues[$fieldName], $classMetadata->getTypeOfField($fieldName));
+            }
         }
 
         if (null !== $criteria->getCreatedBefore()) {

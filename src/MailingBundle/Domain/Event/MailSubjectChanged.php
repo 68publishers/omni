@@ -13,10 +13,15 @@ final class MailSubjectChanged extends AbstractDomainEvent
 {
     public static function create(MailId $mailId, Subject $subject, Locale $locale): self
     {
-        return self::occur($mailId->toNative(), [
+        return self::occur($mailId, [
             'subject' => $subject,
             'locale' => $locale,
         ]);
+    }
+
+    public function getAggregateId(): MailId
+    {
+        return MailId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getSubject(): Subject

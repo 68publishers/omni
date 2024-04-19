@@ -30,7 +30,7 @@ final class UserCreated extends AbstractDomainEvent
         DateTimeZone $timezone,
         Attributes $attributes,
     ): self {
-        return self::occur($userId->toNative(), [
+        return self::occur($userId, [
             'username' => $username,
             'password' => $password,
             'email_address' => $emailAddress,
@@ -41,6 +41,11 @@ final class UserCreated extends AbstractDomainEvent
             'timezone' => $timezone,
             'attributes' => $attributes,
         ]);
+    }
+
+    public function getAggregateId(): UserId
+    {
+        return UserId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getUsername(): Username

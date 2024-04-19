@@ -12,9 +12,14 @@ final class UserPasswordChanged extends AbstractDomainEvent
 {
     public static function create(UserId $userId, HashedPassword $password): self
     {
-        return self::occur($userId->toNative(), [
+        return self::occur($userId, [
             'password' => $password,
         ]);
+    }
+
+    public function getAggregateId(): UserId
+    {
+        return UserId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getPassword(): HashedPassword

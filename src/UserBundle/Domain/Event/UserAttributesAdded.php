@@ -12,9 +12,14 @@ final class UserAttributesAdded extends AbstractDomainEvent
 {
     public static function create(UserId $userId, Attributes $attributes): self
     {
-        return self::occur($userId->toNative(), [
+        return self::occur($userId, [
             'attributes' => $attributes,
         ]);
+    }
+
+    public function getAggregateId(): UserId
+    {
+        return UserId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getAttributes(): Attributes

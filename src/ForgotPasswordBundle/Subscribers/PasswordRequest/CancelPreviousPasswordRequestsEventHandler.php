@@ -22,7 +22,7 @@ final class CancelPreviousPasswordRequestsEventHandler implements EventHandlerIn
 
     public function __invoke(PasswordChangeRequested $event): void
     {
-        $currentId = PasswordRequestId::fromAggregateId($event->getAggregateId());
+        $currentId = $event->getAggregateId();
 
         foreach ($this->queryBus->dispatch(new FindIdsOfRequestedPasswordChangesQuery($event->getEmailAddress()->toNative())) as $passwordRequestId) {
             assert($passwordRequestId instanceof PasswordRequestId);

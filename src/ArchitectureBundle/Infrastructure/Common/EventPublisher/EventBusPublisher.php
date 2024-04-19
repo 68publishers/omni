@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Infrastructure\Common\EventPublisher;
 
 use SixtyEightPublishers\ArchitectureBundle\Bus\EventBusInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateIdInterface;
 
 final class EventBusPublisher implements EventPublisherInterface
 {
@@ -16,7 +16,7 @@ final class EventBusPublisher implements EventPublisherInterface
         $this->eventBus = $eventBus;
     }
 
-    public function publish(string $aggregateClassname, AggregateId $aggregateId, array $events): void
+    public function publish(string $aggregateClassname, AggregateIdInterface $aggregateId, array $events): void
     {
         foreach ($events as $event) {
             bdump($event); // @todo: remove

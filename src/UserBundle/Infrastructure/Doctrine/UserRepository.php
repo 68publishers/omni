@@ -23,7 +23,7 @@ final class UserRepository implements UserRepositoryInterface
 
     public function get(UserId $id): User
     {
-        $user = $this->aggregateRootRepository->loadAggregateRoot(User::class, $id->toAggregateId());
+        $user = $this->aggregateRootRepository->loadAggregateRoot(User::class, $id);
 
         if (!$user instanceof User) {
             throw UserNotFoundException::withId($id);

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Event;
 
+use BackedEnum;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateIdInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\EventId;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
 use SixtyEightPublishers\ArchitectureBundle\Event\EventInterface;
@@ -39,8 +40,13 @@ abstract class AbstractDomainEvent implements EventInterface
      * @param array<string, mixed> $metadata
      * @param array<string, mixed> $parameters
      */
-    public static function reconstitute(string $eventName, EventId $eventId, DateTimeImmutable $createdAt, array $metadata, array $parameters): static
-    {
+    public static function reconstitute(
+        string $eventName,
+        EventId $eventId,
+        DateTimeImmutable $createdAt,
+        array $metadata,
+        array $parameters,
+    ): static {
         $event = new static(); // @phpstan-ignore-line
 
         $event->eventName = $eventName;
@@ -51,6 +57,8 @@ abstract class AbstractDomainEvent implements EventInterface
 
         return $event;
     }
+
+    abstract public function getAggregateId(): AggregateIdInterface;
 
     /**
      * @return class-string
@@ -76,11 +84,6 @@ abstract class AbstractDomainEvent implements EventInterface
     public function getMetadata(): array
     {
         return $this->metadata;
-    }
-
-    public function getAggregateId(): AggregateId
-    {
-        return AggregateId::fromNative($this->metadata[self::METADATA_AGGREGATE_ID]);
     }
 
     public function getVersion(): int
@@ -129,12 +132,17 @@ abstract class AbstractDomainEvent implements EventInterface
         ];
     }
 
+    protected function getNativeAggregatedId(): mixed
+    {
+        return $this->metadata[self::METADATA_AGGREGATE_ID];
+    }
+
     /**
      * @param array<string, mixed> $parameters
      *
      * @noinspection PhpDocMissingThrowsInspection
      */
-    protected static function occur(string $aggregateId, array $parameters = []): static
+    protected static function occur(AggregateIdInterface $aggregateId, array $parameters = []): static
     {
         $event = new static();  // @phpstan-ignore-line
 
@@ -146,6 +154,10 @@ abstract class AbstractDomainEvent implements EventInterface
             static function (mixed $value): mixed {
                 if ($value instanceof ValueObjectInterface) {
                     return $value->toNative();
+                }
+
+                if ($value instanceof BackedEnum) {
+                    return $value->value;
                 }
 
                 if ($value instanceof DateTimeInterface) {
@@ -162,7 +174,7 @@ abstract class AbstractDomainEvent implements EventInterface
         );
 
         $event->metadata = [
-            self::METADATA_AGGREGATE_ID => $aggregateId,
+            self::METADATA_AGGREGATE_ID => $aggregateId->toNative(),
             self::METADATA_AGGREGATE_VERSION => 1, // initial
         ];
 

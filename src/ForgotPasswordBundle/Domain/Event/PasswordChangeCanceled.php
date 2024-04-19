@@ -18,11 +18,16 @@ final class PasswordChangeCanceled extends AbstractDomainEvent
         EmailAddress $emailAddress,
         Attributes $attributes,
     ): self {
-        return self::occur($passwordRequestId->toNative(), [
+        return self::occur($passwordRequestId, [
             'finished_device_info' => $finishedDeviceInfo,
             'email_address' => $emailAddress,
             'attributes' => $attributes,
         ]);
+    }
+
+    public function getAggregateId(): PasswordRequestId
+    {
+        return PasswordRequestId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getFinishedDeviceInfo(): DeviceInfo

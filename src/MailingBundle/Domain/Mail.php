@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\MailingBundle\Domain;
 
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\DeletableAggregateRootTrait;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootTrait;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\UnableToRecordEventOnDeletedAggregateException;
 use SixtyEightPublishers\MailingBundle\Domain\Command\CreateMailCommand;
 use SixtyEightPublishers\MailingBundle\Domain\Event\MailCodeChanged;
 use SixtyEightPublishers\MailingBundle\Domain\Event\MailCreated;
+use SixtyEightPublishers\MailingBundle\Domain\Event\MailDeleted;
 use SixtyEightPublishers\MailingBundle\Domain\Event\MailMessageBodyChanged;
 use SixtyEightPublishers\MailingBundle\Domain\Event\MailSubjectChanged;
 use SixtyEightPublishers\MailingBundle\Domain\ValueObject\Code;
@@ -25,9 +28,13 @@ use function assert;
 
 class Mail implements AggregateRootInterface
 {
-    use DeletableAggregateRootTrait;
+    use AggregateRootTrait {
+        recordThat as private _recordThat;
+    }
 
     private MailId $id;
+
+    protected ?DateTimeImmutable $deletedAt = null;
 
     private Code $code;
 
@@ -55,9 +62,9 @@ class Mail implements AggregateRootInterface
         return $mail;
     }
 
-    public function getAggregateId(): AggregateId
+    public function getAggregateId(): MailId
     {
-        return $this->id->toAggregateId();
+        return $this->id;
     }
 
     public function changeCode(string $code, ?CodeGuardInterface $codeGuard = null): void
@@ -92,9 +99,22 @@ class Mail implements AggregateRootInterface
         }
     }
 
+    public function delete(): void
+    {
+        if (null !== $this->deletedAt) {
+            return;
+        }
+
+        $this->recordThat(
+            event: MailDeleted::create(
+                mailId: $this->id,
+            ),
+        );
+    }
+
     protected function whenMailCreated(MailCreated $event): void
     {
-        $this->id = MailId::fromAggregateId($event->getAggregateId());
+        $this->id = $event->getAggregateId();
         $this->code = $event->getCode();
         $this->translations = new ArrayCollection();
 
@@ -130,8 +150,22 @@ class Mail implements AggregateRootInterface
         }
     }
 
+    protected function whenMailDeleted(MailDeleted $event): void
+    {
+        $this->deletedAt = $event->getCreatedAt();
+    }
+
     private function filterTranslation(Locale $locale): ?MailTranslation
     {
         return $this->translations->findFirst(static fn (int $key, MailTranslation $mailTranslation): bool => $mailTranslation->getLocale()->equals($locale));
+    }
+
+    protected function recordThat(AbstractDomainEvent $event, bool $apply = true): void
+    {
+        if (null !== $this->deletedAt) {
+            throw UnableToRecordEventOnDeletedAggregateException::create(static::class, $this->getAggregateId());
+        }
+
+        $this->_recordThat($event, $apply);
     }
 }

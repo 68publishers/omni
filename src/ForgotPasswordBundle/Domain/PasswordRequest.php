@@ -9,7 +9,6 @@ use DateTimeZone;
 use Exception;
 use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootTrait;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\CancelPasswordRequestCommand;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\CompletePasswordRequestCommand;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\RequestPasswordChangeCommand;
@@ -121,9 +120,9 @@ class PasswordRequest implements AggregateRootInterface
         ));
     }
 
-    public function getAggregateId(): AggregateId
+    public function getAggregateId(): PasswordRequestId
     {
-        return $this->id->toAggregateId();
+        return $this->id;
     }
 
     public function isExpired(): bool
@@ -140,7 +139,7 @@ class PasswordRequest implements AggregateRootInterface
      */
     protected function whenPasswordChangeRequested(PasswordChangeRequested $event): void
     {
-        $this->id = PasswordRequestId::fromAggregateId($event->getAggregateId());
+        $this->id = $event->getAggregateId();
         $this->emailAddress = $event->getEmailAddress();
         $this->status = Status::REQUESTED;
         $this->requestedAt = $event->getCreatedAt();

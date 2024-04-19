@@ -7,12 +7,14 @@ namespace SixtyEightPublishers\UserBundle\Domain;
 use DateTimeImmutable;
 use DateTimeZone;
 use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootInterface;
-use SixtyEightPublishers\ArchitectureBundle\Domain\DeletableAggregateRootTrait;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\AggregateRootTrait;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
+use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\UnableToRecordEventOnDeletedAggregateException;
 use SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserActiveStateChanged;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserAttributesAdded;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserCreated;
+use SixtyEightPublishers\UserBundle\Domain\Event\UserDeleted;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserEmailAddressChanged;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserLocaleChanged;
 use SixtyEightPublishers\UserBundle\Domain\Event\UserNameChanged;
@@ -36,11 +38,15 @@ use SixtyEightPublishers\UserBundle\Domain\ValueObject\Username;
 
 class User implements AggregateRootInterface
 {
-    use DeletableAggregateRootTrait;
+    use AggregateRootTrait {
+        recordThat as private _recordThat;
+    }
 
     protected UserId $id;
 
     protected DateTimeImmutable $createdAt;
+
+    protected ?DateTimeImmutable $deletedAt = null;
 
     protected Username $username;
 
@@ -108,9 +114,9 @@ class User implements AggregateRootInterface
         return $user;
     }
 
-    public function getAggregateId(): AggregateId
+    public function getAggregateId(): UserId
     {
-        return $this->id->toAggregateId();
+        return $this->id;
     }
 
     public function changeUsername(string $username, ?UsernameGuardInterface $usernameGuard = null): void
@@ -225,9 +231,22 @@ class User implements AggregateRootInterface
         }
     }
 
+    public function delete(): void
+    {
+        if (null !== $this->deletedAt) {
+            return;
+        }
+
+        $this->recordThat(
+            event: UserDeleted::create(
+                userId: $this->id,
+            ),
+        );
+    }
+
     protected function whenUserCreated(UserCreated $event): void
     {
-        $this->id = UserId::fromAggregateId($event->getAggregateId());
+        $this->id = $event->getAggregateId();
         $this->createdAt = $event->getCreatedAt();
         $this->username = $event->getUsername();
         $this->password = $event->getPassword();
@@ -283,5 +302,19 @@ class User implements AggregateRootInterface
     protected function whenUserAttributesAdded(UserAttributesAdded $event): void
     {
         $this->attributes = $this->attributes->merge($event->getAttributes());
+    }
+
+    protected function whenUserDeleted(UserDeleted $event): void
+    {
+        $this->deletedAt = $event->getCreatedAt();
+    }
+
+    protected function recordThat(AbstractDomainEvent $event, bool $apply = true): void
+    {
+        if (null !== $this->deletedAt) {
+            throw UnableToRecordEventOnDeletedAggregateException::create(static::class, $this->getAggregateId());
+        }
+
+        $this->_recordThat($event, $apply);
     }
 }

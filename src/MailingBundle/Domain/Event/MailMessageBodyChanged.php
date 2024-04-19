@@ -13,10 +13,15 @@ final class MailMessageBodyChanged extends AbstractDomainEvent
 {
     public static function create(MailId $mailId, MessageBody $messageBody, Locale $locale): self
     {
-        return self::occur($mailId->toNative(), [
+        return self::occur($mailId, [
             'message_body' => $messageBody,
             'locale' => $locale,
         ]);
+    }
+
+    public function getAggregateId(): MailId
+    {
+        return MailId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getMessageBody(): MessageBody

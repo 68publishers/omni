@@ -16,10 +16,15 @@ final class MailCreated extends AbstractDomainEvent
         Code $code,
         Translations $translations,
     ): self {
-        return self::occur($mailId->toNative(), [
+        return self::occur($mailId, [
             'code' => $code,
             'translations' => $translations,
         ]);
+    }
+
+    public function getAggregateId(): MailId
+    {
+        return MailId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getCode(): Code

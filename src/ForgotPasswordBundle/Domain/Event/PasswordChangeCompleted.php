@@ -22,7 +22,7 @@ final class PasswordChangeCompleted extends AbstractDomainEvent
         Attributes $attributes,
         string $password,
     ): self {
-        $event = self::occur($passwordRequestId->toNative(), [
+        $event = self::occur($passwordRequestId, [
             'finished_device_info' => $finishedDeviceInfo,
             'email_address' => $emailAddress,
             'attributes' => $attributes,
@@ -31,6 +31,11 @@ final class PasswordChangeCompleted extends AbstractDomainEvent
         $event->password = $password;
 
         return $event;
+    }
+
+    public function getAggregateId(): PasswordRequestId
+    {
+        return PasswordRequestId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getFinishedDeviceInfo(): DeviceInfo

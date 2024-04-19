@@ -23,7 +23,7 @@ final class PasswordRequestRepository implements PasswordRequestRepositoryInterf
 
     public function get(PasswordRequestId $id): PasswordRequest
     {
-        $passwordRequest = $this->aggregateRootRepository->loadAggregateRoot(PasswordRequest::class, $id->toAggregateId());
+        $passwordRequest = $this->aggregateRootRepository->loadAggregateRoot(PasswordRequest::class, $id);
 
         if (!$passwordRequest instanceof PasswordRequest) {
             throw PasswordRequestNotFoundException::withId($id);

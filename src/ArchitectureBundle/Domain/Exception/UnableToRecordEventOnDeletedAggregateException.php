@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\Exception;
 
 use DomainException;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateId;
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateIdInterface;
 use function sprintf;
 
 final class UnableToRecordEventOnDeletedAggregateException extends DomainException
@@ -16,7 +16,7 @@ final class UnableToRecordEventOnDeletedAggregateException extends DomainExcepti
     private function __construct(
         string $message,
         public readonly string $aggregateClassname,
-        public readonly AggregateId $aggregateId,
+        public readonly AggregateIdInterface $aggregateId,
     ) {
         parent::__construct($message);
     }
@@ -24,12 +24,16 @@ final class UnableToRecordEventOnDeletedAggregateException extends DomainExcepti
     /**
      * @param class-string $aggregateClassname
      */
-    public static function create(string $aggregateClassname, AggregateId $aggregateId): self
+    public static function create(string $aggregateClassname, AggregateIdInterface $aggregateId): self
     {
-        return new self(sprintf(
-            'Unable to record event on deleted aggregate %s of type %s',
-            $aggregateId->toNative(),
-            $aggregateClassname,
-        ), $aggregateClassname, $aggregateId);
+        return new self(
+            message: sprintf(
+                'Unable to record event on deleted aggregate %s of type %s',
+                $aggregateId->toString(),
+                $aggregateClassname,
+            ),
+            aggregateClassname: $aggregateClassname,
+            aggregateId: $aggregateId,
+        );
     }
 }

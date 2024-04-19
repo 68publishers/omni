@@ -12,9 +12,14 @@ final class UserRolesChanged extends AbstractDomainEvent
 {
     public static function create(UserId $userId, Roles $roles): self
     {
-        return self::occur($userId->toNative(), [
+        return self::occur($userId, [
             'roles' => $roles,
         ]);
+    }
+
+    public function getAggregateId(): UserId
+    {
+        return UserId::fromSafeNative($this->getNativeAggregatedId());
     }
 
     public function getRoles(): Roles

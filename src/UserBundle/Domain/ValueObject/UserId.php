@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\ValueObject;
 
+use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\AggregateIdInterface;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\UuidValueTrait;
-use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\ValueObjectInterface;
 
-final class UserId implements ValueObjectInterface
+final class UserId implements AggregateIdInterface
 {
     use UuidValueTrait;
 }

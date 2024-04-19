@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject;
 
-final class AggregateId implements ValueObjectInterface
+/**
+ * @deprecated
+ */
+final class AggregateId implements AggregateIdInterface
 {
     use UuidValueTrait;
 }
