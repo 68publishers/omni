@@ -54,14 +54,6 @@ trait UuidValueTrait
         }
     }
 
-    /**
-     * @deprecated
-     */
-    public static function fromAggregateId(AggregateId $aggregateId): static
-    {
-        return self::fromUuid($aggregateId->toUuid());
-    }
-
     public static function isValid(mixed $native): bool
     {
         return is_string($native) && Uuid::isValid($native);
@@ -75,14 +67,6 @@ trait UuidValueTrait
     public function toNative(): string
     {
         return $this->value->toString();
-    }
-
-    /**
-     * @deprecated
-     */
-    public function toAggregateId(): AggregateId
-    {
-        return AggregateId::fromUuid($this->toUuid());
     }
 
     public function equals(ValueObjectInterface $object): bool
