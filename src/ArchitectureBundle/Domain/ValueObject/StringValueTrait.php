@@ -45,6 +45,16 @@ trait StringValueTrait
         return $object instanceof static && $object->toNative() === $this->toNative();
     }
 
+    public function toString(): string
+    {
+        return $this->toNative();
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString();
+    }
+
     protected function validate(): void
     {
     }

@@ -8,6 +8,7 @@ use DomainException;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\InvalidNativeValueTypeException;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Exception\Typehint;
 use function array_key_exists;
+use function array_map;
 use function count;
 use function implode;
 
@@ -155,7 +156,13 @@ trait CompositeAggregateIdTrait
 
     public function toString(): string
     {
-        return implode('/', $this->values);
+        return implode(
+            separator: '/',
+            array: array_map(
+                callback: \strval(...),
+                array: $this->values,
+            ),
+        );
     }
 
     public function __toString(): string
