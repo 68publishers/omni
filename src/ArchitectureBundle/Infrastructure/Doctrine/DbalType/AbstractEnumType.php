@@ -34,6 +34,10 @@ abstract class AbstractEnumType extends Type
 
     public function convertToPHPValue($value, AbstractPlatform $platform): ?BackedEnum
     {
+        if (null === $value) {
+            return null;
+        }
+
         $enumClassname = $this->getEnumsClassname();
 
         if (false === enum_exists($enumClassname, true)) {
