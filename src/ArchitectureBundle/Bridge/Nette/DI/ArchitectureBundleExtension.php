@@ -38,7 +38,7 @@ final class ArchitectureBundleExtension extends CompilerExtension implements Mes
         ])->castTo(ArchitectureBundleConfig::class);
     }
 
-    public function setCompiler(Compiler $compiler, string $name): self
+    public function setCompiler(Compiler $compiler, string $name): static
     {
         parent::setCompiler($compiler, $name);
 

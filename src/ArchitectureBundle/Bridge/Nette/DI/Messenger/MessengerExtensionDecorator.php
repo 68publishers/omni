@@ -96,7 +96,7 @@ final class MessengerExtensionDecorator extends CompilerExtension
         $this->extension->afterCompile($class);
     }
 
-    public function setCompiler(Compiler $compiler, string $name): self
+    public function setCompiler(Compiler $compiler, string $name): static
     {
         $this->extension->setCompiler($compiler, $name);
 
