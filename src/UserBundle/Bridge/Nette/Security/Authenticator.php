@@ -88,6 +88,6 @@ final class Authenticator implements NetteAuthenticatorInterface, NetteIdentityH
 	 */
 	private function transformIdentity(NetteIdentityInterface $identity): Identity
 	{
-		return !$identity instanceof Identity ? Identity::createSleeping(UserId::fromString((string) $identity->getId())) : $identity;
+		return !$identity instanceof Identity ? Identity::createSleeping(UserId::fromString($identity->getId())) : $identity;
 	}
 }

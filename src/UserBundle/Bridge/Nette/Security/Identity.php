@@ -27,12 +27,9 @@ final class Identity extends AuthIdentity implements NetteIdentityInterface
 		return $newIdentity;
 	}
 
-	/**
-	 * @return \SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId
-	 */
-	public function getId(): UserId
+	public function getId(): string
 	{
-		return $this->id();
+		return $this->id()->toString();
 	}
 
 	/**
