@@ -52,15 +52,15 @@ trait LogoutPresenterTrait
 		assert($user instanceof NetteUser);
 
 		if (!$user->isLoggedIn()) {
-			$this->handleUserNotLoggedIn();
+			$this->userNotLoggedInHandler();
 		}
 
 		if ($this->getParameter($this->tokenName) !== $this->csrfTokenFactory->create(static::class)) {
-			$this->handleInvalidToken();
+			$this->invalidTokenHandler();
 		}
 
 		$user->logout();
-		$this->handleUserLoggedOut();
+		$this->userLoggedOutHandler();
 
 		throw new InvalidStateException(sprintf(
 			'Method %s::handleUserLoggedOut() must redirect when the user is logged out.',
@@ -74,7 +74,7 @@ trait LogoutPresenterTrait
 	 * @return void
 	 * @throws \Nette\Application\AbortException
 	 */
-	abstract protected function handleUserLoggedOut(): void;
+	abstract protected function userLoggedOutHandler(): void;
 
 	/**
 	 * Use can override the default behavior
@@ -82,7 +82,7 @@ trait LogoutPresenterTrait
 	 * @return void
 	 * @throws \Nette\Application\ForbiddenRequestException
 	 */
-	protected function handleUserNotLoggedIn(): void
+	protected function userNotLoggedInHandler(): void
 	{
 		throw new ForbiddenRequestException('');
 	}
@@ -93,7 +93,7 @@ trait LogoutPresenterTrait
 	 * @return void
 	 * @throws \Nette\Application\ForbiddenRequestException
 	 */
-	protected function handleInvalidToken(): void
+	protected function invalidTokenHandler(): void
 	{
 		throw new ForbiddenRequestException('');
 	}
