@@ -23,7 +23,7 @@ final class ArchitectureBundleExtension extends CompilerExtension implements Mes
 
 	public const EXTENSION_POSTFIX_MESSENGER = 'messenger';
 
-	public function setCompiler(Compiler $compiler, string $name): self
+	public function setCompiler(Compiler $compiler, string $name): static
 	{
 		parent::setCompiler($compiler, $name);
 
