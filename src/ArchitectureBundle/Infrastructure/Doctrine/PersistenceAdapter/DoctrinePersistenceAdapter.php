@@ -39,7 +39,10 @@ final class DoctrinePersistenceAdapter implements PersistenceAdapterInterface
 
             $em->flush();
             $em->getConnection()->commit();
-            $em->clear();
+
+            if (!$em->getConnection()->isTransactionActive()) {
+                $em->clear();
+            }
         } catch (DbalException $e) {
             throw TransactionException::unableToCommitTransaction($e->getMessage());
         }
