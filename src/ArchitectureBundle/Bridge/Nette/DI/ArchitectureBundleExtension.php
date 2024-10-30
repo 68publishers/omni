@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI;
 
-use Nette\Bridges\ApplicationDI\ApplicationExtension;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\Reference;
@@ -57,10 +56,6 @@ final class ArchitectureBundleExtension extends CompilerExtension implements Mes
         $this->setBundleParameter('extension_name', $this->name);
         $this->setBundleParameter('default_event_store_name', $config->default_event_store_name ?? 'null');
         $this->loadConfigurationDir(__DIR__ . '/definitions/architecture_bundle', false);
-
-        if (null !== $this->requireCompilerExtension(ApplicationExtension::class, false)) {
-            $this->loadConfigurationDir(__DIR__ . '/definitions/architecture_bundle/http_link');
-        }
     }
 
     public function provideMessageBusConfigurations(): iterable
@@ -100,21 +95,6 @@ final class ArchitectureBundleExtension extends CompilerExtension implements Mes
         $eventStoreNameResolver->addSetup('registerAggregateClassname', [
             $aggregateClassname,
             $eventStoreName,
-        ]);
-    }
-
-    /**
-     * @param array<string, mixed> $staticParameters
-     */
-    public function registerHttpLink(string $name, string $destination, array $staticParameters = []): void
-    {
-        $linkFactoryDefinition = $this->getContainerBuilder()->getDefinition($this->prefix('application.http_link.link_factory.default'));
-        assert($linkFactoryDefinition instanceof ServiceDefinition);
-
-        $linkFactoryDefinition->addSetup('registerLink', [
-            $name,
-            $destination,
-            $staticParameters,
         ]);
     }
 }
