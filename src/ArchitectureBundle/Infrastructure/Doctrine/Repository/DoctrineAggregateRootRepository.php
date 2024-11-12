@@ -32,12 +32,24 @@ final class DoctrineAggregateRootRepository implements DoctrineAggregateRootRepo
     /**
      * @throws EventStoreException
      */
-    public function saveAggregateRoot(AggregateRootInterface $aggregateRoot): void
+    public function saveAggregateRoot(AggregateRootInterface $aggregateRoot, ?string $deleteEventClassname = null): void
     {
         $events = $aggregateRoot->popRecordedEvents();
         $aggregateRootClassname = get_class($aggregateRoot);
+        $persist = true;
 
-        $this->em->persist($aggregateRoot);
+        if (null !== $deleteEventClassname) {
+            foreach ($events as $event) {
+                if ($event instanceof $deleteEventClassname && $event->getAggregateId()->equals($aggregateRoot->getAggregateId())) {
+                    $this->em->remove($aggregateRoot);
+                    $persist = false;
+                }
+            }
+        }
+
+        if ($persist) {
+            $this->em->persist($aggregateRoot);
+        }
 
         $this->eventStore->store($aggregateRootClassname, $events);
 
