@@ -56,7 +56,7 @@ trait AggregateRootTrait
     protected function recordThat(AbstractDomainEvent $event, bool $apply = true): void
     {
         ++$this->version;
-        $this->recordedEvents[] = $event->withVersion($this->version);
+        $this->recordedEvents[] = $event = $event->withVersion($this->version);
 
         if ($apply) {
             $this->apply($event);
