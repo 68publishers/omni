@@ -28,7 +28,7 @@ trait CompositeValueObjectTrait
      */
     public function toNative(): array
     {
-        return array_map(static fn (ValueObjectInterface $valueObject): mixed => $valueObject->toNative(), $this->propertiesToArray());
+        return array_map(static fn (?ValueObjectInterface $valueObject): mixed => $valueObject?->toNative(), $this->propertiesToArray());
     }
 
     public function equals(ValueObjectInterface $object): bool
