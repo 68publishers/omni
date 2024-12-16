@@ -28,6 +28,10 @@ abstract class AbstractNonTransactionalPersistenceAdapter implements Persistence
         throw TransactionException::unableToRollbackTransaction('The storage is non transactional.');
     }
 
+    public function postTransaction(): void
+    {
+    }
+
     public function hasActiveTransaction(): bool
     {
         return false;

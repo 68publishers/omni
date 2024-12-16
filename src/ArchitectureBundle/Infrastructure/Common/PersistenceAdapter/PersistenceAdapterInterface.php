@@ -25,6 +25,8 @@ interface PersistenceAdapterInterface
      */
     public function rollbackTransaction(): void;
 
+    public function postTransaction(): void;
+
     public function hasActiveTransaction(): bool;
 
     public function pingConnection(): void;

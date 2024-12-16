@@ -48,6 +48,8 @@ final class StoreTransactionMiddleware implements MiddlewareInterface
             }
 
             throw $exception;
+        } finally {
+            $this->persistenceAdapter->postTransaction();
         }
     }
 }

@@ -57,6 +57,15 @@ final class DoctrinePersistenceAdapter implements PersistenceAdapterInterface
         }
     }
 
+    public function postTransaction(): void
+    {
+        $em = $this->resolveEntityManager();
+
+        if (!$em->isOpen()) {
+            $this->managerRegistry->resetManager($this->entityManagerName);
+        }
+    }
+
     public function hasActiveTransaction(): bool
     {
         return $this->resolveEntityManager()->getConnection()->isTransactionActive();

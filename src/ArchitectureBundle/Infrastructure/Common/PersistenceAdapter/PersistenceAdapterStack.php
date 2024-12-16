@@ -51,6 +51,15 @@ final class PersistenceAdapterStack implements PersistenceAdapterInterface
         }
     }
 
+    public function postTransaction(): void
+    {
+        foreach ($this->persistenceAdapters as $persistenceAdapter) {
+            if ($persistenceAdapter->supportsTransactions()) {
+                $persistenceAdapter->postTransaction();
+            }
+        }
+    }
+
     public function hasActiveTransaction(): bool
     {
         foreach ($this->persistenceAdapters as $persistenceAdapter) {
