@@ -12,6 +12,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\Persistence\ManagerRegistry;
 use LogicException;
 use SixtyEightPublishers\ArchitectureBundle\Domain\Event\AbstractDomainEvent;
 use SixtyEightPublishers\ArchitectureBundle\Domain\ValueObject\CompositeAggregateIdInterface;
@@ -33,7 +34,7 @@ final class DoctrineEventStore implements EventStoreInterface
     public const NAME = 'doctrine';
 
     public function __construct(
-        private readonly EntityManagerInterface $em,
+        private readonly ManagerRegistry $managerRegistry,
     ) {}
 
     /**
@@ -42,7 +43,8 @@ final class DoctrineEventStore implements EventStoreInterface
      */
     public function store(string $aggregateRootClassname, array $events): void
     {
-        $connection = $this->em->getConnection();
+        $connection = $this->getConnection();
+        $em = $this->getEntityManager();
         $tableName = $this->getTableName($aggregateRootClassname);
 
         foreach ($events as $event) {
@@ -61,7 +63,7 @@ final class DoctrineEventStore implements EventStoreInterface
                 Types::JSON,
             ];
 
-            $classMetadata = $this->em->getClassMetadata($aggregateRootClassname);
+            $classMetadata = $em->getClassMetadata($aggregateRootClassname);
             $aggregatedId = $event->getAggregateId();
 
             $identifierColumns = array_combine(
@@ -111,7 +113,7 @@ final class DoctrineEventStore implements EventStoreInterface
 
     public function get(string $aggregateRootClassname, EventId $eventId): ?AbstractDomainEvent
     {
-        $connection = $this->em->getConnection();
+        $connection = $this->getConnection();
         $tableName = $this->getTableName($aggregateRootClassname);
 
         $query = sprintf(
@@ -139,7 +141,7 @@ final class DoctrineEventStore implements EventStoreInterface
      */
     public function find(EventCriteria $criteria): array
     {
-        $connection = $this->em->getConnection();
+        $connection = $this->getConnection();
         $tableName = $this->getTableName($criteria->getAggregateRootClassname());
 
         $qb = $connection->createQueryBuilder()
@@ -197,7 +199,7 @@ final class DoctrineEventStore implements EventStoreInterface
      */
     public function count(EventCriteria $criteria): int
     {
-        $connection = $this->em->getConnection();
+        $connection = $this->getConnection();
         $tableName = $this->getTableName($criteria->getAggregateRootClassname());
 
         $qb = $connection->createQueryBuilder()
@@ -219,8 +221,10 @@ final class DoctrineEventStore implements EventStoreInterface
      */
     private function buildConditions(QueryBuilder $qb, EventCriteria $criteria): QueryBuilder
     {
+        $em = $this->getEntityManager();
+
         if (null !== $criteria->getAggregateId()) {
-            $classMetadata = $this->em->getClassMetadata($criteria->getAggregateRootClassname());
+            $classMetadata = $em->getClassMetadata($criteria->getAggregateRootClassname());
             $aggregatedId = $criteria->getAggregateId();
 
             $identifierColumns = array_combine(
@@ -293,11 +297,13 @@ final class DoctrineEventStore implements EventStoreInterface
      */
     private function getTableName(string $aggregateRootClassname): string
     {
-        $classMetadata = $this->em->getClassMetadata($aggregateRootClassname);
+        $em = $this->getEntityManager();
+        $connection = $em->getConnection();
+        $classMetadata = $em->getClassMetadata($aggregateRootClassname);
         $tableName = $classMetadata->getTableName();
 
         try {
-            $quoteCharacter = $this->em->getConnection()->getDatabasePlatform()->getIdentifierQuoteCharacter();
+            $quoteCharacter = $connection->getDatabasePlatform()->getIdentifierQuoteCharacter();
         } catch (DbalException $e) {
             throw EventStoreException::of($e, $e instanceof RetryableException);
         }
@@ -323,5 +329,18 @@ final class DoctrineEventStore implements EventStoreInterface
             $connection->convertToPHPValue($data['metadata'], Types::JSON) + [self::METADATA_POSITION => $data['id']],
             $connection->convertToPHPValue($data['parameters'], Types::JSON),
         );
+    }
+
+    private function getEntityManager(): EntityManagerInterface
+    {
+        $em = $this->managerRegistry->getManager();
+        assert($em instanceof EntityManagerInterface);
+
+        return $em;
+    }
+
+    private function getConnection(): Connection
+    {
+        return $this->getEntityManager()->getConnection();
     }
 }

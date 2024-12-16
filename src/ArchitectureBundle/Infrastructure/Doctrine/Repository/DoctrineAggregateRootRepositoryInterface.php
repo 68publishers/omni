@@ -13,10 +13,18 @@ interface DoctrineAggregateRootRepositoryInterface
     /**
      * @param class-string $classname
      */
-    public function loadAggregateRoot(string $classname, AggregateIdInterface $aggregateId): ?object;
+    public function loadAggregateRoot(
+        string $classname,
+        AggregateIdInterface $aggregateId,
+        ?string $entityManagerName = null,
+    ): ?object;
 
     /**
      * @param class-string<AbstractDomainEvent>|null $deleteEventClassname
      */
-    public function saveAggregateRoot(AggregateRootInterface $aggregateRoot, ?string $deleteEventClassname = null): void;
+    public function saveAggregateRoot(
+        AggregateRootInterface $aggregateRoot,
+        ?string $deleteEventClassname = null,
+        ?string $entityManagerName = null,
+    ): void;
 }
