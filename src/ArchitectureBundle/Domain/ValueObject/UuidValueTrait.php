@@ -21,7 +21,7 @@ trait UuidValueTrait
 
     public static function new(): static
     {
-        return new static(Uuid::uuid4());
+        return new static(Uuid::uuid7());
     }
 
     public static function fromUuid(UuidInterface $uuid): static
