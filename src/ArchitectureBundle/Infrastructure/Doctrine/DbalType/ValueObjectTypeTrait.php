@@ -33,7 +33,7 @@ trait ValueObjectTypeTrait
         $classname = $this->getValueObjectClassname();
 
         try {
-            return $classname::fromSafeNative($value);
+            return $classname::fromSafeNative($value); # @phpstan-ignore-line
         } catch (DomainException $e) {
             throw ConversionException::conversionFailed(
                 is_scalar($value) ? (string) $value : var_export($value, true), // @phpstan-ignore-line

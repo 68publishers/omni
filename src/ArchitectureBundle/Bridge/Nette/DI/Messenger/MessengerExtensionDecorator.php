@@ -7,10 +7,12 @@ namespace SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\Messenger;
 use Fmasa\Messenger\DI\MessengerExtension;
 use Fmasa\Messenger\Exceptions\InvalidHandlerService;
 use Fmasa\Messenger\Exceptions\MultipleHandlersFound;
+use Fmasa\Messenger\LazyHandlersLocator;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\Definition;
 use Nette\DI\Definitions\FactoryDefinition;
+use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\Extensions\ParametersExtension;
 use Nette\DI\Helpers;
 use Nette\DI\InvalidConfigurationException;
@@ -21,6 +23,7 @@ use Nette\Schema\Processor;
 use Nette\Schema\Schema;
 use Nette\Schema\ValidationException;
 use SixtyEightPublishers\ArchitectureBundle\Bridge\Nette\DI\CompilerExtensionUtilsTrait;
+use SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use function array_filter;
 use function assert;
@@ -86,6 +89,15 @@ final class MessengerExtensionDecorator extends CompilerExtension
             foreach ($messageBusConfiguration->messageHandlerTypes as $messageHandlerType) {
                 $this->setupMessageHandlerTag($messageHandlerType, $messageBusConfiguration->busName);
             }
+        }
+
+        $builder = $this->getContainerBuilder();
+
+        foreach ($builder->findByType(LazyHandlersLocator::class) as $definition) {
+            assert($definition instanceof ServiceDefinition);
+
+            $definition->setType(HandlersLocator::class)
+                ->setFactory(HandlersLocator::class);
         }
 
         $this->extension->beforeCompile();
