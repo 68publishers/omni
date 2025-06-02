@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ProjectionBundle\Projection;
 
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
-
-interface ProjectionInterface extends MessageSubscriberInterface
+interface ProjectionInterface
 {
 	public static function projectionName(): string;
 

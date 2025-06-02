@@ -24,23 +24,6 @@ abstract class AbstractProjection implements ProjectionInterface
 		return static::class;
 	}
 
-	/**
-	 * @throws \ReflectionException
-	 */
-	public static function getHandledMessages(): iterable
-	{
-		foreach (call_user_func([static::class, 'defineEvents']) as $eventDefinition) {
-			assert($eventDefinition instanceof EventDefinition);
-
-			$methodName = $eventDefinition->methodName ?? 'when' . implode(array_slice(explode('\\', $eventDefinition->eventClassname), -1));
-
-			yield $eventDefinition->eventClassname => [
-				'method' => $methodName,
-				'from_transport' => static::projectionName(),
-			];
-		}
-	}
-
 	protected function projectionModel(): ProjectionModelInterface
 	{
 		if (NULL !== $this->resolvedProjectionModel) {
