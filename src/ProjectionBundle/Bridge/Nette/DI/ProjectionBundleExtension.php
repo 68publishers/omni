@@ -56,10 +56,7 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 			$builder->addDefinition($this->prefix('projection.' . $i))
 				->setType($classname)
 				->setFactory($projection)
-				->setAutowired(FALSE)
-				->addTag('contributte.messenger.handler', [
-					'bus' => self::PROJECTION_BUS_NAME,
-				]);
+				->setAutowired(FALSE);
 
 			$builder->addDefinition($this->prefix('receiver.' . $i))
 				->setType(EventStoreReceiver::class)

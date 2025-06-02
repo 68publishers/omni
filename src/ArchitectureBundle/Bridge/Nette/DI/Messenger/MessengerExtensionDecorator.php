@@ -13,7 +13,6 @@ use Nette\Schema\Processor;
 use Nette\DI\CompilerExtension;
 use Nette\PhpGenerator\ClassType;
 use Nette\Schema\ValidationException;
-use Nette\DI\Extensions\DecoratorExtension;
 use Nette\DI\InvalidConfigurationException;
 use Nette\DI\Extensions\ParametersExtension;
 use Contributte\Messenger\DI\MessengerExtension;
@@ -67,18 +66,6 @@ final class MessengerExtensionDecorator extends CompilerExtension
 
 	public function beforeCompile(): void
 	{
-		$decoratorExtension = $this->requireCompilerExtension(DecoratorExtension::class);
-
-		foreach ($this->getMessageBusConfigurations() as $messageBusConfiguration) {
-			foreach ($messageBusConfiguration->messageHandlerTypes as $messageHandlerType) {
-				$decoratorExtension->addTags($messageHandlerType, [
-					'contributte.messenger.handler' => [
-						'bus' => $messageBusConfiguration->busName,
-					],
-				]);
-			}
-		}
-
 		$this->extension->beforeCompile();
 	}
 
