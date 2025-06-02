@@ -11,6 +11,7 @@ use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\Statement;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\InvalidConfigurationException;
+use Contributte\Messenger\DI\MessengerExtension;
 use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionInterface;
 use SixtyEightPublishers\ProjectionBundle\Projection\ProjectionClassnameResolver;
 use SixtyEightPublishers\ProjectionBundle\ProjectionModel\ProjectionModelInterface;
@@ -62,7 +63,7 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 				->setType(EventStoreReceiver::class)
 				->setArgument('projectionClassname', $classname)
 				->setAutowired(FALSE)
-				->addTag('messenger.receiver.alias', $classname::projectionName());
+				->addTag(MessengerExtension::TRANSPORT_TAG, $classname::projectionName());
 
 			$projectionClassnames[] = $classname;
 		}
