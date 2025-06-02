@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\CommandHandler;
 
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use SixtyEightPublishers\UserBundle\Domain\Command\DeleteUserCommand;
 use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
 use SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface;
 
+#[AsMessageHandler(bus: 'command')]
 final class DeleteUserCommandHandler implements CommandHandlerInterface
 {
 	private UserRepositoryInterface $userRepository;

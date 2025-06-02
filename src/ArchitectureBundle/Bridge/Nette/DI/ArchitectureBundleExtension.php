@@ -17,9 +17,9 @@ final class ArchitectureBundleExtension extends CompilerExtension implements Mes
 {
 	use CompilerExtensionUtilsTrait;
 
-	public const COMMAND_BUS_NAME = 'command_bus';
-	public const QUERY_BUS_NAME = 'query_bus';
-	public const EVENT_BUS_NAME = 'event_bus';
+	public const COMMAND_BUS_NAME = 'command';
+	public const QUERY_BUS_NAME = 'query';
+	public const EVENT_BUS_NAME = 'event';
 
 	public const EXTENSION_POSTFIX_MESSENGER = 'messenger';
 

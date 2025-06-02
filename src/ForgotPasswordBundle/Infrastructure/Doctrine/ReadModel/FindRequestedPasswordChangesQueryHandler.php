@@ -7,6 +7,7 @@ namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\Read
 use Generator;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\Status;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View\PasswordRequestView;
@@ -14,6 +15,7 @@ use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterfac
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\Query\FindRequestedPasswordChangesQuery;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\BatchGeneratorFactory;
 
+#[AsMessageHandler(bus: 'query')]
 final class FindRequestedPasswordChangesQueryHandler implements QueryHandlerInterface
 {
 	private EntityManagerInterface $em;

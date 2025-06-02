@@ -1,11 +1,7 @@
+autowired: no
 allowNoHandlers: no
-singleHandlerPerMessage: yes
-middleware:
-	- Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware(command_bus)
-	- Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware
+middlewares:
 	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\OriginalExceptionMiddleware
-	- Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware
 	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\StorePingConnectionMiddleware
 	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\StoreCloseConnectionMiddleware
 	- SixtyEightPublishers\ArchitectureBundle\Bridge\Symfony\Messenger\Middleware\StoreTransactionMiddleware
-panel: %debugMode%

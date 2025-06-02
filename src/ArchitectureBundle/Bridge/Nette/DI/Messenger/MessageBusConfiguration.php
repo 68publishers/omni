@@ -8,8 +8,8 @@ final class MessageBusConfiguration
 {
 	public string $busName;
 
-	/** @var string|array */
-	public $configuration;
+	/** @var string|array<string, mixed> */
+	public string|array $configuration;
 
 	public array $messageHandlerTypes;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\CommandHandler;
 
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\UserBundle\Domain\Command\CreateUserCommand;
 use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
 use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
@@ -11,6 +12,7 @@ use SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface;
 use SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface;
 use SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface;
 
+#[AsMessageHandler(bus: 'command')]
 final class CreateUserCommandHandler implements CommandHandlerInterface
 {
 	private UserRepositoryInterface $userRepository;

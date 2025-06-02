@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Subscribers\PasswordRequest;
 
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\Batch;
 use SixtyEightPublishers\ArchitectureBundle\Bus\CommandBusInterface;
@@ -13,6 +14,7 @@ use SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeRequest
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\CancelPasswordRequestCommand;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\Query\FindRequestedPasswordChangesQuery;
 
+#[AsMessageHandler(bus: 'event')]
 final class CancelPreviousPasswordRequestsEventHandler implements EventHandlerInterface
 {
 	private QueryBusInterface $queryBus;

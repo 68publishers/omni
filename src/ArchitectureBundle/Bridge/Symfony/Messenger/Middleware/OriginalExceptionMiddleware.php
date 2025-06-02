@@ -23,7 +23,7 @@ final class OriginalExceptionMiddleware implements MiddlewareInterface
 		try {
 			$envelope = $stack->next()->handle($envelope, $stack);
 		} catch (HandlerFailedException $exception) {
-			throw $exception->getNestedExceptions()[0] ?? $exception;
+			throw $exception->getWrappedExceptions()[0] ?? $exception;
 		}
 
 		return $envelope;

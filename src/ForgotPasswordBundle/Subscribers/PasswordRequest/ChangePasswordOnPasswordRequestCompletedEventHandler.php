@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Subscribers\PasswordRequest;
 
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\UserBundle\ReadModel\View\UserView;
 use SixtyEightPublishers\ArchitectureBundle\Bus\QueryBusInterface;
 use SixtyEightPublishers\ArchitectureBundle\Bus\CommandBusInterface;
@@ -13,6 +14,7 @@ use SixtyEightPublishers\UserBundle\ReadModel\Query\GetUserByEmailAddressQuery;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Event\PasswordChangeCompleted;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Exception\EmailAddressNotFoundException;
 
+#[AsMessageHandler(bus: 'event')]
 final class ChangePasswordOnPasswordRequestCompletedEventHandler implements EventHandlerInterface
 {
 	private QueryBusInterface $queryBus;

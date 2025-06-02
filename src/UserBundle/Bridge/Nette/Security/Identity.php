@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\UserBundle\Bridge\Nette\Security;
 
 use Nette\Security\IIdentity as NetteIdentityInterface;
-use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\Role as RoleValueObject;
 use SixtyEightPublishers\UserBundle\Application\Authentication\Identity as AuthIdentity;
 

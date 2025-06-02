@@ -23,7 +23,7 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 {
 	use CompilerExtensionUtilsTrait;
 
-	public const PROJECTION_BUS_NAME = 'projection_bus';
+	public const PROJECTION_BUS_NAME = 'projection';
 
 	public function getConfigSchema(): Schema
 	{
@@ -57,7 +57,7 @@ final class ProjectionBundleExtension extends CompilerExtension implements Messa
 				->setType($classname)
 				->setFactory($projection)
 				->setAutowired(FALSE)
-				->addTag('messenger.messageHandler', [
+				->addTag('contributte.messenger.handler', [
 					'bus' => self::PROJECTION_BUS_NAME,
 				]);
 

@@ -86,7 +86,7 @@ final class EventStoreReceiver implements ReceiverInterface, MessageCountAwareIn
 			assert($event instanceof AbstractDomainEvent);
 
 			$envelope = new Envelope($event, [
-				new BusNameStamp('projection_bus'),
+				new BusNameStamp('projection'),
 				new TransportMessageIdStamp([
 					'projection' => $this->projectionClassname,
 					'aggregate_classname' => $event->metadata()[self::METADATA_AGGREGATE_CLASSNAME],

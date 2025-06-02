@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\ForgotPasswordBundle\Domain\CommandHandler;
 
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\ArchitectureBundle\Command\CommandHandlerInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\ValueObject\PasswordRequestId;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Command\CompletePasswordRequestCommand;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Repository\PasswordRequestRepositoryInterface;
 
+#[AsMessageHandler(bus: 'command')]
 final class CompletePasswordRequestCommandHandler implements CommandHandlerInterface
 {
 	private PasswordRequestRepositoryInterface $passwordRequestRepository;

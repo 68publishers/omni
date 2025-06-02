@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\UserBundle\Domain\CommandHandler;
 
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\UserBundle\Domain\ValueObject\UserId;
 use SixtyEightPublishers\UserBundle\Domain\Command\UpdateUserCommand;
 use SixtyEightPublishers\UserBundle\Domain\PasswordHashAlgorithmInterface;
@@ -12,6 +13,7 @@ use SixtyEightPublishers\UserBundle\Domain\CheckUsernameUniquenessInterface;
 use SixtyEightPublishers\UserBundle\Domain\Repository\UserRepositoryInterface;
 use SixtyEightPublishers\UserBundle\Domain\CheckEmailAddressUniquenessInterface;
 
+#[AsMessageHandler(bus: 'command')]
 final class UpdateUserCommandHandler implements CommandHandlerInterface
 {
 	private UserRepositoryInterface $userRepository;

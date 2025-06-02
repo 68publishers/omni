@@ -7,12 +7,14 @@ namespace SixtyEightPublishers\UserBundle\Infrastructure\Doctrine\ReadModel;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use SixtyEightPublishers\UserBundle\Domain\Aggregate\User;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\UserBundle\ReadModel\View\UserView;
 use SixtyEightPublishers\UserBundle\ReadModel\Query\GetIdentityQuery;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterface;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\DoctrineViewData;
 
+#[AsMessageHandler(bus: 'query')]
 final class GetIdentityQueryHandler implements QueryHandlerInterface
 {
 	private EntityManagerInterface $em;

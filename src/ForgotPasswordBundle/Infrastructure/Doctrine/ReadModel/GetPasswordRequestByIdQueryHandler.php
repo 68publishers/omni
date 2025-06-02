@@ -6,6 +6,7 @@ namespace SixtyEightPublishers\ForgotPasswordBundle\Infrastructure\Doctrine\Read
 
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use SixtyEightPublishers\ForgotPasswordBundle\Domain\Aggregate\PasswordRequest;
 use SixtyEightPublishers\ArchitectureBundle\ReadModel\View\ViewFactoryInterface;
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\View\PasswordRequestView;
@@ -13,6 +14,7 @@ use SixtyEightPublishers\ArchitectureBundle\ReadModel\Query\QueryHandlerInterfac
 use SixtyEightPublishers\ForgotPasswordBundle\ReadModel\Query\GetPasswordRequestByIdQuery;
 use SixtyEightPublishers\ArchitectureBundle\Infrastructure\Doctrine\ReadModel\DoctrineViewData;
 
+#[AsMessageHandler(bus: 'query')]
 final class GetPasswordRequestByIdQueryHandler implements QueryHandlerInterface
 {
 	private EntityManagerInterface $em;
